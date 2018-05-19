@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
+  console.log(env.REACT_APP_TRAKT_CLIENT_ID);
   render() {
     return (
       <div className="App">
