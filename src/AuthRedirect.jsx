@@ -15,7 +15,7 @@ class AuthRedirect extends Component {
         code: getParams.code,
         client_id: env.REACT_APP_CLIENT_ID,
         client_secret: env.REACT_APP_CLIENT_SECRET,
-        redirect_uri: 'http://localhost:3000/redirect',
+        redirect_uri: env.REACT_APP_REDIRECT_URI,
         grant_type: 'authorization_code'
       }
     });

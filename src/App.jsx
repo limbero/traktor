@@ -16,7 +16,7 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <h1 className="App-title">Welcome to Traktor</h1>
-          <a href={ `https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${env.REACT_APP_TRAKT_CLIENT_ID}&redirect_uri=http://localhost:3000/redirect` }>Login</a>
+          <a href={ `https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${env.REACT_APP_TRAKT_CLIENT_ID}&redirect_uri=${env.REACT_APP_REDIRECT_URI}` }>Login</a>
         </header>
       </div>
     );
