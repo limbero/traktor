@@ -4,6 +4,7 @@ import './App.css';
 
 class App extends Component {
   render() {
+    const env = runtimeEnv();
     console.log(env.REACT_APP_TRAKT_CLIENT_ID);
     return (
       <div className="App">
