@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import runtimeEnv from '@mars/heroku-js-runtime-env';
 import logo from './logo.svg';
 import './App.css';
 
