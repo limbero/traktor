@@ -3,8 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
-  console.log(env.REACT_APP_TRAKT_CLIENT_ID);
   render() {
+    console.log(env.REACT_APP_TRAKT_CLIENT_ID);
     return (
       <div className="App">
         <header className="App-header">
