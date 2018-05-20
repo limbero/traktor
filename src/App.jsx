@@ -1,26 +1,55 @@
 import React, { Component } from 'react';
 import runtimeEnv from '@mars/heroku-js-runtime-env';
 
+import { connect } from "react-redux";
 import store from "./store/index";
-import { addShow } from "./actions/index";
+import { setToken } from "./actions/index";
+import Shows from './Shows.jsx';
 
 import './App.css';
 
 const env = runtimeEnv();
 
-store.dispatch(addShow({ name: 'The Flash', id: 1 }));
+const mapStateToAppProps = (state) => {
+  return { token: state.token };
+};
 
-class App extends Component {
+class Applet extends Component {
+  componentDidMount() {
+    if (localStorage.getItem('token') === null) {
+      return;
+    }
+    const state = store.getState();
+    if (state.token === null) {
+      store.dispatch(setToken(JSON.parse(localStorage.getItem('token'))));
+    }
+  }
+
   render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">Welcome to Traktor</h1>
-          <a href={ `https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${env.REACT_APP_TRAKT_CLIENT_ID}&redirect_uri=${env.REACT_APP_REDIRECT_URI}` }>Login</a>
-        </header>
-      </div>
-    );
+    if (!this.props.token) {
+      return (
+        <div className="app">
+          <header className="app-header">
+            <h1 className="app-title">Traktor</h1>
+            <p>
+              <a href={`https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${env.REACT_APP_TRAKT_CLIENT_ID}&redirect_uri=${env.REACT_APP_REDIRECT_URI}`}>Login</a>
+            </p>
+          </header>
+        </div>
+      );
+    } else {
+      return (
+        <div className="app">
+          <header className="app-header">
+            <h1 className="app-title">Traktor</h1>
+            <p>You are logged in.</p>
+          </header>
+          <Shows />
+        </div>
+      );
+    }
   }
 }
+const App = connect(mapStateToAppProps)(Applet);
 
 export default App;
