@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import runtimeEnv from '@mars/heroku-js-runtime-env';
+import CountUp from 'react-countup';
 import Helpers from './Helpers';
 
 import store from "./store/index";
@@ -12,7 +13,8 @@ class Show extends Component {
       redux: store.getState(),
       success: 0,
       loading: false,
-      show: null
+      show: null,
+      prevPct: 0
     };
   }
   async markNextWatched(e) {
@@ -61,12 +63,17 @@ class Show extends Component {
           success: 2
         };
       });
+      let completedFraction = 100*(this.props.show.completed / this.props.show.aired);
+      if (this.state.show) {
+        completedFraction = 100*(this.state.show.completed / this.state.show.aired);
+      }
       const newNext = await Promise.all([newData, Helpers.sleep(350)]);
       this.setState((prevState) => {
         return {
           ...prevState,
           success: 0,
-          show: newNext[0]
+          show: newNext[0],
+          prevPct: completedFraction
         };
       });
     } else {
@@ -87,17 +94,35 @@ class Show extends Component {
       show.aired = this.state.show.aired;
     }
     const next = show.next_episode;
-    const completedFraction = (100*(show.completed / show.aired)).toFixed(1) + '%';
+    const completedFraction = 100*(show.completed / show.aired);
+
+    let next_episode = (<p className={ `success-${this.state.success}` }>
+        { `[${show.aired-show.completed} left] Next up: S${next.season}E${next.number} ${next.title}` }
+      </p>);
+    let done = false;
+    if (show.completed === show.aired) {
+      done = true;
+      next_episode = (<p>All done!</p>);
+    }
     return (
       <div className="show" style={{ backgroundImage: `url(${show.imgUrl})`}}>
-        <div className="progress-bar" style={{ width: completedFraction }} />
-        <p className="percentage">{ completedFraction }</p>
+        <div className="progress-bar" style={{ width: completedFraction + '%' }} />
+        <p className="percentage">
+          <CountUp
+              start={this.state.prevPct}
+              end={completedFraction}
+              duration={1.5}
+              useEasing={true}
+              separator=" "
+              decimals={1}
+              decimal="."
+              suffix="%"
+            />
+        </p>
         <p className="title">{ show.title }</p>
         <div className="next-episode">
-          <p className={ `success-${this.state.success}` }>
-            { `[${show.aired-show.completed} left] Next up: S${next.season}E${next.number} ${next.title}` }
-          </p>
-          <a className={ 'small-btn btn' + (this.state.success > 0 ? ' success' : '') + (this.state.loading ? ' loading' : '')} onClick={(e) => this.markNextWatched(e)}>&gt;</a>
+          {next_episode}
+          <a className={ 'small-btn btn' + (this.state.success || done > 0 ? ' success' : '') + (this.state.loading ? ' loading' : '')} onClick={(e) => this.markNextWatched(e)}>&gt;</a>
         </div>
       </div>
     );
