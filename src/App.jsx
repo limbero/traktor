@@ -26,28 +26,24 @@ class Applet extends Component {
   }
 
   render() {
+    let content;
     if (!this.props.token) {
-      return (
-        <div className="app">
-          <header className="app-header">
-            <h1 className="app-title">Traktor</h1>
-            <p>
-              <a href={`https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${env.REACT_APP_TRAKT_CLIENT_ID}&redirect_uri=${env.REACT_APP_REDIRECT_URI}`}>Login</a>
-            </p>
-          </header>
-        </div>
-      );
+      content = (<p>
+        <a className="btn" href={`https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${env.REACT_APP_TRAKT_CLIENT_ID}&redirect_uri=${env.REACT_APP_REDIRECT_URI}`}>Login</a>
+      </p>);
     } else {
-      return (
-        <div className="app">
-          <header className="app-header">
-            <h1 className="app-title">Traktor</h1>
-            <p>You are logged in.</p>
-          </header>
-          <Shows />
-        </div>
-      );
+      content = <Shows />;
     }
+    return (
+      <div className="app">
+        <header className="app-header">
+          <h1 className="app-title"><span role="img" aria-label="tractor icon">🚜</span>Traktor</h1>
+        </header>
+        <div id="content">
+          {content}
+        </div>
+      </div>
+    );
   }
 }
 const App = connect(mapStateToAppProps)(Applet);

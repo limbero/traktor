@@ -10,6 +10,10 @@ class Helpers {
     return fetch(url, options).then(response => response.json())
     .catch(error => console.error(error));
   }
+
+  static async sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 }
 
 export default Helpers;

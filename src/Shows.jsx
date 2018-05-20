@@ -29,13 +29,7 @@ class Shows extends Component {
       const showPromises = [];
       for (let i = 0; i < watchedShows.length; i++) {
         const watched = watchedShows[i];
-        const showPromise = Helpers.fetchJson(`https://api.trakt.tv/shows/${watched.show.ids.trakt}/progress/watched`, 'GET', null, {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'trakt-api-version': '2',
-          'trakt-api-key': env.REACT_APP_TRAKT_CLIENT_ID,
-          'Authorization': `Bearer ${this.state.redux.token.access_token}`
-        });
+        const showPromise = Helpers.fetchJson(`https://api.trakt.tv/shows/${watched.show.ids.trakt}/progress/watched`, 'GET', null, traktAuthHeaders);
         showPromises.push(showPromise);
       }
       Promise.all(showPromises).then((allShows) => {
@@ -61,7 +55,6 @@ class Shows extends Component {
           const zipped = unwatchedShows.map((show, index) => {
             return { ...show, imgUrl: urls[index] };
           });
-          console.log(zipped);
           this.setState((prevState) => {
             return { ...prevState, shows: zipped };
           });
@@ -84,13 +77,10 @@ class Shows extends Component {
         url = imagesJson.backdrops[0].file_path;
         localStorage.setItem(id, url);
 
-        await this.sleep(delay);
+        await Helpers.sleep(delay);
       }
     }
     return this.getImages(movieDbIds, [...imageUrls, url]);
-  }
-  sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   render() {
