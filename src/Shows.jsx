@@ -38,23 +38,28 @@ class Shows extends Component {
         });
         showPromises.push(showPromise);
       }
-      Promise.all(showPromises).then((shows) => {
-        this.getImages(watchedShows.map((watched) => watched.show.ids.tmdb), []).then((imagePaths) => {
+      Promise.all(showPromises).then((allShows) => {
+        const unwatchedShows = allShows.map((show, index) => {
+          const watched = watchedShows[index];
+          return {
+            title: watched.show.title,
+            ids: watched.show.ids,
+            aired: show.aired,
+            completed: show.completed,
+            last_episode: show.last_episode,
+            last_watched_at: show.last_watched_at,
+            next_episode: show.next_episode,
+            seasons: show.seasons
+          };
+        }).filter((show) => show.aired !== show.completed);
+        let delay = 250;
+        if (unwatchedShows.length <= 40) {
+          delay = 0;
+        }
+        this.getImages(unwatchedShows.map((unwatched) => unwatched.ids.tmdb), [], delay).then((imagePaths) => {
           const urls = imagePaths.map((url) => `https://image.tmdb.org/t/p/w500${url}`);
-          const zipped = shows.map((show, index) => {
-            const watched = watchedShows[index];
-            const imgUrl = urls[index];
-            return {
-              title: watched.show.title,
-              ids: watched.show.ids,
-              aired: show.aired,
-              completed: show.completed,
-              last_episode: show.last_episode,
-              last_watched_at: show.last_watched_at,
-              next_episode: show.next_episode,
-              seasons: show.seasons,
-              imgUrl: imgUrl
-            };
+          const zipped = unwatchedShows.map((show, index) => {
+            return { ...show, imgUrl: urls[index] };
           });
           console.log(zipped);
           this.setState((prevState) => {
@@ -65,7 +70,7 @@ class Shows extends Component {
     });
   }
 
-  async getImages(movieDbIds, imageUrls) {
+  async getImages(movieDbIds, imageUrls, delay) {
     if (movieDbIds.length === 0) {
       return imageUrls;
     }
@@ -78,8 +83,8 @@ class Shows extends Component {
         const imagesJson = await Helpers.fetchJson(`https://api.themoviedb.org/3/tv/${id}/images?api_key=${env.REACT_APP_THEMOVIEDB_APIKEY}`, 'GET');
         url = imagesJson.backdrops[0].file_path;
         localStorage.setItem(id, url);
-  
-        await this.sleep(250);
+
+        await this.sleep(delay);
       }
     }
     return this.getImages(movieDbIds, [...imageUrls, url]);
@@ -91,7 +96,7 @@ class Shows extends Component {
   render() {
     let shows = [];
     if (this.state.shows !== null) {
-      shows = this.state.shows.filter((show) => show.completed !== show.aired).map((show, index) => <Show key={index} show={show} />);
+      shows = this.state.shows.map((show, index) => <Show key={index} show={show} />);
       return (
         <div className="shows">
           {shows}
