@@ -96,13 +96,13 @@ class Show extends Component {
     const next = show.next_episode;
     const completedFraction = 100*(show.completed / show.aired);
 
-    let next_episode = (<p className={ `success-${this.state.success}` }>
+    let next_episode = (<p>All done!</p>);
+    let done = true;
+    if (show.completed !== show.aired) {
+      done = false;
+      next_episode = (<p className={ `success-${this.state.success}` }>
         { `[${show.aired-show.completed} left] Next up: S${next.season}E${next.number} ${next.title}` }
       </p>);
-    let done = false;
-    if (show.completed === show.aired) {
-      done = true;
-      next_episode = (<p>All done!</p>);
     }
     return (
       <div className="show" style={{ backgroundImage: `url(${show.imgUrl})`}}>
