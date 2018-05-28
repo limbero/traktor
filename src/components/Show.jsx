@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import runtimeEnv from '@mars/heroku-js-runtime-env';
 import CountUp from 'react-countup';
-import Helpers from './Helpers';
+import Helpers from '../Helpers';
 
-import store from "./store/index";
+import store from "../store/index";
 const env = runtimeEnv();
 
 class Show extends Component {

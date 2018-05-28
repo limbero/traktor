@@ -156,6 +156,11 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
 .show:hover div.next-episode {
   bottom: 0;
 }
+
+.progress-circle .percentage {
+  position: relative;
+  top: -85px;
+}
 @media only screen and (max-width: 800px) {
   .shows {
     grid-template-columns: repeat(1, 1fr);
