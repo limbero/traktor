@@ -122,7 +122,7 @@ class Show extends Component {
         <p className="title">{ show.title }</p>
         <div className="next-episode">
           {next_episode}
-          <a className={ 'small-btn btn' + (this.state.success || done > 0 ? ' success' : '') + (this.state.loading ? ' loading' : '')} onClick={(e) => this.markNextWatched(e)}>&gt;</a>
+          <a className={ 'small-btn btn' + (this.state.success > 0 || done ? ' success' : '') + (this.state.loading ? ' loading' : '')} onClick={(done ? null : (e) => this.markNextWatched(e))}>&gt;</a>
         </div>
       </div>
     );
