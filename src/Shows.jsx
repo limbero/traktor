@@ -25,7 +25,12 @@ class Shows extends Component {
       'Authorization': `Bearer ${this.state.redux.token.access_token}`
     };
 
-    const firstCap = 25;
+    let factor = 1;
+    if (localStorage.getItem('imagesCached') !== null) {
+      factor = 2;
+    }
+
+    const firstCap = 25 * factor;
     const firstTotal = 2;
     let firstN = 0;
 
@@ -59,8 +64,8 @@ class Shows extends Component {
       hiddenShows = hiddenShows.map((hidden) => hidden.show.ids.tmdb)
       watchedShows = watchedShows.filter((watched) => !hiddenShows.includes(watched.show.ids.tmdb));
 
-      const secondBase = 25;
-      const secondCap = 50;
+      const secondBase = 25 * factor;
+      const secondCap = 50 * factor;
       const secondTotal = watchedShows.length;
       let secondN = 0;
 
@@ -119,6 +124,7 @@ class Shows extends Component {
 
   async getImages(movieDbIds, imageUrls, delay, n, cap, total, base) {
     if (movieDbIds.length === 0) {
+      localStorage.setItem('imagesCached', JSON.stringify(true));
       return imageUrls;
     }
     const id = movieDbIds.shift();
@@ -133,13 +139,15 @@ class Shows extends Component {
         localStorage.setItem(id, url);
       }
       const pct = (++n / total) * (cap - base) + base;
-      this.setState((prevState) => {
-        return {
-          ...prevState,
-          progressPercent: pct,
-          prevPct: prevState.progressPercent
-        };
-      });
+      if (localStorage.getItem('imagesCached') === null) {
+        this.setState((prevState) => {
+          return {
+            ...prevState,
+            progressPercent: pct,
+            prevPct: prevState.progressPercent
+          };
+        });
+      }
       if (exists === null) {
         await Helpers.sleep(delay);
       }
