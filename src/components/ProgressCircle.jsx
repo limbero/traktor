@@ -4,6 +4,8 @@ import CountUp from 'react-countup';
 const zero = -1/2 * Math.PI;
 const wholeLap = 2 * Math.PI;
 
+let canvas, ctx;
+
 class ProgressCircle extends Component {
   constructor(props) {
     super(props);
@@ -11,26 +13,36 @@ class ProgressCircle extends Component {
   }
   
   componentDidMount() {
-    const canvas = this.canvas.current;
-    const ctx = canvas.getContext("2d");
+    canvas = this.canvas.current;
+    ctx = canvas.getContext("2d");
 
-    ctx.beginPath();
-    ctx.arc(50, 50, 30, zero, zero + wholeLap * this.props.percent);
-    ctx.stroke();
+    const pct = this.props.percent / 100;
+
+    const step = pct / 15;
+
+    requestAnimationFrame(() => this.animate(0, step, pct));
   }
 
   componentDidUpdate() {
+    const prevPct = this.props.prevPct / 100;
     const pct = this.props.percent / 100;
-    const canvas = this.canvas.current;
-    const ctx = canvas.getContext("2d");
 
+    const step = (pct - prevPct) / 15;
 
+    requestAnimationFrame(() => this.animate(prevPct, step, pct));
+  }
+
+  animate(cur, step, cap) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     ctx.beginPath();
     ctx.lineWidth = 5;
-    ctx.arc(50, 50, 30, zero, zero + wholeLap * pct);
+    ctx.arc(50, 50, 30, zero, zero + wholeLap * (cur+step));
     ctx.stroke();
+
+    if (cur + step < cap) {
+      requestAnimationFrame(() => this.animate(cur+step, step, cap));
+    }
   }
 
   render() {
