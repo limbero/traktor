@@ -166,7 +166,7 @@ class Shows extends Component {
       );
     } else {
       return (
-        <div>
+        <div className="center">
           <ProgressCircle percent={this.state.progressPercent} prevPct={this.state.prevPct} />
         </div>
       );

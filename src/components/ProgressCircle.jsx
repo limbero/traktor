@@ -4,7 +4,7 @@ import CountUp from 'react-countup';
 const zero = -1/2 * Math.PI;
 const wholeLap = 2 * Math.PI;
 
-let canvas, ctx;
+let canvas, ctx, scaleFactor;
 
 class ProgressCircle extends Component {
   constructor(props) {
@@ -14,7 +14,18 @@ class ProgressCircle extends Component {
   
   componentDidMount() {
     canvas = this.canvas.current;
-    ctx = canvas.getContext("2d");
+    scaleFactor = this.backingScale(ctx);
+
+    if (scaleFactor > 1) {
+      console.log(scaleFactor);
+      canvas.width = canvas.width * scaleFactor;
+      canvas.height = canvas.height * scaleFactor;
+      canvas.style.width = `${canvas.width / scaleFactor}px`;
+      canvas.style.height = `${canvas.height / scaleFactor}px`;
+      // update the context for the new canvas scale
+      ctx = canvas.getContext("2d");
+      ctx.scale(scaleFactor, scaleFactor);
+  }
 
     const pct = this.props.percent / 100;
 
@@ -31,6 +42,15 @@ class ProgressCircle extends Component {
 
     requestAnimationFrame(() => this.animate(prevPct, step, pct));
   }
+
+  backingScale(context) {
+    if ('devicePixelRatio' in window) {
+        if (window.devicePixelRatio > 1) {
+            return window.devicePixelRatio;
+        }
+    }
+    return 1;
+}
 
   animate(cur, step, cap) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
