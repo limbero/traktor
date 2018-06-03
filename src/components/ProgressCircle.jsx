@@ -17,7 +17,6 @@ class ProgressCircle extends Component {
     scaleFactor = this.backingScale(ctx);
 
     if (scaleFactor > 1) {
-      console.log(scaleFactor);
       canvas.width = canvas.width * scaleFactor;
       canvas.height = canvas.height * scaleFactor;
       canvas.style.width = `${canvas.width / scaleFactor}px`;

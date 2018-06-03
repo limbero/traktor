@@ -183,9 +183,10 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
     margin: 0;
   }
   .show {
-    margin: 2px 0;
-    width: 100vw;
-    height: 55vw;
+    margin: 4vw;
+
+    max-width: 90vw;
+    max-height: 50vw;
 
     box-shadow: inset 0 70px 30px -25px rgba(0,0,0, 0.5);
   }
