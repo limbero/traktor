@@ -73,7 +73,7 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
 }
 .show .progress-bar {
   position: absolute;
-  background-color: rgb(225, 0, 0);
+  background-color: #e10000;
   top: -0;
   left: 0;
   height: 5px;
