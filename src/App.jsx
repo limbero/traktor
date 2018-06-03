@@ -29,7 +29,7 @@ class Applet extends Component {
     let content;
     if (!this.props.token) {
       content = (<p>
-        <a className="btn" href={`https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${env.REACT_APP_TRAKT_CLIENT_ID}&redirect_uri=${env.REACT_APP_REDIRECT_URI}`}>Login</a>
+        <a className="btn" href={`https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${env.REACT_APP_TRAKT_CLIENT_ID}&redirect_uri=${window.location.origin}/redirect`}>Login</a>
       </p>);
     } else {
       content = <Shows />;
