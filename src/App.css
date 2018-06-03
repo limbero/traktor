@@ -80,7 +80,7 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
 
   transition: top .35s, width .35s;
 }
-.show:hover .progress-bar {
+.show:hover .progress-bar, .no-hover .show .progress-bar {
   top: 0;
 }
 .show p, .show div.next-episode {
@@ -93,7 +93,7 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
   left: -50px;
   transition: left .35s;
 }
-.show:hover p.percentage {
+.show:hover p.percentage, .no-hover .show p.percentage {
   left: 5px;
 }
 .show p.title {
@@ -104,6 +104,10 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
 
   width: 75%;
   text-align: right;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
 }
 .show div.next-episode {
   bottom: -50px;
@@ -155,10 +159,10 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
   background-color: #3C5;
   transform: rotate(90deg);
 }
-.show:hover div.next-episode .btn {
+.show:hover div.next-episode .btn, .no-hover .show div.next-episode .btn {
   bottom: 28px;
 }
-.show:hover div.next-episode {
+.show:hover div.next-episode, .no-hover .show div.next-episode {
   bottom: 0;
 }
 
@@ -188,17 +192,20 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
   .show p.title {
     top: 1px;
     right: 8px;
-    font-size: 2.5em;
+    font-size: 1.75em;
   }
   .show p.percentage {
-    top: 8px;
-    left: 5px;
-    font-size: 1.5em;
+    top: 5px;
+    left: 7px;
+    font-size: 1.25em;
   }
   .show div.next-episode {
     bottom: 0;
-    font-size: 1.5em;
+    font-size: 1.25em;
     height: 60px;
+  }
+  .show div.next-episode p {
+    margin-bottom: 5px;
   }
   .show div.next-episode .btn {
     padding: 8px 20px 11px 22px;

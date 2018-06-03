@@ -8,6 +8,7 @@ import Shows from './Shows.jsx';
 
 import './App.css';
 
+const hasHover = require('has-hover');
 const env = runtimeEnv();
 
 const mapStateToAppProps = (state) => {
@@ -35,7 +36,7 @@ class Applet extends Component {
       content = <Shows />;
     }
     return (
-      <div className="app">
+      <div className={ "app" + (hasHover ? "" : " no-hover") }>
         <header className="app-header">
           <h1 className="app-title"><span role="img" aria-label="tractor icon">🚜</span>Traktor</h1>
         </header>
