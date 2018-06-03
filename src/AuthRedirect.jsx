@@ -18,7 +18,7 @@ class AuthRedirect extends Component {
       code: getParams.code,
       client_id: env.REACT_APP_TRAKT_CLIENT_ID,
       client_secret: env.REACT_APP_TRAKT_CLIENT_SECRET,
-      redirect_uri: env.REACT_APP_REDIRECT_URI,
+      redirect_uri: `${window.location.origin}/redirect`,
       grant_type: 'authorization_code'
     }, {
         'Accept': 'application/json',
