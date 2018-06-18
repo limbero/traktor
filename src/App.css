@@ -177,9 +177,12 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
 .progress-circle .percentage {
   margin: 0;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-62.5%);
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  line-height: 100px;
 }
 @media only screen and (max-width: 800px) {
   .shows {
@@ -222,25 +225,9 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
     bottom: 40px;
   }
 }
-@media only screen and (min-width: 801px) and (max-width: 1240px) {
+@media only screen and (min-width: 801px) {
   .shows {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .show {
-    margin: 4vw 10px;
-  }
-}
-@media only screen and (min-width: 1241px) and (max-width: 1520px) {
-  .shows {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .show {
-    margin: 3vw 20px;
-  }
-}
-@media only screen and (min-width: 1521px) and (max-width: 1800px) {
-  .shows {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
   }
   .show {
     margin: 2vw 20px;
