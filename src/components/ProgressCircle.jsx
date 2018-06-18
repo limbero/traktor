@@ -14,17 +14,15 @@ class ProgressCircle extends Component {
   
   componentDidMount() {
     canvas = this.canvas.current;
-    scaleFactor = this.backingScale(ctx);
+    scaleFactor = Math.max(this.backingScale(ctx), 2);
 
-    if (scaleFactor > 1) {
-      canvas.width = canvas.width * scaleFactor;
-      canvas.height = canvas.height * scaleFactor;
-      canvas.style.width = `${canvas.width / scaleFactor}px`;
-      canvas.style.height = `${canvas.height / scaleFactor}px`;
-      // update the context for the new canvas scale
-      ctx = canvas.getContext("2d");
-      ctx.scale(scaleFactor, scaleFactor);
-  }
+    canvas.width = canvas.width * scaleFactor;
+    canvas.height = canvas.height * scaleFactor;
+    canvas.style.width = `${canvas.width / scaleFactor}px`;
+    canvas.style.height = `${canvas.height / scaleFactor}px`;
+    // update the context for the new canvas scale
+    ctx = canvas.getContext("2d");
+    ctx.scale(scaleFactor, scaleFactor);
 
     const pct = this.props.percent / 100;
 
@@ -44,9 +42,7 @@ class ProgressCircle extends Component {
 
   backingScale(context) {
     if ('devicePixelRatio' in window) {
-        if (window.devicePixelRatio > 1) {
-            return window.devicePixelRatio;
-        }
+      return window.devicePixelRatio;
     }
     return 1;
 }

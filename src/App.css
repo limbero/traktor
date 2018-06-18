@@ -148,6 +148,10 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
   right: 20px;
   bottom: 10px;
 
+  box-sizing: border-box;
+  width: 39px;
+  height: 39px;
+
   /* border-bottom: 1.5px solid #FFF; */
 
   transition: bottom .35s, border .35s, transform .35s;
@@ -209,7 +213,9 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
     margin-bottom: 5px;
   }
   .show div.next-episode .btn {
-    padding: 8px 20px 11px 22px;
+    padding: 8px 0 0 20px;
+    width: 45px;
+    height: 45px;
     bottom: 35px;
   }
   .show:hover div.next-episode .btn {
