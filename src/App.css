@@ -213,13 +213,13 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
     margin-bottom: 5px;
   }
   .show div.next-episode .btn {
-    padding: 8px 0 0 20px;
+    padding: 6px 0 0 20px;
     width: 45px;
     height: 45px;
-    bottom: 35px;
+    bottom: 40px;
   }
-  .show:hover div.next-episode .btn {
-    bottom: 35px;
+  .show:hover div.next-episode .btn, .no-hover .show div.next-episode .btn {
+    bottom: 40px;
   }
 }
 @media only screen and (min-width: 801px) and (max-width: 1240px) {
