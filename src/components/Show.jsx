@@ -102,7 +102,7 @@ class Show extends Component {
     }
     const done = false;
     return (
-      <div className="show" style={{ backgroundImage: `url(${propShow.imgUrl})` }}>
+      <div className="show" style={{ backgroundImage: `url(${propShow.imgUrl ? propShow.imgUrl : '/testbild.jpg'})` }}>
         <div>
           <div className="progress-bar" style={{ width: `${completedFraction}%` }} />
           <p className="percentage">

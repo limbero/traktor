@@ -152,7 +152,7 @@ class AddShow extends Component {
             <div className="results shows">
               {
                 results.map(result => (
-                  <div key={result.ids.trakt} className="show" style={{ backgroundImage: `url(${result.imgUrl})` }}>
+                  <div key={result.ids.trakt} className="show" style={{ backgroundImage: `url(${result.imgUrl ? result.imgUrl : '/testbild.jpg'})` }}>
                     <div>
                       <p className="title">
                         { result.title }

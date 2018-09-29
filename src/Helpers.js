@@ -3,6 +3,7 @@ class Helpers {
     const options = {
       method,
       headers,
+      cache: 'no-store',
     };
     if (body !== null) {
       options.body = JSON.stringify(body);
