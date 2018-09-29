@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import runtimeEnv from '@mars/heroku-js-runtime-env';
 import { connect } from 'react-redux';
-import store from './store/index';
-import { setToken } from './actions/index';
+import store from './redux/store';
+import { setToken } from './redux/actions';
 import Shows from './Shows';
 import Helpers from './Helpers';
 import './App.css';

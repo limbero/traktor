@@ -1,19 +1,12 @@
 import {
-  ADD_SHOW,
   SET_TOKEN,
-} from '../actions/action-types';
+} from './actions';
 
 const initialState = {
-  shows: [],
   token: null,
 };
 const rootReducer = (state = initialState, action) => {
   switch (action.type) {
-    case ADD_SHOW:
-      return {
-        ...state,
-        shows: [...state.shows, action.payload],
-      };
     case SET_TOKEN:
       return {
         ...state,

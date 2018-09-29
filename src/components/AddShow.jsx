@@ -3,7 +3,7 @@ import ReactModal from 'react-modal';
 import runtimeEnv from '@mars/heroku-js-runtime-env';
 import Helpers from '../Helpers';
 
-import store from '../store/index';
+import store from '../redux/store';
 
 const env = runtimeEnv();
 ReactModal.setAppElement('#root');

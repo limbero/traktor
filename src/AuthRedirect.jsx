@@ -4,8 +4,8 @@ import runtimeEnv from '@mars/heroku-js-runtime-env';
 import qs from 'qs';
 import Helpers from './Helpers';
 
-import store from './store/index';
-import { setToken } from './actions/index';
+import store from './redux/store';
+import { setToken } from './redux/actions';
 
 const env = runtimeEnv();
 

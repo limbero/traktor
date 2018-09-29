@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import App from './App';
 import AuthRedirect from './AuthRedirect';
 
-import store from './store/index';
+import store from './redux/store';
 
 const Router = () => (
   <Provider store={store}>

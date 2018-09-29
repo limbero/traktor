@@ -6,7 +6,7 @@ import Show from './components/Show';
 import ProgressCircle from './components/ProgressCircle';
 import AddShow from './components/AddShow';
 
-import store from './store/index';
+import store from './redux/store';
 
 const env = runtimeEnv();
 
