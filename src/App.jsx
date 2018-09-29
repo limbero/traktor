@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import store from './store/index';
 import { setToken } from './actions/index';
 import Shows from './Shows';
+import Helpers from './Helpers';
 import './App.css';
 
 const hasHover = require('has-hover');
@@ -13,13 +14,44 @@ const env = runtimeEnv();
 const mapStateToAppProps = state => ({ token: state.token });
 
 class Applet extends Component {
+  static refreshTokenIfNecessaryThenStoreIt(token) {
+    const expirationDate = (token.created_at + token.expires_in) * 1000;
+    const aDay = 1000 * 60 * 60 * 24;
+
+    if (new Date() > new Date(expirationDate - aDay)) {
+      Helpers.fetchJson(
+        'https://api.trakt.tv/oauth/token',
+        'POST',
+        {
+          refresh_token: token.refresh_token,
+          client_id: env.REACT_APP_TRAKT_CLIENT_ID,
+          client_secret: env.REACT_APP_TRAKT_CLIENT_SECRET,
+          redirect_uri: `${window.location.origin}/redirect`,
+          grant_type: 'refresh_token',
+        },
+        {
+          'Content-Type': 'application/json',
+        },
+      ).then((refreshedToken) => {
+        store.dispatch(setToken(refreshedToken));
+        localStorage.setItem('traktor_trakt_token', JSON.stringify(refreshedToken));
+      });
+    } else {
+      store.dispatch(setToken(token));
+    }
+  }
+
   componentDidMount() {
     if (localStorage.getItem('traktor_trakt_token') === null) {
       return;
     }
     const state = store.getState();
     if (state.token === null) {
-      store.dispatch(setToken(JSON.parse(localStorage.getItem('traktor_trakt_token'))));
+      Applet.refreshTokenIfNecessaryThenStoreIt(
+        JSON.parse(localStorage.getItem('traktor_trakt_token')),
+      );
+    } else {
+      Applet.refreshTokenIfNecessaryThenStoreIt(state.token);
     }
   }
 

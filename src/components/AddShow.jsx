@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import ReactModal from 'react-modal';
 import runtimeEnv from '@mars/heroku-js-runtime-env';
 import Helpers from '../Helpers';
-import Show from './Show';
 
 import store from '../store/index';
 
@@ -29,13 +28,17 @@ class AddShow extends Component {
     };
   }
 
-  hideSearchModal() {
+  setQuery(query) {
     this.setState(prevState => ({
       ...prevState,
-      show: false,
-      results: [],
-      images: [],
+      query,
     }));
+  }
+
+  addShow(show) {
+    const { addShow } = this.props;
+    addShow(show);
+    this.hideSearchModal();
   }
 
   async search() {
@@ -44,19 +47,20 @@ class AddShow extends Component {
       results: [],
       images: [],
     }));
-    let results = await Helpers.fetchJson(`https://api.trakt.tv/search/show?query=${this.state.query}&limit=9`, 'GET', null, this.state.traktAuthHeaders);
+    const { query, traktAuthHeaders } = this.state;
+    let results = await Helpers.fetchJson(`https://api.trakt.tv/search/show?query=${query}&limit=9`, 'GET', null, traktAuthHeaders);
     results = results.slice(0, 9);
 
-    const progressPromises = results.map(result => {
-      return Helpers.fetchJson(`https://api.trakt.tv/shows/${result.show.ids.trakt}/progress/watched`, 'GET', null, this.state.traktAuthHeaders);
+    const progressPromises = results.map((result) => {
+      return Helpers.fetchJson(`https://api.trakt.tv/shows/${result.show.ids.trakt}/progress/watched`, 'GET', null, traktAuthHeaders);
     });
     const progresses = await Promise.all(progressPromises);
 
-    const imagePromises = results.map(result => {
+    const imagePromises = results.map((result) => {
       return Helpers.fetchJson(`https://api.themoviedb.org/3/tv/${result.show.ids.tmdb}/images?api_key=${env.REACT_APP_THEMOVIEDB_APIKEY}`, 'GET');
     });
     const responses = await Promise.all(imagePromises);
-    const images = responses.map(response => {
+    const images = responses.map((response) => {
       if (
         !response.hasOwnProperty('backdrops') ||
         response.backdrops.length === 0
@@ -88,15 +92,11 @@ class AddShow extends Component {
     }));
   }
 
-  addShow(show) {
-    this.props.addShow(show);
-    this.hideSearchModal();
-  }
-
-  setQuery(query) {
+  hideSearchModal() {
     this.setState(prevState => ({
       ...prevState,
-      query,
+      show: false,
+      results: [],
     }));
   }
 
@@ -111,22 +111,23 @@ class AddShow extends Component {
       ...prevState,
       show: true,
     }), () => {
-      setTimeout(() => { this.queryInput && this.queryInput.focus() }, 1);
+      setTimeout(() => this.queryInput.focus(), 1);
     });
   }
 
   render() {
-    const { results, images } = this.state;
+    const { results } = this.state;
+    const { query, show } = this.state;
     return (
       <div>
         <button className="small-btn btn circular" type="button" onClick={() => this.showSearchModal()}>
           +
         </button>
         <ReactModal
-          isOpen={this.state.show}
+          isOpen={show}
           contentLabel="Minimal Modal Example"
           onRequestClose={() => this.hideSearchModal()}
-          shouldCloseOnOverlayClick={true}
+          shouldCloseOnOverlayClick
           className="Modal"
           overlayClassName="modalOverlay"
         >
@@ -138,9 +139,9 @@ class AddShow extends Component {
           <div className="inner">
             <input
               type="text"
-              value={this.state.query}
-              onChange={(e) => this.setQuery(e.target.value)}
-              onKeyPress={(e) => this.handleKeyPress(e)}
+              value={query}
+              onChange={e => this.setQuery(e.target.value)}
+              onKeyPress={e => this.handleKeyPress(e)}
               ref={(input) => { this.queryInput = input; }}
             />
             <button className="btn" onClick={() => this.search()} type="button">
@@ -150,17 +151,17 @@ class AddShow extends Component {
             </button>
             <div className="results shows">
               {
-                results.map((show, index) => (
-                  <div key={show.ids.trakt} className="show" style={{ backgroundImage: `url(${show.imgUrl})` }}>
+                results.map(result => (
+                  <div key={result.ids.trakt} className="show" style={{ backgroundImage: `url(${result.imgUrl})` }}>
                     <div>
                       <p className="title">
-                        { show.title }
+                        { result.title }
                       </p>
                       <div className="next-episode">
                         <p className="success-0">
                           Add show
                         </p>
-                        <button className="small-btn btn circular" type="button" onClick={() => this.addShow(show)}>
+                        <button className="small-btn btn circular" type="button" onClick={() => this.addShow(result)}>
                           +
                         </button>
                       </div>
