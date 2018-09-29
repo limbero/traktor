@@ -5,6 +5,11 @@ body {
   font-weight: 400;
 }
 
+h1.app-title img {
+  position: relative;
+  vertical-align: top;
+  top: -7px;
+}
 .app-header {
   text-align: center;
 }
@@ -26,7 +31,13 @@ body {
   align-self: center;
   justify-self: center;
 }
-a.btn {
+button {
+  font-family: 'News Cycle';
+  border: none;
+  outline: none;
+  padding: 0;
+}
+.btn {
   color: #FFF;
   text-decoration: none;
   background-color: #37F;
@@ -37,18 +48,23 @@ a.btn {
   box-shadow: 2px 5px 10px 0 rgba(0,0,0, 0.5);
   transition: box-shadow .35s;
 }
-a.btn:hover {
+.btn:hover {
   box-shadow: 1px 3px 3px 0 rgba(0,0,0, 0.7);
 }
-a.btn:active {
+.btn:active {
   box-shadow: 0 0 0 0 rgba(0,0,0, 0.9);
 }
-a.btn.small-btn {
+.btn.small-btn {
   padding: 6px 15px 9px 17px;
   font-size: 0.85em;
   font-weight: 700;
 }
-a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
+.btn.circular {
+  padding: 5px 5px 8px 5px;
+  width: 41px;
+  height: 41px;
+}
+.btn.small-btn, .btn.small-btn:hover, .btn.small-btn:active {
   box-shadow: none;
   transition: none;
   border-radius: 100px;
@@ -68,6 +84,7 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
   /* margin: 2vw 20px; */
 
   box-shadow: inset 0 60px 30px -25px rgba(0,0,0, 0.5);
+  background-color: #555;
 
   overflow: hidden;
 }
@@ -184,6 +201,76 @@ a.btn.small-btn, a.btn.small-btn:hover, a.btn.small-btn:active {
   text-align: center;
   line-height: 100px;
 }
+
+.Modal {
+  position: absolute;
+  top: 80px;
+  left: 80px;
+  right: 80px;
+  bottom: 80px;
+  background-color: #FFF;
+
+  max-width: 95vw;
+
+  outline: none;
+
+  text-align: center;
+}
+
+.Modal input {
+  box-sizing: border-box;
+  height: 35px;
+  width: 130px;
+  padding: 8px;
+  margin: 0;
+  outline: none;
+}
+
+.Modal input + button, .Modal input + button:hover {
+  margin: 0;
+  box-shadow: none;
+
+  box-sizing: border-box;
+  padding: 8px;
+  height: 35px;
+}
+.Modal .inner {
+  overflow-y: scroll;
+
+  box-sizing: border-box;
+  padding: 40px;
+  height: 100%;
+}
+
+.btn.modalX, .btn.modalX:hover, .btn.modalX:active {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  background-color: #e10000;
+
+  font-size: 0.25em;
+  padding: 5px 5px 7px 5px;
+  height: 35px;
+  width: 35px;
+
+  transform: translate(-40%, -40%);
+
+  box-shadow: 1px 3px 3px 0 rgba(0,0,0, 0.7);
+}
+
+.modalOverlay {
+  z-index: 3;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  background-color: rgba(0,0,0, .7);
+}
+
 @media only screen and (max-width: 800px) {
   .shows {
     grid-template-columns: repeat(1, 1fr);

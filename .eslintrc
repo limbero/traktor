@@ -1,0 +1,15 @@
+{
+  "extends": "airbnb",
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "env": {
+    "es6": true,
+    "jest": true,
+    "browser": true
+  },
+  "rules": {
+    "quote-props": [1, "consistent-as-needed"],
+    "no-plusplus": [1, { "allowForLoopAfterthoughts": true}]
+  }
+}

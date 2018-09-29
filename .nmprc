@@ -1,1 +1,2 @@
-npm config set registry https://registry.npmjs.org/
+save-exact=true
+registry=https://registry.npmjs.org/
