@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactModal from 'react-modal';
 import Trakt from '../apis/Trakt';
-import TheMovieDb from '../apis/TheMovieDb';
+import ShowToAdd from './ShowToAdd';
 
 ReactModal.setAppElement('#root');
 
@@ -9,10 +9,9 @@ class AddShow extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      show: false,
+      isOpen: false,
       query: '',
       results: [],
-      images: [],
     };
   }
 
@@ -33,44 +32,40 @@ class AddShow extends Component {
     this.setState(prevState => ({
       ...prevState,
       results: [],
-      images: [],
     }));
     const { query } = this.state;
-    let results = await Trakt.search(query);
-    results = results.slice(0, 9);
+    const results = await Trakt.search(query, 20);
 
     const progressPromises = results.map(result => Trakt.getShowProgress(result.show.ids.trakt));
     const progresses = await Promise.all(progressPromises);
 
-    const imagePromises = results.map(result => TheMovieDb.getImage(result.show.ids.tmdb));
-    const images = await Promise.all(imagePromises);
-
-    const shows = progresses.map((show, index) => {
-      const watched = results[index];
-      return {
-        title: watched.show.title,
-        ids: watched.show.ids,
-        aired: show.aired,
-        completed: show.completed,
-        last_episode: show.last_episode,
-        last_watched_at: show.last_watched_at,
-        next_episode: show.next_episode,
-        seasons: show.seasons,
-        imgUrl: images[index],
-      };
-    });
+    const shows = progresses
+      .map((show, index) => {
+        const watched = results[index];
+        return {
+          title: watched.show.title,
+          ids: watched.show.ids,
+          aired: show.aired,
+          completed: show.completed,
+          last_episode: show.last_episode,
+          last_watched_at: show.last_watched_at,
+          next_episode: show.next_episode,
+          seasons: show.seasons,
+        };
+      })
+      .filter(show => show.aired !== show.completed)
+      .slice(0, 9);
 
     this.setState(prevState => ({
       ...prevState,
       results: shows,
-      images,
     }));
   }
 
   hideSearchModal() {
     this.setState(prevState => ({
       ...prevState,
-      show: false,
+      isOpen: false,
       results: [],
     }));
   }
@@ -85,15 +80,14 @@ class AddShow extends Component {
   showSearchModal() {
     this.setState(prevState => ({
       ...prevState,
-      show: true,
+      isOpen: true,
     }), () => {
       setTimeout(() => this.queryInput.focus(), 1);
     });
   }
 
   render() {
-    const { results } = this.state;
-    const { query, show } = this.state;
+    const { isOpen, query, results } = this.state;
     return (
       <div>
         <div className="center">
@@ -104,7 +98,7 @@ class AddShow extends Component {
           </button>
         </div>
         <ReactModal
-          isOpen={show}
+          isOpen={isOpen}
           contentLabel="Minimal Modal Example"
           onRequestClose={() => this.hideSearchModal()}
           shouldCloseOnOverlayClick
@@ -134,23 +128,11 @@ class AddShow extends Component {
             <div className="results shows">
               {
                 results.map(result => (
-                  <div key={result.ids.trakt} className="show" style={{ backgroundImage: `url(${result.imgUrl ? result.imgUrl : '/testbild.jpg'})` }}>
-                    <div>
-                      <p className="title">
-                        { result.title }
-                      </p>
-                      <div className="next-episode">
-                        <p className="success-0">
-                          Add show
-                        </p>
-                        <button className="small-btn btn circular center" type="button" onClick={() => this.addShow(result)}>
-                          <span>
-                            +
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <ShowToAdd
+                    key={result.ids.trakt}
+                    show={result}
+                    addShow={() => this.addShow(result)}
+                  />
                 ))
               }
             </div>

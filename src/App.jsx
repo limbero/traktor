@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import runtimeEnv from '@mars/heroku-js-runtime-env';
-import Shows from './Shows';
+import Shows from './components/Shows';
 import Trakt from './apis/Trakt';
 import './App.css';
 

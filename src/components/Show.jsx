@@ -2,18 +2,20 @@ import React, { Component } from 'react';
 import CountUp from 'react-countup';
 import Helpers from '../Helpers';
 import Trakt from '../apis/Trakt';
+import TheMovieDb from '../apis/TheMovieDb';
 
 class Show extends Component {
   constructor(props) {
     super(props);
-    const { show, image } = this.props;
+    const { show } = this.props;
     this.state = {
       success: 0,
       loading: false,
       show,
-      image,
+      image: null,
       prevPct: 0,
     };
+    this.fetchImage();
   }
 
   async markNextWatched() {
@@ -58,14 +60,20 @@ class Show extends Component {
     }));
   }
 
+  async fetchImage() {
+    const { show } = this.state;
+    const image = await TheMovieDb.getImage(show.ids.tmdb);
+    this.setState(prevState => ({ ...prevState, image }));
+  }
+
   render() {
     const {
+      image,
+      loading,
+      prevPct,
       show,
       success,
-      prevPct,
-      loading,
     } = this.state;
-    const { image } = this.props;
 
     const next = show.next_episode;
     const completedFraction = 100 * (show.completed / show.aired);
