@@ -100,7 +100,6 @@ class Shows extends Component {
   }
 
   increaseLoading(percent) {
-    console.log(percent);
     this.setState(
       prevState => ({
         ...prevState,

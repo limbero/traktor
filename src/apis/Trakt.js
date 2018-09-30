@@ -1,5 +1,6 @@
 import runtimeEnv from '@mars/heroku-js-runtime-env';
 import store from '../redux/store';
+import { setToken } from '../redux/actions';
 
 const env = runtimeEnv();
 
@@ -12,8 +13,8 @@ class Trakt {
     };
   }
 
-  static headers() {
-    const { token } = store.getState();
+  static async headers() {
+    const token = await Trakt.token();
     return {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
@@ -23,10 +24,36 @@ class Trakt {
     };
   }
 
+  static async token() {
+    const { token } = store.getState();
+
+    if (token === null) {
+      const localStorageToken = JSON.parse(localStorage.getItem('traktor_trakt_token'));
+      if (localStorageToken === null) {
+        throw Error('Not authenticated');
+      }
+
+      const freshToken = await Trakt.refreshTokenIfNecessary(localStorageToken);
+      if (freshToken.created_at !== localStorageToken.created_at) {
+        localStorage.setItem('traktor_trakt_token', JSON.stringify(freshToken));
+      }
+      store.dispatch(setToken(freshToken));
+      return freshToken;
+    }
+
+    const freshToken = await Trakt.refreshTokenIfNecessary(token);
+
+    if (freshToken.created_at !== token.created_at) {
+      store.dispatch(setToken(freshToken));
+      localStorage.setItem('traktor_trakt_token', JSON.stringify(freshToken));
+    }
+    return freshToken;
+  }
+
   static async get(url) {
     const init = {
       method: 'GET',
-      headers: Trakt.headers(),
+      headers: await Trakt.headers(),
       cache: 'no-store',
     };
 
@@ -75,14 +102,23 @@ class Trakt {
     });
   }
 
-  static async refreshToken() {
-    const { token } = store.getState();
-
+  static async refreshToken(token) {
     return Trakt.postToTokenEndpoint({
       ...Trakt.basicTokenPayload(),
       refresh_token: token.refresh_token,
       grant_type: 'refresh_token',
     });
+  }
+
+  static async refreshTokenIfNecessary(token) {
+    const expirationDate = (token.created_at + token.expires_in) * 1000;
+    const aDay = 1000 * 60 * 60 * 24;
+
+    if (new Date() > new Date(expirationDate - aDay)) {
+      return Trakt.refreshToken(token);
+    }
+
+    return token;
   }
 
   static async markEpisodeWatched(ids) {
@@ -98,7 +134,7 @@ class Trakt {
     return fetch('https://api.trakt.tv/sync/history', {
       method: 'POST',
       body: JSON.stringify(watched),
-      headers: Trakt.headers(),
+      headers: await Trakt.headers(),
     }).then((response) => {
       if (!response.ok) {
         throw Error(response.statusText);
