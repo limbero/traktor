@@ -231,15 +231,19 @@ button {
   text-align: center;
 }
 
-.Modal input {
+.Modal input[type=search] {
   box-sizing: border-box;
   height: 40px;
-  width: 130px;
-  padding: 8px;
+  width: 150px;
+  padding: 8px 20px;
+  -webkit-appearance: none;
+  -webkit-border-radius:0; 
+  border-radius: 0;
+  border: 1px solid #999;
+
   margin: 0;
   outline: none;
   box-shadow: none;
-  border: 1px solid #999;
   
   font-size: 16px;
 }
@@ -252,9 +256,6 @@ button {
   padding: 8px;
   height: 40px;
   width: 40px;
-
-  position: relative;
-  top: -1px;
 }
 .Modal .inner {
   overflow-y: scroll;

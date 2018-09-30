@@ -78,6 +78,7 @@ class AddShow extends Component {
   handleKeyPress(e) {
     if (e.key === 'Enter') {
       this.search();
+      e.preventDefault();
     }
   }
 
@@ -116,18 +117,20 @@ class AddShow extends Component {
             </span>
           </button>
           <div className="inner">
-            <input
-              type="text"
-              value={query}
-              onChange={e => this.setQuery(e.target.value)}
-              onKeyPress={e => this.handleKeyPress(e)}
-              ref={(input) => { this.queryInput = input; }}
-            />
-            <button className="btn" onClick={() => this.search()} type="button">
-              <span role="img" aria-label="search">
-                🔍
-              </span>
-            </button>
+            <form className="center" action="#">
+              <input
+                type="search"
+                value={query}
+                onChange={e => this.setQuery(e.target.value)}
+                onKeyPress={e => this.handleKeyPress(e)}
+                ref={(input) => { this.queryInput = input; }}
+              />
+              <button className="btn" onClick={() => this.search()} type="button">
+                <span role="img" aria-label="search">
+                  🔍
+                </span>
+              </button>
+            </form>
             <div className="results shows">
               {
                 results.map(result => (
