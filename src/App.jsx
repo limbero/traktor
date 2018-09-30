@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import store from './redux/store';
 import { setToken } from './redux/actions';
 import Shows from './Shows';
-import Helpers from './Helpers';
+import Trakt from './apis/Trakt';
 import './App.css';
 
 const hasHover = require('has-hover');
@@ -19,23 +19,11 @@ class Applet extends Component {
     const aDay = 1000 * 60 * 60 * 24;
 
     if (new Date() > new Date(expirationDate - aDay)) {
-      Helpers.fetchJson(
-        'https://api.trakt.tv/oauth/token',
-        'POST',
-        {
-          refresh_token: token.refresh_token,
-          client_id: env.REACT_APP_TRAKT_CLIENT_ID,
-          client_secret: env.REACT_APP_TRAKT_CLIENT_SECRET,
-          redirect_uri: `${window.location.origin}/redirect`,
-          grant_type: 'refresh_token',
-        },
-        {
-          'Content-Type': 'application/json',
-        },
-      ).then((refreshedToken) => {
-        store.dispatch(setToken(refreshedToken));
-        localStorage.setItem('traktor_trakt_token', JSON.stringify(refreshedToken));
-      });
+      Trakt.refreshToken()
+        .then((refreshedToken) => {
+          store.dispatch(setToken(refreshedToken));
+          localStorage.setItem('traktor_trakt_token', JSON.stringify(refreshedToken));
+        });
     } else {
       store.dispatch(setToken(token));
     }

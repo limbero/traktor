@@ -42,10 +42,10 @@ class ProgressCircle extends Component {
   }
 
   componentDidUpdate() {
-    const { prevPct, percent } = this.props;
-    const step = (percent - prevPct) / 1500;
+    const { prevPercent, percent } = this.props;
+    const step = (percent - prevPercent) / 1500;
 
-    requestAnimationFrame(() => this.animate(prevPct / 100, step, percent / 100));
+    requestAnimationFrame(() => this.animate(prevPercent / 100, step, percent / 100));
   }
 
   animate(cur, step, cap) {
@@ -62,7 +62,7 @@ class ProgressCircle extends Component {
   }
 
   render() {
-    const { prevPct, percent } = this.props;
+    const { prevPercent, percent } = this.props;
     return (
       <div className="progress-circle">
         <div className="canvas">
@@ -70,7 +70,7 @@ class ProgressCircle extends Component {
         </div>
         <p className="percentage">
           <CountUp
-            start={prevPct}
+            start={prevPercent}
             end={percent}
             duration={0.15}
             useEasing

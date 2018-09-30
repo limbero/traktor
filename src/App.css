@@ -59,6 +59,20 @@ button {
   font-size: 0.85em;
   font-weight: 700;
 }
+.btn.small-btn.plus {
+  font-size: 1.15em;
+}
+.btn.small-btn.plus span {
+  height: 100%;
+  position: relative;
+  top: -1px;
+}
+.btn.small-btn.center span {
+  height: 100%;
+}
+.btn.small-btn.center {
+  padding: 0;
+}
 .btn.circular {
   padding: 5px 5px 8px 5px;
   width: 41px;
@@ -219,11 +233,15 @@ button {
 
 .Modal input {
   box-sizing: border-box;
-  height: 35px;
+  height: 40px;
   width: 130px;
   padding: 8px;
   margin: 0;
   outline: none;
+  box-shadow: none;
+  border: 1px solid #999;
+  
+  font-size: 16px;
 }
 
 .Modal input + button, .Modal input + button:hover {
@@ -232,7 +250,11 @@ button {
 
   box-sizing: border-box;
   padding: 8px;
-  height: 35px;
+  height: 40px;
+  width: 40px;
+
+  position: relative;
+  top: -1px;
 }
 .Modal .inner {
   overflow-y: scroll;

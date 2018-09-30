@@ -1,27 +1,15 @@
 import React, { Component } from 'react';
 import ReactModal from 'react-modal';
-import runtimeEnv from '@mars/heroku-js-runtime-env';
-import Helpers from '../Helpers';
+import Trakt from '../apis/Trakt';
+import TheMovieDb from '../apis/TheMovieDb';
 
-import store from '../redux/store';
-
-const env = runtimeEnv();
 ReactModal.setAppElement('#root');
 
 class AddShow extends Component {
   constructor(props) {
     super(props);
-    const redux = store.getState();
     this.state = {
-      redux,
       show: false,
-      traktAuthHeaders: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'trakt-api-version': '2',
-        'trakt-api-key': env.REACT_APP_TRAKT_CLIENT_ID,
-        'Authorization': `Bearer ${redux.token.access_token}`,
-      },
       query: '',
       results: [],
       images: [],
@@ -47,28 +35,15 @@ class AddShow extends Component {
       results: [],
       images: [],
     }));
-    const { query, traktAuthHeaders } = this.state;
-    let results = await Helpers.fetchJson(`https://api.trakt.tv/search/show?query=${query}&limit=9`, 'GET', null, traktAuthHeaders);
+    const { query } = this.state;
+    let results = await Trakt.search(query);
     results = results.slice(0, 9);
 
-    const progressPromises = results.map((result) => {
-      return Helpers.fetchJson(`https://api.trakt.tv/shows/${result.show.ids.trakt}/progress/watched`, 'GET', null, traktAuthHeaders);
-    });
+    const progressPromises = results.map(result => Trakt.getShowProgress(result.show.ids.trakt));
     const progresses = await Promise.all(progressPromises);
 
-    const imagePromises = results.map((result) => {
-      return Helpers.fetchJson(`https://api.themoviedb.org/3/tv/${result.show.ids.tmdb}/images?api_key=${env.REACT_APP_THEMOVIEDB_APIKEY}`, 'GET');
-    });
-    const responses = await Promise.all(imagePromises);
-    const images = responses.map((response) => {
-      if (
-        !response.hasOwnProperty('backdrops') ||
-        response.backdrops.length === 0
-      ) {
-        return null;
-      }
-      return `https://image.tmdb.org/t/p/w500${response.backdrops[0].file_path}`;
-    });
+    const imagePromises = results.map(result => TheMovieDb.getImage(result.show.ids.tmdb));
+    const images = await Promise.all(imagePromises);
 
     const shows = progresses.map((show, index) => {
       const watched = results[index];
@@ -120,9 +95,13 @@ class AddShow extends Component {
     const { query, show } = this.state;
     return (
       <div>
-        <button className="small-btn btn circular" type="button" onClick={() => this.showSearchModal()}>
-          +
-        </button>
+        <div className="center">
+          <button className="small-btn btn circular plus center" type="button" onClick={() => this.showSearchModal()}>
+            <span>
+              +
+            </span>
+          </button>
+        </div>
         <ReactModal
           isOpen={show}
           contentLabel="Minimal Modal Example"
@@ -161,8 +140,10 @@ class AddShow extends Component {
                         <p className="success-0">
                           Add show
                         </p>
-                        <button className="small-btn btn circular" type="button" onClick={() => this.addShow(result)}>
-                          +
+                        <button className="small-btn btn circular center" type="button" onClick={() => this.addShow(result)}>
+                          <span>
+                            +
+                          </span>
                         </button>
                       </div>
                     </div>

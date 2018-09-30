@@ -1,83 +1,61 @@
 import React, { Component } from 'react';
-import runtimeEnv from '@mars/heroku-js-runtime-env';
 import CountUp from 'react-countup';
 import Helpers from '../Helpers';
-
-import store from '../redux/store';
-
-const env = runtimeEnv();
+import Trakt from '../apis/Trakt';
 
 class Show extends Component {
   constructor(props) {
     super(props);
+    const { show, image } = this.props;
     this.state = {
-      redux: store.getState(),
       success: 0,
       loading: false,
-      show: null,
+      show,
+      image,
       prevPct: 0,
     };
   }
 
   async markNextWatched() {
-    const { redux, show } = this.state;
-    const traktAuthHeaders = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'trakt-api-version': '2',
-      'trakt-api-key': env.REACT_APP_TRAKT_CLIENT_ID,
-      'Authorization': `Bearer ${redux.token.access_token}`,
-    };
-    const watched = {
-      episodes: [
-        {
-          watched_at: new Date().toISOString(),
-          ids: (show ? show.next_episode.ids : this.props.show.next_episode.ids),
-        },
-      ],
-    };
+    const { show } = this.state;
 
-    const fetching = fetch('https://api.trakt.tv/sync/history', {
-      method: 'POST',
-      body: JSON.stringify(watched),
-      headers: traktAuthHeaders,
-    });
     this.setState(prevState => ({
       ...prevState,
       loading: true,
     }));
 
-    const result = await fetching;
-    if (result.status === 201) {
-      this.setState(prevState => ({
-        ...prevState,
-        success: 1,
-        loading: false,
-      }));
-      const newData = Helpers.fetchJson(`https://api.trakt.tv/shows/${this.props.show.ids.trakt}/progress/watched`, 'GET', null, traktAuthHeaders);
-      await Helpers.sleep(350);
-      this.setState(prevState => ({
-        ...prevState,
-        success: 2,
-      }));
-      let completedFraction = 100 * (this.props.show.completed / this.props.show.aired);
-      if (show) {
-        completedFraction = 100 * (show.completed / show.aired);
-      }
-      const newNext = await Promise.all([newData, Helpers.sleep(350)]);
-      this.setState(prevState => ({
-        ...prevState,
-        success: 0,
-        show: newNext[0],
-        prevPct: completedFraction,
-      }));
-    } else {
-      this.setState(prevState => ({
-        ...prevState,
-        success: 0,
-        loading: false,
-      }));
-    }
+    await Trakt.markEpisodeWatched(show.next_episode.ids)
+      .catch(() => {
+        this.setState(prevState => ({
+          ...prevState,
+          success: 0,
+          loading: false,
+        }));
+      });
+
+    this.setState(prevState => ({
+      ...prevState,
+      success: 1,
+      loading: false,
+    }));
+
+    const newData = Trakt.getShowProgress(show.ids.trakt);
+    await Helpers.sleep(350);
+    this.setState(prevState => ({
+      ...prevState,
+      success: 2,
+    }));
+
+    const newNext = await Promise.all([newData, Helpers.sleep(350)]);
+    this.setState(prevState => ({
+      ...prevState,
+      success: 0,
+      show: {
+        ...prevState.show,
+        ...newNext[0],
+      },
+      prevPct: 100 * (show.completed / show.aired),
+    }));
   }
 
   render() {
@@ -87,22 +65,17 @@ class Show extends Component {
       prevPct,
       loading,
     } = this.state;
+    const { image } = this.props;
 
-    const propShow = JSON.parse(JSON.stringify(this.props.show));
-    if (show) {
-      propShow.next_episode = show.next_episode;
-      propShow.completed = show.completed;
-      propShow.aired = show.aired;
-    }
-    const next = propShow.next_episode;
-    const completedFraction = 100 * (propShow.completed / propShow.aired);
+    const next = show.next_episode;
+    const completedFraction = 100 * (show.completed / show.aired);
 
-    if (propShow.completed === propShow.aired) {
+    if (show.completed === show.aired) {
       return null;
     }
     const done = false;
     return (
-      <div className="show" style={{ backgroundImage: `url(${propShow.imgUrl ? propShow.imgUrl : '/testbild.jpg'})` }}>
+      <div className="show" style={{ backgroundImage: (image ? `url(${image})` : 'none') }}>
         <div>
           <div className="progress-bar" style={{ width: `${completedFraction}%` }} />
           <p className="percentage">
@@ -118,11 +91,11 @@ class Show extends Component {
             />
           </p>
           <p className="title">
-            { propShow.title }
+            { show.title }
           </p>
           <div className="next-episode">
             <p className={`success-${success}`}>
-              { `[${propShow.aired - propShow.completed} left] Next up: S${next.season}E${next.number} ${next.title}` }
+              { `[${show.aired - show.completed} left] Next up: S${next.season}E${next.number} ${next.title}` }
             </p>
             <button className={`small-btn btn${success > 0 || done ? ' success' : ''}${loading ? ' loading' : ''}`} type="button" onClick={(done ? null : e => this.markNextWatched(e))}>
               <span>&gt;</span>
