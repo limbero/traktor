@@ -163,8 +163,10 @@ button {
   text-overflow: ellipsis;
   width: 80%;
 
+  font-size: 14px;
+
   left: 10px;
-  bottom: 10px;
+  bottom: 14px;
   transition: bottom .35s, left .35s;
 }
 .show div.next-episode p.success-1 {
@@ -326,6 +328,10 @@ button {
   }
   .show div.next-episode p {
     margin-bottom: 5px;
+    width: 93%;
+
+    font-size: 16px;
+    bottom: 5px;
   }
   .show div.next-episode .btn {
     width: 45px;
