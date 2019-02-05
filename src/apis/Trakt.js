@@ -146,6 +146,10 @@ class Trakt {
   static async search(query, limit = 9, page = 1) {
     return Trakt.get(`https://api.trakt.tv/search/show?query=${query}&limit=${limit}&page=${page}`);
   }
+
+  static async getRatings() {
+    return Trakt.get('https://api.trakt.tv/users/me/ratings/shows');
+  }
 }
 
 export default Trakt;

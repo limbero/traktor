@@ -19,14 +19,19 @@ class Shows extends Component {
 
     Promise.all(
       [
-        this.trackForLoading(Trakt.getHiddenShows(), 10),
+        this.trackForLoading(Trakt.getHiddenShows(), 5),
         this.trackForLoading(Trakt.getShows(), 20),
+        this.trackForLoading(Trakt.getRatings(), 5),
       ],
-    ).then((tuple) => {
-      const hiddenShows = tuple[0].map(hidden => hidden.show.ids.trakt);
-      const watchedShows = tuple[1].filter(watched => (
+    ).then((triple) => {
+      const hiddenShows = triple[0].map(hidden => hidden.show.ids.trakt);
+      const watchedShows = triple[1].filter(watched => (
         !hiddenShows.includes(watched.show.ids.trakt)
       ));
+      const ratedShowMap = {};
+      triple[2].forEach((ratedShow) => {
+        ratedShowMap[ratedShow.show.ids.trakt] = ratedShow.rating;
+      });
 
       Promise.all(watchedShows.map(watched => (
         this.trackForLoading(
@@ -34,19 +39,37 @@ class Shows extends Component {
           70 / watchedShows.length,
         )
       ))).then((allShows) => {
-        const shows = allShows.map((show, index) => {
-          const watched = watchedShows[index];
-          return {
-            title: watched.show.title,
-            ids: watched.show.ids,
-            aired: show.aired,
-            completed: show.completed,
-            last_episode: show.last_episode,
-            last_watched_at: show.last_watched_at,
-            next_episode: show.next_episode,
-            seasons: show.seasons,
-          };
-        }).filter(show => show.aired !== show.completed);
+        const shows = allShows
+          .map((show, index) => {
+            const watched = watchedShows[index];
+            return {
+              title: watched.show.title,
+              ids: watched.show.ids,
+              aired: show.aired,
+              completed: show.completed,
+              last_episode: show.last_episode,
+              last_watched_at: show.last_watched_at,
+              next_episode: show.next_episode,
+              seasons: show.seasons,
+              rating: ratedShowMap[watched.show.ids.trakt],
+            };
+          })
+          .filter(show => show.aired !== show.completed)
+          .sort((a, b) => {
+            if (a.rating > b.rating) {
+              return -1;
+            } else if (a.rating < b.rating) {
+              return 1;
+            } else {
+              if (a.last_watched_at > b.last_watched_at) {
+                return -1;
+              } else if (a.last_watched_at < b.last_watched_at) {
+                return 1;
+              } else {
+                return 0;
+              }
+            }
+          });
 
         this.setState(
           prevState => ({
