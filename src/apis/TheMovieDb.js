@@ -26,7 +26,7 @@ class TheMovieDb {
 
     return TheMovieDb.get(`https://api.themoviedb.org/3/tv/${id}/images`)
       .then((response) => {
-        const imageUrl = `https://image.tmdb.org/t/p/w500${response.backdrops[0].file_path}`
+        const imageUrl = `https://image.tmdb.org/t/p/w500${response.backdrops[0].file_path}`;
         localStorage.setItem(id, imageUrl);
         return imageUrl;
       })

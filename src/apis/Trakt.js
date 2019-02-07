@@ -1,6 +1,7 @@
 import runtimeEnv from '@mars/heroku-js-runtime-env';
 import store from '../redux/store';
 import { setToken } from '../redux/actions';
+import Util from '../Util';
 
 const env = runtimeEnv();
 
@@ -57,13 +58,7 @@ class Trakt {
       cache: 'no-store',
     };
 
-    return fetch(url, init)
-      .then((response) => {
-        if (!response.ok) {
-          throw Error(response.statusText);
-        }
-        return response.json();
-      });
+    return Util.fetchJsonWithRetry(url, init, 3);
   }
 
   static async getHiddenShows() {
@@ -71,7 +66,7 @@ class Trakt {
   }
 
   static async getShows() {
-    return Trakt.get('https://api.trakt.tv/users/me/watched/shows');
+    return Trakt.get('https://api.trakt.tv/users/me/watched/shows?extended=full');
   }
 
   static async getShowProgress(id) {
@@ -87,19 +82,14 @@ class Trakt {
   }
 
   static async postToTokenEndpoint(payload) {
-    return fetch('https://api.trakt.tv/oauth/token', {
+    return Util.fetchJsonWithRetry('https://api.trakt.tv/oauth/token', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
-    }).then((response) => {
-      if (!response.ok) {
-        throw Error(response.statusText);
-      }
-      return response.json();
-    });
+    }, 3);
   }
 
   static async refreshToken(token) {
@@ -131,16 +121,11 @@ class Trakt {
       ],
     };
 
-    return fetch('https://api.trakt.tv/sync/history', {
+    return Util.fetchJsonWithRetry('https://api.trakt.tv/sync/history', {
       method: 'POST',
       body: JSON.stringify(watched),
       headers: await Trakt.headers(),
-    }).then((response) => {
-      if (!response.ok) {
-        throw Error(response.statusText);
-      }
-      return response.json();
-    });
+    }, 3);
   }
 
   static async search(query, limit = 9, page = 1) {

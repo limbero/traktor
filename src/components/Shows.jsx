@@ -25,9 +25,18 @@ class Shows extends Component {
       ],
     ).then((triple) => {
       const hiddenShows = triple[0].map(hidden => hidden.show.ids.trakt);
-      const watchedShows = triple[1].filter(watched => (
-        !hiddenShows.includes(watched.show.ids.trakt)
-      ));
+      const watchedShows = triple[1]
+        .filter(watched => (
+          !hiddenShows.includes(watched.show.ids.trakt)
+        ))
+        .filter((watched) => {
+          const watchedEpisodes = watched.seasons
+            .filter(season => season.number !== 0)
+            .map(season => season.episodes.length)
+            .reduce((a, b) => a + b, 0);
+          return watchedEpisodes !== watched.show.aired_episodes;
+        });
+
       const ratedShowMap = {};
       triple[2].forEach((ratedShow) => {
         ratedShowMap[ratedShow.show.ids.trakt] = ratedShow.rating;
