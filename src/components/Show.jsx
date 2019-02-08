@@ -3,6 +3,7 @@ import CountUp from 'react-countup';
 import Helpers from '../Helpers';
 import Trakt from '../apis/Trakt';
 import TheMovieDb from '../apis/TheMovieDb';
+import { Util } from '../Util';
 
 class Show extends Component {
   constructor(props) {
@@ -74,6 +75,9 @@ class Show extends Component {
       show,
       success,
     } = this.state;
+    const {
+      hasHover
+    } = this.props;
 
     const next = show.next_episode;
     const completedFraction = 100 * (show.completed / show.aired);
@@ -83,28 +87,41 @@ class Show extends Component {
     }
     const done = false;
     return (
-      <div className="show" style={{ backgroundImage: (image ? `url(${image})` : 'none') }}>
+      <div className={`show${ !hasHover ? ' no-hover' : '' }`} style={{ backgroundImage: (image ? `url(${image})` : 'none') }}>
         <div>
-          <div className="progress-bar" style={{ width: `${completedFraction}%` }} />
-          <p className="percentage">
-            <CountUp
-              start={prevPct}
-              end={completedFraction}
-              duration={1.5}
-              useEasing
-              separator=" "
-              decimals={1}
-              decimal="."
-              suffix="%"
-            />
-          </p>
-          <p className="title">
-            { show.title }
-          </p>
-          <div className="next-episode">
-            <p className={`success-${success}`}>
-              { `[${show.aired - show.completed} left] Next up: S${next.season}E${next.number} ${next.title}` }
+          <div className="show-top-area">
+            <div className="progress-bar" style={{ width: `${completedFraction}%` }} />
+            <p className="title">
+              { show.title }
             </p>
+          </div>
+          <div className="next-episode">
+            <p className="prefix">Next up</p>
+            <div className={`episode-info success-${success}`}>
+              <p className="season-and-episode-number">
+                { `S${Util.zeropad(next.season)}E${Util.zeropad(next.number)}` }
+              </p>
+              <p className="episode-title">
+                { next.title }
+              </p>
+            </div>
+            <div className="progress-text">
+              <p className="percentage">
+                <CountUp
+                  start={prevPct}
+                  end={completedFraction}
+                  duration={1.5}
+                  useEasing
+                  separator=" "
+                  decimals={1}
+                  decimal="."
+                  suffix="%"
+                />
+              </p>
+              <p className="absolute">
+                { `[${show.completed}/${show.aired}]` }
+              </p>
+            </div>
             <button className={`small-btn btn${success > 0 || done ? ' success' : ''}${loading ? ' loading' : ''}`} type="button" onClick={(done ? null : e => this.markNextWatched(e))}>
               <span>&gt;</span>
             </button>

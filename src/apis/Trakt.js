@@ -1,9 +1,11 @@
 import runtimeEnv from '@mars/heroku-js-runtime-env';
 import store from '../redux/store';
 import { setToken } from '../redux/actions';
-import Util from '../Util';
+import { Util, CorsError }  from '../Util';
 
 const env = runtimeEnv();
+let getNewToken = false;
+let onGoingTokenRequest = null;
 
 class Trakt {
   static basicTokenPayload() {
@@ -28,9 +30,26 @@ class Trakt {
   static async token() {
     const { token } = store.getState();
 
+    if (onGoingTokenRequest) {
+      return onGoingTokenRequest;
+    }
+    if (getNewToken) {
+      getNewToken = false;
+      onGoingTokenRequest = Trakt.refreshToken(token)
+        .then((response) => {
+          onGoingTokenRequest = null;
+          return response;
+        });
+      const freshToken = await onGoingTokenRequest;
+      localStorage.setItem('traktor_trakt_token', JSON.stringify(freshToken));
+      store.dispatch(setToken(freshToken));
+      return freshToken;
+    }
+
     if (token === null) {
       const localStorageToken = JSON.parse(localStorage.getItem('traktor_trakt_token'));
       if (localStorageToken === null) {
+        console.log('both are null');
         throw Error('Not authenticated');
       }
 
@@ -51,28 +70,6 @@ class Trakt {
     return freshToken;
   }
 
-  static async get(url) {
-    const init = {
-      method: 'GET',
-      headers: await Trakt.headers(),
-      cache: 'no-store',
-    };
-
-    return Util.fetchJsonWithRetry(url, init, 3);
-  }
-
-  static async getHiddenShows() {
-    return Trakt.get('https://api.trakt.tv/users/hidden/progress_watched?type=show&limit=100');
-  }
-
-  static async getShows() {
-    return Trakt.get('https://api.trakt.tv/users/me/watched/shows?extended=full');
-  }
-
-  static async getShowProgress(id) {
-    return Trakt.get(`https://api.trakt.tv/shows/${id}/progress/watched`);
-  }
-
   static async getTokenFromCode(code) {
     return Trakt.postToTokenEndpoint({
       ...Trakt.basicTokenPayload(),
@@ -82,14 +79,14 @@ class Trakt {
   }
 
   static async postToTokenEndpoint(payload) {
-    return Util.fetchJsonWithRetry('https://api.trakt.tv/oauth/token', {
+    return Util.fetchJson('https://api.trakt.tv/oauth/token', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
-    }, 3);
+    });
   }
 
   static async refreshToken(token) {
@@ -111,6 +108,39 @@ class Trakt {
     return token;
   }
 
+  static async get(url) {
+    const init = {
+      method: 'GET',
+      headers: await Trakt.headers(),
+      cache: 'no-store',
+    };
+
+    return Util.fetchJsonWithRetry(url, init, 3)
+      .catch((error) => {
+        if (error instanceof CorsError) {
+          getNewToken = true;
+          return Trakt.get(url);
+        }
+        throw error;
+      });
+  }
+
+  static async getHiddenShows() {
+    return Trakt.get('https://api.trakt.tv/users/hidden/progress_watched?type=show&limit=100');
+  }
+
+  static async getRatings() {
+    return Trakt.get('https://api.trakt.tv/users/me/ratings/shows');
+  }
+
+  static async getShows() {
+    return Trakt.get('https://api.trakt.tv/users/me/watched/shows?extended=full');
+  }
+
+  static async getShowProgress(id) {
+    return Trakt.get(`https://api.trakt.tv/shows/${id}/progress/watched`);
+  }
+
   static async markEpisodeWatched(ids) {
     const watched = {
       episodes: [
@@ -130,10 +160,6 @@ class Trakt {
 
   static async search(query, limit = 9, page = 1) {
     return Trakt.get(`https://api.trakt.tv/search/show?query=${query}&limit=${limit}&page=${page}`);
-  }
-
-  static async getRatings() {
-    return Trakt.get('https://api.trakt.tv/users/me/ratings/shows');
   }
 }
 

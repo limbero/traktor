@@ -138,6 +138,9 @@ class Shows extends Component {
       prevPercent,
       percent,
     } = this.state;
+    const {
+      hasHover
+    } = this.props;
 
     if (loading) {
       return (
@@ -151,7 +154,7 @@ class Shows extends Component {
         <AddShow addShow={show => this.addShow(show)} />
         <div className="shows" ref={(el) => { (this.grid = el); }}>
           {
-            shows.map(show => <Show key={show.ids.trakt} show={show} />)
+            shows.map(show => <Show key={show.ids.trakt} show={show} hasHover={hasHover} />)
           }
         </div>
       </div>

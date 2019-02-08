@@ -6,6 +6,7 @@
     "@mars/heroku-js-runtime-env": "^3.0.2",
     "animate-css-grid": "^1.0.4",
     "has-hover": "^1.0.1",
+    "node-sass": "^4.11.0",
     "qs": "^6.5.2",
     "react": "^16.8",
     "react-countup": "^3.0.3",

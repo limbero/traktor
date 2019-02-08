@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import runtimeEnv from '@mars/heroku-js-runtime-env';
 import Shows from '../components/Shows';
 import Trakt from '../apis/Trakt';
-import '../App.css';
+import './App.scss';
 
 const hasHover = require('has-hover');
 
@@ -14,8 +14,14 @@ class App extends Component {
     this.state = {
       loggedIn: false,
     };
+  }
+
+  componentDidMount() {
     Trakt.token()
-      .then(() => this.setState(prevState => ({ ...prevState, loggedIn: true })))
+      .then(() => {
+        console.log('token\'d');
+        this.setState(prevState => ({ ...prevState, loggedIn: true }) )
+      })
       .catch(() => this.setState(prevState => ({ ...prevState, loggedIn: false })));
   }
 
@@ -32,7 +38,7 @@ class App extends Component {
         <div id="content">
           {
             loggedIn
-              ? <Shows />
+              ? <Shows hasHover={hasHover} />
               : (
                 <p>
                   <a className="btn" href={`https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${env.REACT_APP_TRAKT_CLIENT_ID}&redirect_uri=${window.location.origin}/redirect`}>

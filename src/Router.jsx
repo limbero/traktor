@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import App from './views/App';
-import AuthRedirect from './AuthRedirect';
+import AuthRedirect from './views/AuthRedirect';
 
 import store from './redux/store';
 
