@@ -264,9 +264,9 @@ button {
       letter-spacing: 1px;
       color: var(--primary-color);
 
-      @media only screen and (max-width: 800px) {
-        font-size: 1.05em;
-      }
+      // @media only screen and (max-width: 800px) {
+      //   font-size: 1.05em;
+      // }
     }
 
     .episode-info {
@@ -291,10 +291,10 @@ button {
           bottom: 4px;
           font-size: 0.75em;
           color: #CCC;
-          @media only screen and (max-width: 800px) {
-            font-size: 1.65em;
-            color: #FFF;
-          }
+          // @media only screen and (max-width: 800px) {
+          //   font-size: 1.65em;
+          //   color: #FFF;
+          // }
         }
         &.episode-title {
           bottom: 23px;
@@ -309,9 +309,9 @@ button {
         
           width: 80%;
 
-          @media only screen and (max-width: 800px) {
-            visibility: hidden;
-          }
+          // @media only screen and (max-width: 800px) {
+          //   visibility: hidden;
+          // }
         }
       }
     }
@@ -337,17 +337,17 @@ button {
 
         &.percentage {
           bottom: 20px;
-          @media only screen and (max-width: 800px) {
-            bottom: 8px;
-            right: 10px;
-            font-size: 1em;
-          }
+          // @media only screen and (max-width: 800px) {
+          //   bottom: 8px;
+          //   right: 10px;
+          //   font-size: 1em;
+          // }
         }
         &.absolute {
           bottom: 4px;
-          @media only screen and (max-width: 800px) {
-            visibility: hidden; 
-          }
+          // @media only screen and (max-width: 800px) {
+          //   visibility: hidden; 
+          // }
         }
       }
     }
@@ -360,7 +360,7 @@ button {
       @media only screen and (max-width: 800px) {
         width: 45px;
         height: 45px;
-        top: -18px;
+        top: -24px;
       }
     
       box-sizing: border-box;
