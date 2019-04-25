@@ -94,6 +94,9 @@ class Trakt {
       ...Trakt.basicTokenPayload(),
       refresh_token: token.refresh_token,
       grant_type: 'refresh_token',
+    }).catch(() => {
+      localStorage.removeItem('traktor_trakt_token');
+      window.location.reload();
     });
   }
 

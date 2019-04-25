@@ -10,21 +10,32 @@ class AuthRedirect extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      authed: false
-    }
+      authed: false,
+      error: false,
+    };
   }
 
   async componentDidMount() {
     const { location } = this.props;
     const { code } = qs.parse(location.search.slice(1));
-    const token = await Trakt.getTokenFromCode(code);
+
+    let token;
+    try {
+      token = await Trakt.getTokenFromCode(code);
+    } catch (fetchError) {
+      this.setState(prevState => ({
+        ...prevState,
+        error: fetchError,
+      }));
+      return;
+    }
     store.dispatch(setToken(token));
     localStorage.setItem('traktor_trakt_token', JSON.stringify(token));
     this.setState(prevState => ({ ...prevState, authed: true }));
   }
 
   render() {
-    if (!this.state.authed) {
+    if (!this.state.authed && !this.state.error) {
       return null;
     }
     return (

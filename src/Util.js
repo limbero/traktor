@@ -15,7 +15,7 @@ class Util {
     return fetch(url, init)
       .then((response) => {
         if (!response.ok) {
-          throw new FetchError(response.status, response.statusText);
+          return Promise.reject(new FetchError(response.status, response.statusText));
         }
         return response;
       });
