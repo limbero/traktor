@@ -10,6 +10,20 @@ body {
   font-family: 'News Cycle';
   font-weight: 400;
 }
+body, .Modal, .Modal input[type=search] {
+  @media (prefers-color-scheme: dark) {
+    background-color: #222;
+    color: #FFF;
+  }
+  @media (prefers-color-scheme: light) {
+    background-color: #FFF;
+    color: #000;
+  }
+  @media (prefers-color-scheme: no-preference) {
+    background-color: #222;
+    color: #FFF;
+  }
+}
 
 h1.app-title img {
   position: relative;
@@ -404,7 +418,6 @@ button {
   left: 80px;
   right: 80px;
   bottom: 80px;
-  background-color: #FFF;
 
   max-width: 95vw;
 

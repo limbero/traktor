@@ -53,6 +53,7 @@ class ProgressCircle extends Component {
 
     ctx.beginPath();
     ctx.lineWidth = 5;
+    ctx.strokeStyle = '#e10000';
     ctx.arc(50, 50, 30, zero, zero + wholeLap * (cur + step));
     ctx.stroke();
 
