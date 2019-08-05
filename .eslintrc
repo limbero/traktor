@@ -10,6 +10,7 @@
   },
   "rules": {
     "quote-props": [1, "consistent-as-needed"],
-    "no-plusplus": [1, { "allowForLoopAfterthoughts": true}]
+    "no-plusplus": [1, { "allowForLoopAfterthoughts": true}],
+    "no-else-return": [0]
   }
 }

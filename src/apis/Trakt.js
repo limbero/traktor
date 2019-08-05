@@ -128,12 +128,20 @@ class Trakt {
       });
   }
 
+  static async getEpisode(showId, season, episode) {
+    return Trakt.get(`https://api.trakt.tv/shows/${showId}/seasons/${season}/episodes/${episode}`);
+  }
+
   static async getHiddenShows() {
     return Trakt.get('https://api.trakt.tv/users/hidden/progress_watched?type=show&limit=100');
   }
 
   static async getRatings() {
     return Trakt.get('https://api.trakt.tv/users/me/ratings/shows');
+  }
+
+  static async getResetShows() {
+    return Trakt.get('https://api.trakt.tv/users/hidden/progress_watched_reset?type=show&limit=100');
   }
 
   static async getShows() {
@@ -163,6 +171,47 @@ class Trakt {
 
   static async search(query, limit = 9, page = 1) {
     return Trakt.get(`https://api.trakt.tv/search/show?query=${query}&limit=${limit}&page=${page}`);
+  }
+
+  static countWatchedSinceReset(show, resetAt) {
+    return show.seasons
+      .filter(season => season.number !== 0)
+      .map(
+        season => season.episodes.map(
+          episode => (
+            Date.parse(episode.last_watched_at) > resetAt
+              ? 1
+              : 0
+          )
+        ).reduce((a, b) => a + b, 0)
+      )
+      .reduce((a, b) => a + b, 0);
+  }
+
+  static async nextEpisodeForRewatch(show, numWatched) {
+    let index = 0;
+    const seasons = show.seasons.filter(season => season.number !== 0);
+    for (let i=0; i < seasons.length; i++) {
+      const season = seasons[i];
+      const { episodes } = season;
+      for (let j=0; j < episodes.length; j++) {
+        const episode = episodes[j];
+        if (index === numWatched) {
+          return Trakt.getEpisode(show.show.ids.trakt, season.number, episode.number);
+        } else {
+          index++;
+        }
+      }
+    }
+    return Promise.resolve(null);
+  }
+
+  static showResetAt(show, resetShows) {
+    let resetAt = resetShows[show.show.ids.trakt];
+    if (typeof resetAt === 'undefined') {
+      resetAt = Number.MIN_SAFE_INTEGER;
+    }
+    return resetAt;
   }
 }
 

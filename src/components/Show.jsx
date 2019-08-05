@@ -40,22 +40,26 @@ class Show extends Component {
       ...prevState,
       success: 1,
       loading: false,
+      show: {
+        ...prevState.show,
+        completed: prevState.show.completed + 1,
+      },
     }));
 
-    const newData = Trakt.getShowProgress(show.ids.trakt);
+    const newData = Trakt.nextEpisodeForRewatch({...this.state.show, show: this.state.show}, this.state.show.completed);
     await Helpers.sleep(350);
     this.setState(prevState => ({
       ...prevState,
       success: 2,
     }));
 
-    const newNext = await Promise.all([newData, Helpers.sleep(350)]);
+    const [, newNext] = await Promise.all([Helpers.sleep(350), newData]);
     this.setState(prevState => ({
       ...prevState,
       success: 0,
       show: {
         ...prevState.show,
-        ...newNext[0],
+        next_episode: newNext,
       },
       prevPct: 100 * (show.completed / show.aired),
     }));
