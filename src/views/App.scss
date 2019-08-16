@@ -279,6 +279,9 @@ button {
       bottom: 0;
       left: 8px;
 
+      color: #FFF;
+      text-decoration: none;
+
       transition: bottom .35s, left .35s;
 
       &.success-1 {

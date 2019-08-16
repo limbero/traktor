@@ -101,14 +101,19 @@ class Show extends Component {
           </div>
           <div className="next-episode">
             <p className="prefix">Next up</p>
-            <div className={`episode-info success-${success}`}>
+            <a
+              href={`https://trakt.tv/shows/${show.ids.slug}/seasons/${show.next_episode.season}/episodes/${show.next_episode.number}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`episode-info success-${success}`}
+            >
               <p className="season-and-episode-number">
                 { `S${Util.zeropad(next.season)}E${Util.zeropad(next.number)}` }
               </p>
               <p className="episode-title">
                 { next.title }
               </p>
-            </div>
+            </a>
             <div className="progress-text">
               <p className="percentage">
                 <CountUp
