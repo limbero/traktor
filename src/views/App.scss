@@ -115,15 +115,8 @@ button {
   text-align: center;
 
   grid-template-rows: repeat(120px);
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
   margin: 0 40px;
-
-  @media only screen and (max-width: 800px) {
-    grid-template-columns: repeat(1, 1fr);
-    margin: 0;
-  }
-  @media only screen and (min-width: 801px) {
-    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  }
 }
 
 .show {
@@ -133,8 +126,9 @@ button {
   box-sizing: border-box;
   display: block;
   overflow: hidden;
-  width: 320px;
-  height: 180px;
+
+  width: 80%;
+  padding-top: 45%;
 
   background-color: #555;
   background-size: cover;
