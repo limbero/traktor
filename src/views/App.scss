@@ -9,19 +9,14 @@ $primaryColor: #e10000;
 body {
   font-family: 'News Cycle';
   font-weight: 400;
-}
-body, .Modal, .Modal input[type=search] {
-  @media (prefers-color-scheme: dark) {
+
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: no-preference) {
     background-color: #222;
     color: #FFF;
   }
   @media (prefers-color-scheme: light) {
     background-color: #FFF;
     color: #000;
-  }
-  @media (prefers-color-scheme: no-preference) {
-    background-color: #222;
-    color: #FFF;
   }
 }
 
@@ -425,6 +420,15 @@ button {
 
   text-align: center;
 
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: no-preference) {
+    background-color: #222;
+    color: #FFF;
+  }
+  @media (prefers-color-scheme: light) {
+    background-color: #FFF;
+    color: #000;
+  }
+
   @media only screen and (max-width: 800px) {
     top: 20px;
     left: 20px;
@@ -448,7 +452,16 @@ button {
     -webkit-appearance: none;
     -webkit-border-radius:0; 
     border-radius: 0;
-    border: 1px solid #999;
+
+    @media (prefers-color-scheme: dark), (prefers-color-scheme: no-preference) {
+      border: 1px solid #555;
+      background-color: #000;
+      color: #FFF;
+    }
+    @media (prefers-color-scheme: light) {
+      border: 1px solid #999;
+    }
+    border-right: none;
   
     margin: 0;
     outline: none;
