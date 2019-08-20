@@ -115,8 +115,14 @@ button {
   text-align: center;
 
   grid-template-rows: repeat(120px);
+
   grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
   margin: 0 40px;
+
+  @media only screen and (max-width: 440px) {
+    grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+    margin: 0;
+  }
 }
 
 .show {
