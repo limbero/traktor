@@ -53,6 +53,10 @@ class Show extends Component {
       success: 2,
     }));
 
+    if (show.completed === show.aired) {
+      return;
+    }
+
     const [, newNext] = await Promise.all([Helpers.sleep(350), newData]);
     this.setState(prevState => ({
       ...prevState,
@@ -86,7 +90,7 @@ class Show extends Component {
     const next = show.next_episode;
     const completedFraction = 100 * (show.completed / show.aired);
 
-    if (show.completed === show.aired) {
+    if (show.completed === show.aired && [0, 2].includes(success)) {
       return null;
     }
     const done = false;
