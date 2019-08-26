@@ -24,8 +24,9 @@ class Shows extends Component {
     if (!loading && first) {
       first = false;
       wrapGrid(this.grid, {
-        stagger: 100,
-        duration: 500,
+        stagger: 25,
+        duration: 400,
+        easing: 'backOut',
       });
     }
   }
