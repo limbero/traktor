@@ -24,7 +24,7 @@ class Shows extends Component {
     if (!loading && first) {
       first = false;
       wrapGrid(this.grid, {
-        stagger: 25,
+        stagger: 0,
         duration: 400,
         easing: 'backOut',
       });
@@ -127,8 +127,8 @@ class Shows extends Component {
       {
         ...prevState,
         shows: [
-          ...prevState.shows,
           show,
+          ...prevState.shows,
         ],
       }
     ));

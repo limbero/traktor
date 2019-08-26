@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@mars/heroku-js-runtime-env": "^3.0.2",
-    "animate-css-grid": "^1.0.4",
+    "animate-css-grid": "1.4.1",
     "has-hover": "^1.0.1",
     "node-sass": "^4.11.0",
     "qs": "^6.5.2",

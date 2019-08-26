@@ -1192,10 +1192,10 @@ amdefine@>=0.0.4:
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
   integrity sha1-SlKCrBZHKek2Gbz9OtFR+BfOkfU=
 
-animate-css-grid@^1.0.4:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/animate-css-grid/-/animate-css-grid-1.2.1.tgz#6c6140c4543b2f86f764046fb1ef6da958bf499f"
-  integrity sha512-icNq3z56hXcxRYFwssQ0axQP30bqerwaOjmW5Wf41NXSL7HUe2XYy3saqnORh5FVxNURmDN8Oy7F43JclG4tcg==
+animate-css-grid@1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/animate-css-grid/-/animate-css-grid-1.4.1.tgz#84ad772227abab7e4a3656a87395f917784c278a"
+  integrity sha512-2ZZqtqeWeUgD1p/PLawRsq/tscIjDS5Tjm8ZWW4icvsD+Griwg0ERJuTyz8YGRvCFj6EfnIFURQnkzbxyDqC/g==
   dependencies:
     "@popmotion/easing" "^1.0.1"
     lodash.throttle "^4.1.1"
