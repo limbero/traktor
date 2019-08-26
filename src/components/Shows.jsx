@@ -36,21 +36,13 @@ class Shows extends Component {
       apiHiddenShows,
       apiWatchedShows,
       apiRatings,
-      apiResetShows,
     ] = await Promise.all([
       this.trackForLoading(Trakt.getHiddenShows(), 3),
       this.trackForLoading(Trakt.getShows(), 20),
       this.trackForLoading(Trakt.getRatings(), 5),
-      this.trackForLoading(Trakt.getResetShows(), 2),
     ]);
 
     const hiddenShows = apiHiddenShows.map(hidden => hidden.show.ids.trakt);
-
-    const resetShowsArray = apiResetShows.map(reset => reset.show.ids.trakt);
-    const resetShows = {};
-    resetShowsArray.forEach((showId, index) => {
-      resetShows[showId] = Date.parse(apiResetShows[index].hidden_at);
-    });
 
     const watchedShows = apiWatchedShows
       .filter(watchedShow => !hiddenShows.includes(watchedShow.show.ids.trakt))
@@ -58,7 +50,7 @@ class Shows extends Component {
         ...watchedShow,
         watched_since_reset: Trakt.countWatchedSinceReset(
           watchedShow,
-          Trakt.showResetAt(watchedShow, resetShows)
+          Trakt.showResetAt(watchedShow)
         ),
       }))
       .filter(
@@ -96,7 +88,7 @@ class Shows extends Component {
               watched,
               watched.watched_since_reset
             )),
-          reset_at: Trakt.showResetAt(watched, resetShows),
+          reset_at: Trakt.showResetAt(watched),
           seasons: show.seasons,
           rating: ratedShowMap[watched.show.ids.trakt],
         };

@@ -221,12 +221,10 @@ class Trakt {
     return Promise.resolve(null);
   }
 
-  static showResetAt(show, resetShows) {
-    let resetAt = resetShows[show.show.ids.trakt];
-    if (typeof resetAt === "undefined") {
-      resetAt = Number.MIN_SAFE_INTEGER;
-    }
-    return resetAt;
+  static showResetAt(show) {
+    return show.reset_at === null
+      ? Number.MIN_SAFE_INTEGER
+      : Date.parse(show.reset_at);
   }
 }
 
