@@ -214,7 +214,7 @@ class Trakt {
             episode.number
           );
         } else {
-          index += index;
+          index += 1;
         }
       }
     }
