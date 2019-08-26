@@ -52,7 +52,6 @@ class AddShow extends Component {
           ids: watched.show.ids,
           aired: show.aired,
           completed: show.completed,
-          last_episode: show.last_episode,
           last_watched_at: show.last_watched_at,
           next_episode: show.next_episode,
           seasons: show.seasons,
