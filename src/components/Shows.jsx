@@ -83,6 +83,7 @@ class Shows extends Component {
       allShows.map(async (show, index) => {
         const watched = watchedShows[index];
         return {
+          addedFromSearch: false,
           title: watched.show.title,
           ids: watched.show.ids,
           aired: show.aired,

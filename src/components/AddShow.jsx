@@ -24,7 +24,10 @@ class AddShow extends Component {
 
   addShow(show) {
     const { addShow } = this.props;
-    addShow(show);
+    addShow({
+      ...show,
+      addedFromSearch: true,
+    });
     this.hideSearchModal();
   }
 

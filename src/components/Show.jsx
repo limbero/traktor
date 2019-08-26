@@ -15,6 +15,7 @@ class Show extends Component {
       show,
       image: null,
       prevPct: 0,
+      seenEverything: false,
     };
     this.fetchImage();
   }
@@ -25,6 +26,10 @@ class Show extends Component {
     this.setState(prevState => ({
       ...prevState,
       loading: true,
+      show: {
+        ...prevState.show,
+        addedFromSearch: false,
+      },
     }));
 
     await Trakt.markEpisodeWatched(show.next_episode.ids).catch(() => {
@@ -79,22 +84,41 @@ class Show extends Component {
   }
 
   render() {
-    const { image, loading, prevPct, show, success } = this.state;
+    const {
+      image,
+      loading,
+      prevPct,
+      show,
+      success,
+      seenEverything,
+    } = this.state;
     const { hasHover } = this.props;
 
     const next = show.next_episode;
     const completedFraction = 100 * (show.completed / show.aired);
 
-    if (show.completed === show.aired && [0, 2].includes(success)) {
+    if (seenEverything) {
       return null;
+    }
+    const seenAllAndReadyToRemove =
+      show.completed === show.aired && [0, 2].includes(success);
+    if (seenAllAndReadyToRemove) {
+      setTimeout(() => {
+        this.setState(prevState => ({
+          ...prevState,
+          seenEverything: true,
+        }));
+      }, 250);
     }
     const done = false;
     return (
-      <div
-        className={`show${!hasHover ? " no-hover" : ""}`}
-        style={{ backgroundImage: image ? `url(${image})` : "none" }}
-      >
-        <div>
+      <div>
+        <div
+          className={`show${!hasHover ? " no-hover" : ""}${
+            show.addedFromSearch ? " added-from-search" : ""
+          }${seenAllAndReadyToRemove ? " seen-everything" : ""}`}
+          style={{ backgroundImage: image ? `url(${image})` : "none" }}
+        >
           <div className="show-top-area">
             <div
               className="progress-bar"
