@@ -78,10 +78,9 @@ class Shows extends Component {
           addedFromSearch: false,
           title: watched.show.title,
           ids: watched.show.ids,
-          aired: show.aired,
+          aired: watched.show.aired_episodes,
           completed: watched.watched_since_reset,
-          last_episode: show.last_episode,
-          last_watched_at: show.last_watched_at,
+          last_watched_at: watched.last_watched_at,
           next_episode:
             show.next_episode ||
             (await Trakt.nextEpisodeForRewatch(
