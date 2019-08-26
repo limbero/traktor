@@ -32,11 +32,7 @@ class Shows extends Component {
   }
 
   async setup() {
-    const [
-      apiHiddenShows,
-      apiWatchedShows,
-      apiRatings,
-    ] = await Promise.all([
+    const [apiHiddenShows, apiWatchedShows, apiRatings] = await Promise.all([
       this.trackForLoading(Trakt.getHiddenShows(), 3),
       this.trackForLoading(Trakt.getShows(), 20),
       this.trackForLoading(Trakt.getRatings(), 5),
