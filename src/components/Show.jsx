@@ -23,6 +23,8 @@ class Show extends Component {
   async markNextWatched() {
     let { show } = this.state;
 
+    const debugging = false;
+
     this.setState(prevState => ({
       ...prevState,
       loading: true,
@@ -32,13 +34,17 @@ class Show extends Component {
       },
     }));
 
-    await Trakt.markEpisodeWatched(show.next_episode.ids).catch(() => {
-      this.setState(prevState => ({
-        ...prevState,
-        success: 0,
-        loading: false,
-      }));
-    });
+    if (!debugging) {
+      await Trakt.markEpisodeWatched(show.next_episode.ids).catch(() => {
+        this.setState(prevState => ({
+          ...prevState,
+          success: 0,
+          loading: false,
+        }));
+      });
+    }
+
+    const newCompleted = debugging ? show.aired : show.completed + 1;
 
     this.setState(prevState => ({
       ...prevState,
@@ -46,15 +52,14 @@ class Show extends Component {
       loading: false,
       show: {
         ...prevState.show,
-        completed: prevState.show.completed + 1,
+        completed: newCompleted,
       },
     }));
 
     ({ show } = this.state);
-    const newData = Trakt.nextEpisodeForRewatch(
-      { ...show, show },
-      show.completed
-    );
+    const newData = debugging
+      ? Promise.resolve(show.next_episode)
+      : Trakt.nextEpisodeForRewatch({ ...show, show }, show.completed);
     await Helpers.sleep(350);
     this.setState(prevState => ({
       ...prevState,
