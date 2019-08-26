@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
-import qs from 'qs';
-import Trakt from '../apis/Trakt';
+import React, { Component } from "react";
+import { Redirect } from "react-router-dom";
+import qs from "qs";
+import Trakt from "../apis/Trakt";
 
-import store from '../redux/store';
-import { setToken } from '../redux/actions';
+import store from "../redux/store";
+import { setToken } from "../redux/actions";
 
 class AuthRedirect extends Component {
   constructor(props) {
@@ -30,17 +30,16 @@ class AuthRedirect extends Component {
       return;
     }
     store.dispatch(setToken(token));
-    localStorage.setItem('traktor_trakt_token', JSON.stringify(token));
+    localStorage.setItem("traktor_trakt_token", JSON.stringify(token));
     this.setState(prevState => ({ ...prevState, authed: true }));
   }
 
   render() {
-    if (!this.state.authed && !this.state.error) {
+    const { authed, error } = this.state;
+    if (!authed && !error) {
       return null;
     }
-    return (
-      <Redirect to="/" />
-    );
+    return <Redirect to="/" />;
   }
 }
 

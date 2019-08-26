@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import { wrapGrid } from 'animate-css-grid';
-import Trakt from '../apis/Trakt';
-import Show from './Show';
-import ProgressCircle from './ProgressCircle';
-import AddShow from './AddShow';
+import React, { Component } from "react";
+import { wrapGrid } from "animate-css-grid";
+import Trakt from "../apis/Trakt";
+import Show from "./Show";
+import ProgressCircle from "./ProgressCircle";
+import AddShow from "./AddShow";
 
 let first = true;
 
@@ -26,7 +26,7 @@ class Shows extends Component {
       wrapGrid(this.grid, {
         stagger: 0,
         duration: 400,
-        easing: 'backOut',
+        easing: "backOut",
       });
     }
   }
@@ -37,14 +37,12 @@ class Shows extends Component {
       apiWatchedShows,
       apiRatings,
       apiResetShows,
-    ] = await Promise.all(
-      [
-        this.trackForLoading(Trakt.getHiddenShows(), 3),
-        this.trackForLoading(Trakt.getShows(), 20),
-        this.trackForLoading(Trakt.getRatings(), 5),
-        this.trackForLoading(Trakt.getResetShows(), 2),
-      ],
-    );
+    ] = await Promise.all([
+      this.trackForLoading(Trakt.getHiddenShows(), 3),
+      this.trackForLoading(Trakt.getShows(), 20),
+      this.trackForLoading(Trakt.getRatings(), 5),
+      this.trackForLoading(Trakt.getResetShows(), 2),
+    ]);
 
     const hiddenShows = apiHiddenShows.map(hidden => hidden.show.ids.trakt);
 
@@ -55,31 +53,34 @@ class Shows extends Component {
     });
 
     const watchedShows = apiWatchedShows
-      .filter(watchedShow => (
-        !hiddenShows.includes(watchedShow.show.ids.trakt)
-      ))
+      .filter(watchedShow => !hiddenShows.includes(watchedShow.show.ids.trakt))
       .map(watchedShow => ({
         ...watchedShow,
         watched_since_reset: Trakt.countWatchedSinceReset(
           watchedShow,
-          Trakt.showResetAt(watchedShow, resetShows),
+          Trakt.showResetAt(watchedShow, resetShows)
         ),
       }))
-      .filter(watchedShow => watchedShow.watched_since_reset !== watchedShow.show.aired_episodes);
+      .filter(
+        watchedShow =>
+          watchedShow.watched_since_reset !== watchedShow.show.aired_episodes
+      );
 
     const ratedShowMap = {};
-    apiRatings.forEach((ratedShow) => {
+    apiRatings.forEach(ratedShow => {
       ratedShowMap[ratedShow.show.ids.trakt] = ratedShow.rating;
     });
 
-    const allShows = await Promise.all(watchedShows.map(watched => (
-      this.trackForLoading(
-        Trakt.getShowProgress(watched.show.ids.trakt),
-        70 / watchedShows.length,
+    const allShows = await Promise.all(
+      watchedShows.map(watched =>
+        this.trackForLoading(
+          Trakt.getShowProgress(watched.show.ids.trakt),
+          70 / watchedShows.length
+        )
       )
-    )));
-    const showPromises = await Promise.all(allShows
-      .map(async (show, index) => {
+    );
+    const showPromises = await Promise.all(
+      allShows.map(async (show, index) => {
         const watched = watchedShows[index];
         return {
           title: watched.show.title,
@@ -88,15 +89,18 @@ class Shows extends Component {
           completed: watched.watched_since_reset,
           last_episode: show.last_episode,
           last_watched_at: show.last_watched_at,
-          next_episode: show.next_episode || await Trakt.nextEpisodeForRewatch(
-            watched,
-            watched.watched_since_reset,
-          ),
+          next_episode:
+            show.next_episode ||
+            (await Trakt.nextEpisodeForRewatch(
+              watched,
+              watched.watched_since_reset
+            )),
           reset_at: Trakt.showResetAt(watched, resetShows),
           seasons: show.seasons,
           rating: ratedShowMap[watched.show.ids.trakt],
         };
-      }));
+      })
+    );
     const shows = showPromises
       .filter(show => show.aired !== show.completed)
       .sort((a, b) => {
@@ -113,54 +117,38 @@ class Shows extends Component {
         }
       });
 
-    this.setState(
-      prevState => ({
-        ...prevState,
-        shows,
-        loading: false,
-      }),
-    );
+    this.setState(prevState => ({
+      ...prevState,
+      shows,
+      loading: false,
+    }));
   }
 
   addShow(show) {
-    this.setState(prevState => (
-      {
-        ...prevState,
-        shows: [
-          show,
-          ...prevState.shows,
-        ],
-      }
-    ));
+    this.setState(prevState => ({
+      ...prevState,
+      shows: [show, ...prevState.shows],
+    }));
   }
 
   increaseLoading(percent) {
-    this.setState(
-      prevState => ({
-        ...prevState,
-        prevPercent: prevState.percent,
-        percent: prevState.percent + percent,
-      }),
-    );
+    this.setState(prevState => ({
+      ...prevState,
+      prevPercent: prevState.percent,
+      percent: prevState.percent + percent,
+    }));
   }
 
   trackForLoading(promise, worth) {
-    return promise.then((result) => {
+    return promise.then(result => {
       this.increaseLoading(worth);
       return result;
     });
   }
 
   render() {
-    const {
-      shows,
-      loading,
-      prevPercent,
-      percent,
-    } = this.state;
-    const {
-      hasHover
-    } = this.props;
+    const { shows, loading, prevPercent, percent } = this.state;
+    const { hasHover } = this.props;
 
     if (loading) {
       return (
@@ -171,11 +159,19 @@ class Shows extends Component {
     }
     return (
       <div>
-        <AddShow addShow={show => this.addShow(show)} showIds={shows.map(show => show.ids.trakt)} />
-        <div className="shows" ref={(el) => { (this.grid = el); }}>
-          {
-            shows.map(show => <Show key={show.ids.trakt} show={show} hasHover={hasHover} />)
-          }
+        <AddShow
+          addShow={show => this.addShow(show)}
+          showIds={shows.map(show => show.ids.trakt)}
+        />
+        <div
+          className="shows"
+          ref={el => {
+            this.grid = el;
+          }}
+        >
+          {shows.map(show => (
+            <Show key={show.ids.trakt} show={show} hasHover={hasHover} />
+          ))}
         </div>
       </div>
     );

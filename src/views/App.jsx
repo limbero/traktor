@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import runtimeEnv from '@mars/heroku-js-runtime-env';
-import Shows from '../components/Shows';
-import Trakt from '../apis/Trakt';
-import './App.scss';
+import React, { Component } from "react";
+import runtimeEnv from "@mars/heroku-js-runtime-env";
+import Shows from "../components/Shows";
+import Trakt from "../apis/Trakt";
+import "./App.scss";
 
-const hasHover = require('has-hover');
+const hasHover = require("has-hover");
 
 const env = runtimeEnv();
 
@@ -19,34 +19,36 @@ class App extends Component {
   componentDidMount() {
     Trakt.token()
       .then(() => {
-        console.log("token'd");
-        this.setState(prevState => ({ ...prevState, loggedIn: true }) )
+        this.setState(prevState => ({ ...prevState, loggedIn: true }));
       })
-      .catch(() => this.setState(prevState => ({ ...prevState, loggedIn: false })));
+      .catch(() =>
+        this.setState(prevState => ({ ...prevState, loggedIn: false }))
+      );
   }
 
   render() {
     const { loggedIn } = this.state;
     return (
-      <div className={`app${(hasHover ? '' : ' no-hover')}`}>
+      <div className={`app${hasHover ? "" : " no-hover"}`}>
         <header className="app-header">
           <h1 className="app-title">
-            <img src="min_traktor.svg" width={64} alt="tractor icon"/>
+            <img src="min_traktor.svg" width={64} alt="tractor icon" />
             Traktor
           </h1>
         </header>
         <div id="content">
-          {
-            loggedIn
-              ? <Shows hasHover={hasHover} />
-              : (
-                <p>
-                  <a className="btn" href={`https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${env.REACT_APP_TRAKT_CLIENT_ID}&redirect_uri=${window.location.origin}/redirect`}>
-                    Login
-                  </a>
-                </p>
-              )
-          }
+          {loggedIn ? (
+            <Shows hasHover={hasHover} />
+          ) : (
+            <p>
+              <a
+                className="btn"
+                href={`https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${env.REACT_APP_TRAKT_CLIENT_ID}&redirect_uri=${window.location.origin}/redirect`}
+              >
+                Login
+              </a>
+            </p>
+          )}
         </div>
       </div>
     );

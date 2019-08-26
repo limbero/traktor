@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import TheMovieDb from '../apis/TheMovieDb';
+import React, { Component } from "react";
+import TheMovieDb from "../apis/TheMovieDb";
 
 class ShowToAdd extends Component {
   constructor(props) {
@@ -20,24 +20,21 @@ class ShowToAdd extends Component {
     const { addShow, show, alreadyPresent } = this.props;
     const { image } = this.state;
     return (
-      <div className="show" style={{ backgroundImage: (image ? `url(${image})` : 'none') }}>
+      <div
+        className="show"
+        style={{ backgroundImage: image ? `url(${image})` : "none" }}
+      >
         <div>
-          <p className="title">
-            { show.title }
-          </p>
+          <p className="title">{show.title}</p>
           <div className="next-episode">
-            <p className="success-0">
-              Add show
-            </p>
+            <p className="success-0">Add show</p>
             <button
               className="small-btn btn circular center"
               type="button"
               onClick={() => addShow(show)}
               disabled={alreadyPresent}
             >
-              <span>
-                +
-              </span>
+              <span>+</span>
             </button>
           </div>
         </div>

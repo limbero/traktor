@@ -1,10 +1,10 @@
-import React from 'react';
-import { BrowserRouter, Route } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import App from './views/App';
-import AuthRedirect from './views/AuthRedirect';
+import React from "react";
+import { BrowserRouter, Route } from "react-router-dom";
+import { Provider } from "react-redux";
+import App from "./views/App";
+import AuthRedirect from "./views/AuthRedirect";
 
-import store from './redux/store';
+import store from "./redux/store";
 
 const Router = () => (
   <Provider store={store}>

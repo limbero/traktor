@@ -1,16 +1,16 @@
-import React, { Component } from 'react';
-import ReactModal from 'react-modal';
-import Trakt from '../apis/Trakt';
-import ShowToAdd from './ShowToAdd';
+import React, { Component } from "react";
+import ReactModal from "react-modal";
+import Trakt from "../apis/Trakt";
+import ShowToAdd from "./ShowToAdd";
 
-ReactModal.setAppElement('#root');
+ReactModal.setAppElement("#root");
 
 class AddShow extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isOpen: false,
-      query: '',
+      query: "",
       results: [],
     };
   }
@@ -36,7 +36,9 @@ class AddShow extends Component {
     const { query } = this.state;
     const results = await Trakt.search(query, 20);
 
-    const progressPromises = results.map(result => Trakt.getShowProgress(result.show.ids.trakt));
+    const progressPromises = results.map(result =>
+      Trakt.getShowProgress(result.show.ids.trakt)
+    );
     const progresses = await Promise.all(progressPromises);
 
     const shows = progresses
@@ -71,19 +73,22 @@ class AddShow extends Component {
   }
 
   handleKeyPress(e) {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       this.search();
       e.preventDefault();
     }
   }
 
   showSearchModal() {
-    this.setState(prevState => ({
-      ...prevState,
-      isOpen: true,
-    }), () => {
-      setTimeout(() => this.queryInput.focus(), 1);
-    });
+    this.setState(
+      prevState => ({
+        ...prevState,
+        isOpen: true,
+      }),
+      () => {
+        setTimeout(() => this.queryInput.focus(), 1);
+      }
+    );
   }
 
   render() {
@@ -92,10 +97,12 @@ class AddShow extends Component {
     return (
       <div>
         <div className="center">
-          <button className="small-btn btn circular plus center" type="button" onClick={() => this.showSearchModal()}>
-            <span>
-              +
-            </span>
+          <button
+            className="small-btn btn circular plus center"
+            type="button"
+            onClick={() => this.showSearchModal()}
+          >
+            <span>+</span>
           </button>
         </div>
         <ReactModal
@@ -106,7 +113,11 @@ class AddShow extends Component {
           className="Modal"
           overlayClassName="modalOverlay"
         >
-          <button className="small-btn btn circular modalX" onClick={() => this.hideSearchModal()} type="button">
+          <button
+            className="small-btn btn circular modalX"
+            onClick={() => this.hideSearchModal()}
+            type="button"
+          >
             <span role="img" aria-label="close">
               ✕
             </span>
@@ -118,25 +129,29 @@ class AddShow extends Component {
                 value={query}
                 onChange={e => this.setQuery(e.target.value)}
                 onKeyPress={e => this.handleKeyPress(e)}
-                ref={(input) => { this.queryInput = input; }}
+                ref={input => {
+                  this.queryInput = input;
+                }}
               />
-              <button className="btn" onClick={() => this.search()} type="button">
+              <button
+                className="btn"
+                onClick={() => this.search()}
+                type="button"
+              >
                 <span role="img" aria-label="search">
                   🔍
                 </span>
               </button>
             </form>
             <div className="results shows">
-              {
-                results.map(result => (
-                  <ShowToAdd
-                    key={result.ids.trakt}
-                    show={result}
-                    addShow={() => this.addShow(result)}
-                    alreadyPresent={showIds.includes(result.ids.trakt)}
-                  />
-                ))
-              }
+              {results.map(result => (
+                <ShowToAdd
+                  key={result.ids.trakt}
+                  show={result}
+                  addShow={() => this.addShow(result)}
+                  alreadyPresent={showIds.includes(result.ids.trakt)}
+                />
+              ))}
             </div>
           </div>
         </ReactModal>

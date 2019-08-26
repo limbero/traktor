@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import CountUp from 'react-countup';
-import Helpers from '../Helpers';
-import Trakt from '../apis/Trakt';
-import TheMovieDb from '../apis/TheMovieDb';
-import { Util } from '../Util';
+import React, { Component } from "react";
+import CountUp from "react-countup";
+import Helpers from "../Helpers";
+import Trakt from "../apis/Trakt";
+import TheMovieDb from "../apis/TheMovieDb";
+import { Util } from "../Util";
 
 class Show extends Component {
   constructor(props) {
@@ -20,21 +20,20 @@ class Show extends Component {
   }
 
   async markNextWatched() {
-    const { show } = this.state;
+    let { show } = this.state;
 
     this.setState(prevState => ({
       ...prevState,
       loading: true,
     }));
 
-    await Trakt.markEpisodeWatched(show.next_episode.ids)
-      .catch(() => {
-        this.setState(prevState => ({
-          ...prevState,
-          success: 0,
-          loading: false,
-        }));
-      });
+    await Trakt.markEpisodeWatched(show.next_episode.ids).catch(() => {
+      this.setState(prevState => ({
+        ...prevState,
+        success: 0,
+        loading: false,
+      }));
+    });
 
     this.setState(prevState => ({
       ...prevState,
@@ -46,7 +45,11 @@ class Show extends Component {
       },
     }));
 
-    const newData = Trakt.nextEpisodeForRewatch({...this.state.show, show: this.state.show}, this.state.show.completed);
+    ({ show } = this.state);
+    const newData = Trakt.nextEpisodeForRewatch(
+      { ...show, show },
+      show.completed
+    );
     await Helpers.sleep(350);
     this.setState(prevState => ({
       ...prevState,
@@ -76,16 +79,8 @@ class Show extends Component {
   }
 
   render() {
-    const {
-      image,
-      loading,
-      prevPct,
-      show,
-      success,
-    } = this.state;
-    const {
-      hasHover
-    } = this.props;
+    const { image, loading, prevPct, show, success } = this.state;
+    const { hasHover } = this.props;
 
     const next = show.next_episode;
     const completedFraction = 100 * (show.completed / show.aired);
@@ -95,13 +90,17 @@ class Show extends Component {
     }
     const done = false;
     return (
-      <div className={`show${ !hasHover ? ' no-hover' : '' }`} style={{ backgroundImage: (image ? `url(${image})` : 'none') }}>
+      <div
+        className={`show${!hasHover ? " no-hover" : ""}`}
+        style={{ backgroundImage: image ? `url(${image})` : "none" }}
+      >
         <div>
           <div className="show-top-area">
-            <div className="progress-bar" style={{ width: `${completedFraction}%` }} />
-            <p className="title">
-              { show.title }
-            </p>
+            <div
+              className="progress-bar"
+              style={{ width: `${completedFraction}%` }}
+            />
+            <p className="title">{show.title}</p>
           </div>
           <div className="next-episode">
             <p className="prefix">Next up</p>
@@ -112,11 +111,9 @@ class Show extends Component {
               className={`episode-info success-${success}`}
             >
               <p className="season-and-episode-number">
-                { `S${Util.zeropad(next.season)}E${Util.zeropad(next.number)}` }
+                {`S${Util.zeropad(next.season)}E${Util.zeropad(next.number)}`}
               </p>
-              <p className="episode-title">
-                { next.title }
-              </p>
+              <p className="episode-title">{next.title}</p>
             </a>
             <div className="progress-text">
               <p className="percentage">
@@ -131,11 +128,15 @@ class Show extends Component {
                   suffix="%"
                 />
               </p>
-              <p className="absolute">
-                { `[${show.completed}/${show.aired}]` }
-              </p>
+              <p className="absolute">{`[${show.completed}/${show.aired}]`}</p>
             </div>
-            <button className={`small-btn btn${success > 0 || done ? ' success' : ''}${loading ? ' loading' : ''}`} type="button" onClick={(done ? null : e => this.markNextWatched(e))}>
+            <button
+              className={`small-btn btn${
+                success > 0 || done ? " success" : ""
+              }${loading ? " loading" : ""}`}
+              type="button"
+              onClick={done ? null : e => this.markNextWatched(e)}
+            >
               <span>&gt;</span>
             </button>
           </div>
