@@ -19,7 +19,7 @@ class App extends Component {
   componentDidMount() {
     Trakt.token()
       .then(() => {
-        console.log('token\'d');
+        console.log("token'd");
         this.setState(prevState => ({ ...prevState, loggedIn: true }) )
       })
       .catch(() => this.setState(prevState => ({ ...prevState, loggedIn: false })));

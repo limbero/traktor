@@ -1,6 +1,4 @@
-import {
-  SET_TOKEN,
-} from './actions';
+import { SET_TOKEN } from "./actions";
 
 const initialState = {
   token: null,
