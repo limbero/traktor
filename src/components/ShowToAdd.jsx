@@ -17,7 +17,7 @@ class ShowToAdd extends Component {
   }
 
   render() {
-    const { addShow, show } = this.props;
+    const { addShow, show, alreadyPresent } = this.props;
     const { image } = this.state;
     return (
       <div className="show" style={{ backgroundImage: (image ? `url(${image})` : 'none') }}>
@@ -29,7 +29,12 @@ class ShowToAdd extends Component {
             <p className="success-0">
               Add show
             </p>
-            <button className="small-btn btn circular center" type="button" onClick={() => addShow(show)}>
+            <button
+              className="small-btn btn circular center"
+              type="button"
+              onClick={() => addShow(show)}
+              disabled={alreadyPresent}
+            >
               <span>
                 +
               </span>

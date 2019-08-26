@@ -88,6 +88,7 @@ class AddShow extends Component {
 
   render() {
     const { isOpen, query, results } = this.state;
+    const { showIds } = this.props;
     return (
       <div>
         <div className="center">
@@ -132,6 +133,7 @@ class AddShow extends Component {
                     key={result.ids.trakt}
                     show={result}
                     addShow={() => this.addShow(result)}
+                    alreadyPresent={showIds.includes(result.ids.trakt)}
                   />
                 ))
               }

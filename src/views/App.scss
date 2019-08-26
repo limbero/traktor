@@ -383,6 +383,9 @@ button {
     
       transition: top .35s, border .35s, transform .35s;
 
+      &[disabled] {
+        background-color: #999;
+      }
       &.loading {
         transform: rotate(-90deg);
       }

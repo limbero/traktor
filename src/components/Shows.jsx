@@ -171,7 +171,7 @@ class Shows extends Component {
     }
     return (
       <div>
-        <AddShow addShow={show => this.addShow(show)} />
+        <AddShow addShow={show => this.addShow(show)} showIds={shows.map(show => show.ids.trakt)} />
         <div className="shows" ref={(el) => { (this.grid = el); }}>
           {
             shows.map(show => <Show key={show.ids.trakt} show={show} hasHover={hasHover} />)
