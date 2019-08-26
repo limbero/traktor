@@ -385,6 +385,7 @@ button {
 
       &[disabled] {
         background-color: #999;
+        cursor: not-allowed;
       }
       &.loading {
         transform: rotate(-90deg);
