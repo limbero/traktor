@@ -32,7 +32,12 @@ class App extends Component {
       <div className={`app${hasHover ? "" : " no-hover"}`}>
         <header className="app-header">
           <h1 className="app-title">
-            <img src="min_traktor.svg" width={64} alt="tractor icon" />
+            <img
+              src="traktor_3.svg"
+              width={64}
+              alt="tractor icon"
+              style={{ marginRight: "10px" }}
+            />
             Traktor
           </h1>
         </header>
