@@ -124,9 +124,10 @@ button {
   margin: var(--grid-margin);
   grid-gap: var(--grid-margin);
 
-  @media only screen and (max-width: calc(2 * var(--grid-margin) + var(--column-width))) {
+  @media only screen and (max-width: 400px) {
     grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
-    margin: 0;
+    margin: 30px 20px;
+    grid-gap: 30px;
   }
 }
 
