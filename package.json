@@ -7,7 +7,7 @@
     "animate-css-grid": "1.4.1",
     "eslint-plugin-react-hooks": "^1.7.0",
     "has-hover": "^1.0.1",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.13.0",
     "qs": "^6.5.2",
     "react": "^16.8",
     "react-countup": "^3.0.3",

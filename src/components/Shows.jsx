@@ -80,7 +80,10 @@ class Shows extends Component {
           next_episode:
             show.next_episode ||
             (await Trakt.nextEpisodeForRewatch(
-              watched,
+              {
+                ...watched,
+                ...show,
+              },
               watched.watched_since_reset
             )),
           reset_at: Trakt.showResetAt(watched),
