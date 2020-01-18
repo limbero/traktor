@@ -89,9 +89,11 @@ class Show extends Component {
   }
 
   onDown(e) {
-    e.persist();
-    const clientX = e.clientX;
-    const clientY = e.clientY;
+    if (typeof e.persist === 'function') {
+      e.persist();
+    }
+    const clientX = e.clientX || e.changedTouches[0].clientX;
+    const clientY = e.clientY || e.changedTouches[0].clientY;
     this.setState(prevState => ({
       ...prevState,
       swiping: 1,
@@ -102,7 +104,9 @@ class Show extends Component {
   }
 
   onMove(e) {
-    e.persist();
+    if (typeof e.persist === 'function') {
+      e.persist();
+    }
     const {
       swiping,
       lastX,
@@ -111,8 +115,8 @@ class Show extends Component {
     if (swiping === 0) {
       return;
     }
-    const clientX = e.clientX;
-    const clientY = e.clientY;
+    const clientX = e.clientX || e.changedTouches[0].clientX;
+    const clientY = e.clientY || e.changedTouches[0].clientY;
     const xDiff = clientX - lastX;
     const yDiff = clientY - lastY;
     const xSpeed = Math.abs(xDiff);
@@ -152,6 +156,9 @@ class Show extends Component {
       ...prevState,
       elementWidth: this.showElement.current.offsetWidth,
     }));
+    this.showElement.current.addEventListener('touchstart', e => this.onDown(e));
+    this.showElement.current.addEventListener('touchmove', e => this.onMove(e));
+    this.showElement.current.addEventListener('touchend', e => this.resetOrToss(e));
   };
 
   componentDidMount() {
@@ -268,9 +275,6 @@ class Show extends Component {
           onMouseDown={e => this.onDown(e)}
           onMouseMove={e => this.onMove(e)}
           onMouseUp={e => this.resetOrToss(e)}
-          onTouchStart={e => this.onDown(e)}
-          onTouchMove={e => this.onMove(e)}
-          onTouchEnd={e => this.resetOrToss(e)}
           onMouseLeave={e => this.resetOrToss()}
           className={`show${!hasHover ? " no-hover" : ""}${
             show.addedFromSearch ? " added-from-search" : ""
