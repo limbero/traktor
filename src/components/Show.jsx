@@ -62,9 +62,12 @@ class Show extends Component {
           ...prevState,
           seenEverything: true,
         }));
+      } else {
+        this.reset();
       }
+    } else {
+      this.reset();
     }
-    this.reset();
   }
 
   resetStep(velocity) {
