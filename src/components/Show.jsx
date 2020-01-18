@@ -16,8 +16,151 @@ class Show extends Component {
       image: null,
       prevPct: 0,
       seenEverything: false,
+      initialX: Number.MIN_VALUE,
+      lastX: Number.MIN_VALUE,
+      lastY: Number.MIN_VALUE,
+      xOffset: 0,
+      xSpeed: 0,
+      swiping: 0,
+      elementWidth: Number.MIN_VALUE,
     };
+    this.showElement = React.createRef();
     this.fetchImage();
+  }
+
+  resetOrToss() {
+    const { xOffset, xSpeed } = this.state;
+    this.setState(prevState => ({
+      ...prevState,
+      swiping: 0,
+    }));
+    if (xSpeed > 10) {
+      const xVelocity = xOffset > 0 ? xSpeed : -xSpeed;
+      this.tossStep(xVelocity);
+    } else {
+      this.reset();
+    }
+  }
+
+  reset() {
+    const { xOffset } = this.state;
+    this.resetStep(xOffset < 0 ? -30 : 30);
+  }
+
+  tossStep(velocity) {
+    const { xOffset, elementWidth, show } = this.state;
+    if (Math.abs(xOffset) < elementWidth) {
+      this.setState(prevState => ({
+        ...prevState,
+        xOffset: xOffset+velocity,
+      }));
+      window.requestAnimationFrame(() => this.tossStep(velocity));
+    } else {
+      if (window.confirm(`Do you want to permanently hide ${show.title}?`)) {
+        this.setState(prevState => ({
+          ...prevState,
+          seenEverything: true,
+        }));
+      } else {
+        this.reset();
+      }
+    }
+  }
+
+  resetStep(velocity) {
+    const { xOffset } = this.state;
+    if (Math.abs(xOffset) > Math.abs(xOffset-velocity)) {
+      this.setState(prevState => ({
+        ...prevState,
+        xOffset: xOffset-velocity,
+      }));
+      window.requestAnimationFrame(() => this.resetStep(velocity));
+    } else {
+      this.setState(prevState => ({
+        ...prevState,
+        initialX: Number.MIN_VALUE,
+        lastX: Number.MIN_VALUE,
+        lastY: Number.MIN_VALUE,
+        xOffset: 0,
+        xSpeed: 0,
+        swiping: 0,
+      }));
+    }
+  }
+
+  onDown(e) {
+    e.persist();
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    this.setState(prevState => ({
+      ...prevState,
+      swiping: 1,
+      initialX: clientX,
+      lastX: clientX,
+      lastY: clientY,
+    }));
+  }
+
+  onMove(e) {
+    e.persist();
+    const {
+      swiping,
+      lastX,
+      lastY,
+    } = this.state;
+    if (swiping === 0) {
+      return;
+    }
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    const xDiff = clientX - lastX;
+    const yDiff = clientY - lastY;
+    const xSpeed = Math.abs(xDiff);
+    const ySpeed = Math.abs(yDiff);
+    this.setState(prevState => ({
+      ...prevState,
+      xSpeed,
+    }));
+    switch (swiping) {
+      case 1:
+        if (ySpeed >= xSpeed) {
+          if (ySpeed > 0) {
+            this.setState(prevState => ({
+              ...prevState,
+              swiping: 0,
+            }));
+          }
+          return;
+        }
+        this.setState(prevState => ({
+          ...prevState,
+          swiping: 2,
+        }));
+      case 2:
+        this.setState(prevState => ({
+          ...prevState,
+          xOffset: prevState.xOffset + xDiff,
+          lastX: clientX,
+          lastY: clientY,
+        }));
+        e.preventDefault();
+    }
+  }
+
+  updateElementWidth() {
+    this.setState(prevState => ({
+      ...prevState,
+      elementWidth: this.showElement.current.offsetWidth,
+    }));
+  };
+
+  componentDidMount() {
+    window.addEventListener("resize", () => this.updateElementWidth());
+    this.updateElementWidth();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", () => this.updateElementWidth());
   }
 
   async markNextWatched() {
@@ -96,6 +239,9 @@ class Show extends Component {
       show,
       success,
       seenEverything,
+      xOffset,
+      elementWidth,
+      swiping,
     } = this.state;
     const { hasHover } = this.props;
 
@@ -119,10 +265,23 @@ class Show extends Component {
     return (
       <div>
         <div
+          onMouseDown={e => this.onDown(e)}
+          onMouseMove={e => this.onMove(e)}
+          onMouseUp={e => this.resetOrToss(e)}
+          onTouchStart={e => this.onDown(e)}
+          onTouchMove={e => this.onMove(e)}
+          onTouchEnd={e => this.resetOrToss(e)}
+          onMouseLeave={e => this.resetOrToss()}
           className={`show${!hasHover ? " no-hover" : ""}${
             show.addedFromSearch ? " added-from-search" : ""
           }${seenAllAndReadyToRemove ? " seen-everything" : ""}`}
-          style={{ backgroundImage: image ? `url(${image})` : "none" }}
+          style={{
+            backgroundImage: image ? `url(${image})` : "none",
+            transform: `translateX(${xOffset}px)`,
+            opacity: 1 - (Math.abs(xOffset) / elementWidth),
+            zIndex: swiping,
+          }}
+          ref={this.showElement}
         >
           <div className="show-top-area">
             <div
