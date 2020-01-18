@@ -29,12 +29,12 @@ class Show extends Component {
   }
 
   resetOrToss() {
-    const { xOffset, xSpeed } = this.state;
+    const { xOffset, xSpeed, swiping } = this.state;
     this.setState(prevState => ({
       ...prevState,
       swiping: 0,
     }));
-    if (xSpeed > 10) {
+    if (xSpeed > 10 && swiping === 2 ) {
       const xVelocity = xOffset > 0 ? xSpeed : -xSpeed;
       this.tossStep(xVelocity);
     } else {
