@@ -180,6 +180,26 @@ class Trakt {
     );
   }
 
+  static async hideShow(ids) {
+    const payload = {
+      shows: [
+        {
+          ids,
+        },
+      ],
+    };
+
+    return Util.fetchJsonWithRetry(
+      "https://api.trakt.tv/users/hidden/progress_watched",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: await Trakt.headers(),
+      },
+      3
+    );
+  }
+
   static async search(query, limit = 9, page = 1) {
     return Trakt.get(
       `https://api.trakt.tv/search/show?query=${query}&limit=${limit}&page=${page}`

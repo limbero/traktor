@@ -47,7 +47,7 @@ class Show extends Component {
     this.resetStep(xOffset < 0 ? -30 : 30);
   }
 
-  tossStep(velocity) {
+  async tossStep(velocity) {
     const { xOffset, elementWidth, show } = this.state;
     if (Math.abs(xOffset) < elementWidth) {
       this.setState(prevState => ({
@@ -55,16 +55,16 @@ class Show extends Component {
         xOffset: xOffset+velocity,
       }));
       window.requestAnimationFrame(() => this.tossStep(velocity));
-    } else {
-      if (window.confirm(`Do you want to permanently hide ${show.title}?`)) {
+    } else if (window.confirm(`Do you want to permanently hide ${show.title}?`)) {
+      const response = await Trakt.hideShow(show.ids);
+      if (response.added.shows === 1) {
         this.setState(prevState => ({
           ...prevState,
           seenEverything: true,
         }));
-      } else {
-        this.reset();
       }
     }
+    this.reset();
   }
 
   resetStep(velocity) {
