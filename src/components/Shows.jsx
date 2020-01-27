@@ -7,6 +7,20 @@ import AddShow from "./AddShow";
 
 let first = true;
 
+// kudos to https://stackoverflow.com/a/50544192
+function isIos() {
+  const userAgent = window.navigator.userAgent.toLowerCase();
+  return /iphone|ipad|ipod/.test(userAgent);
+}
+// Detects if device is in standalone mode
+function isInStandaloneMode() {
+  return ('standalone' in window.navigator) && (window.navigator.standalone);
+}
+
+function isIosPwa() {
+  return isIos() && isInStandaloneMode();
+}
+
 class Shows extends Component {
   constructor(props) {
     super(props);
@@ -150,10 +164,25 @@ class Shows extends Component {
     }
     return (
       <div>
-        <AddShow
-          addShow={show => this.addShow(show)}
-          showIds={shows.map(show => show.ids.trakt)}
-        />
+        <div className="center">
+          <AddShow
+            addShow={show => this.addShow(show)}
+            showIds={shows.map(show => show.ids.trakt)}
+          />
+        {
+          isIosPwa() ?
+          (
+            <button
+              className="small-btn btn circular refresh"
+              type="button"
+              onClick={() => window.location.reload(true)}
+            >
+              <span>&#8635;</span>
+            </button>
+          ) :
+          null
+        }
+        </div>
         <div
           className="shows"
           ref={el => {

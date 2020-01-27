@@ -98,15 +98,13 @@ class AddShow extends Component {
     const { showIds } = this.props;
     return (
       <div>
-        <div className="center">
-          <button
-            className="small-btn btn circular plus center"
-            type="button"
-            onClick={() => this.showSearchModal()}
-          >
-            <span>+</span>
-          </button>
-        </div>
+        <button
+          className="small-btn btn circular plus center"
+          type="button"
+          onClick={() => this.showSearchModal()}
+        >
+          <span>+</span>
+        </button>
         <ReactModal
           isOpen={isOpen}
           contentLabel="Minimal Modal Example"
