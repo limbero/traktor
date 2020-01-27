@@ -8,17 +8,9 @@ import AddShow from "./AddShow";
 let first = true;
 
 // kudos to https://stackoverflow.com/a/50544192
-function isIos() {
-  const userAgent = window.navigator.userAgent.toLowerCase();
-  return /iphone|ipad|ipod/.test(userAgent);
-}
 // Detects if device is in standalone mode
-function isInStandaloneMode() {
-  return ('standalone' in window.navigator) && (window.navigator.standalone);
-}
-
 function isIosPwa() {
-  return isIos() && isInStandaloneMode();
+  return ('standalone' in window.navigator) && (window.navigator.standalone);
 }
 
 class Shows extends Component {
