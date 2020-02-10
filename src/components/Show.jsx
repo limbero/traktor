@@ -4,6 +4,7 @@ import Helpers from "../Helpers";
 import Trakt from "../apis/Trakt";
 import TheMovieDb from "../apis/TheMovieDb";
 import { Util } from "../Util";
+import ShowProgressBar from "./ShowProgressBar";
 
 class Show extends Component {
   constructor(props) {
@@ -204,7 +205,7 @@ class Show extends Component {
       };
     }
 
-    const newCompleted = debugging ? show.aired : show.completed + 1;
+    const newCompleted = debugging ? show.aired : show.completed;
 
     this.setState(prevState => ({
       ...prevState,
@@ -212,6 +213,7 @@ class Show extends Component {
       loading: false,
       show: {
         ...prevState.show,
+        ...show,
         completed: newCompleted,
       },
     }));
@@ -297,10 +299,7 @@ class Show extends Component {
           ref={this.showElement}
         >
           <div className="show-top-area">
-            <div
-              className="progress-bar"
-              style={{ width: `${completedFraction}%` }}
-            />
+            <ShowProgressBar show={show}/>
             <p className="title">{show.title}</p>
           </div>
           <div className="next-episode">

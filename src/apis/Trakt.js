@@ -234,10 +234,17 @@ class Trakt {
       .filter(({episode}) =>
         episode.last_watched_at && Date.parse(episode.last_watched_at) > resetAt
       )
-      .sort((a, b) => (
-        Date.parse(b.episode.last_watched_at) -
-        Date.parse(a.episode.last_watched_at)
-      ))[0].next;
+      .sort((a, b) => {
+        const aDate = Date.parse(a.episode.last_watched_at);
+        const bDate = Date.parse(b.episode.last_watched_at);
+        if (aDate !== bDate) {
+          return bDate - aDate
+        } else if (a.episode.season !== b.episode.season) {
+          return b.episode.season - a.episode.season;
+        } else {
+          return b.episode.number - a.episode.number;
+        }
+      })[0].next;
 
     if (nextToWatch) {
       return Trakt.getEpisode(
