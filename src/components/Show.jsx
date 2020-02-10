@@ -195,6 +195,13 @@ class Show extends Component {
           loading: false,
         }));
       });
+      const newProgress = await Trakt.getShowProgress(show.ids.trakt);
+      show = {
+        ...show,
+        ...newProgress,
+        show: newProgress,
+        next_episode: show.next_episode,
+      };
     }
 
     const newCompleted = debugging ? show.aired : show.completed + 1;
@@ -209,10 +216,9 @@ class Show extends Component {
       },
     }));
 
-    ({ show } = this.state);
     const newData = debugging
       ? Promise.resolve(show.next_episode)
-      : Trakt.nextEpisodeForRewatch({ ...show, show }, show.completed);
+      : Trakt.nextEpisodeForRewatch({ ...show, show });
     await Helpers.sleep(350);
     this.setState(prevState => ({
       ...prevState,
