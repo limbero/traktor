@@ -8,7 +8,7 @@ export default function ShowProgressBar({show}) {
       key={id}
       className="progress-bar"
       style={{
-        width: `${ep.completed ? oneEpisodeWidth : 0}%`,
+        width: ep.completed ? `calc(${oneEpisodeWidth}% + 1px)` : 0,
         left: `${oneEpisodeWidth * id}%`,
       }}
     />
