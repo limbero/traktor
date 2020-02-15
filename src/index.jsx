@@ -7,6 +7,7 @@ import * as serviceWorker from './serviceWorker';
 ReactDOM.render(<Router />, document.getElementById("root"));
 
 serviceWorker.register({
+  // kudos to https://stackoverflow.com/a/58596965
   onUpdate: registration => {
     const waitingServiceWorker = registration.waiting
 
