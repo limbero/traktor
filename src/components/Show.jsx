@@ -96,6 +96,14 @@ class Show extends Component {
     if (typeof e.persist === 'function') {
       e.persist();
     }
+    if (e.touches && e.touches.length > 1) {
+      this.setState(prevState => ({
+        ...prevState,
+        swiping: 0,
+      }));
+      this.reset();
+      return;
+    }
     const clientX = e.clientX || e.changedTouches[0].clientX;
     const clientY = e.clientY || e.changedTouches[0].clientY;
     this.setState(prevState => ({
