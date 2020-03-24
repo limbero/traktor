@@ -54,11 +54,7 @@ class Shows extends Component {
           watchedShow,
           Trakt.showResetAt(watchedShow)
         ),
-      }))
-      .filter(
-        watchedShow =>
-          watchedShow.watched_since_reset !== watchedShow.show.aired_episodes
-      );
+      }));
 
     const ratedShowMap = {};
     apiRatings.forEach(ratedShow => {
@@ -74,27 +70,26 @@ class Shows extends Component {
       )
     );
     const showPromises = await Promise.all(
-      allShows.map(async (show, index) => {
+      allShows.map((show, index) => {
         const watched = watchedShows[index];
         return {
           addedFromSearch: false,
           title: watched.show.title,
           ids: watched.show.ids,
-          aired: watched.show.aired_episodes,
+          aired: show.aired,
           completed: watched.watched_since_reset,
           last_watched_at: watched.last_watched_at,
-          next_episode:
-            (await Trakt.nextEpisodeForRewatch(
-              {
-                ...watched,
-                ...show,
-              }
-            )),
           reset_at: Trakt.showResetAt(watched),
           seasons: show.seasons,
           rating: ratedShowMap[watched.show.ids.trakt],
         };
       })
+      .filter(show =>
+        show.completed !== show.aired
+      ).map(async show => ({
+        ...show,
+        next_episode: (await Trakt.nextEpisodeForRewatch(show)),
+      }))
     );
     const shows = showPromises
       .filter(show => show.aired !== show.completed)

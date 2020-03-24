@@ -151,7 +151,7 @@ class Trakt {
 
   static async getShows() {
     return Trakt.get(
-      "https://api.trakt.tv/users/me/watched/shows?extended=full"
+      "https://api.trakt.tv/users/me/watched/shows"
     );
   }
 
@@ -248,7 +248,7 @@ class Trakt {
 
     if (nextToWatch) {
       return Trakt.getEpisode(
-        show.show.ids.trakt,
+        show.ids.trakt,
         nextToWatch.season,
         nextToWatch.number
       );

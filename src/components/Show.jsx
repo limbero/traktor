@@ -228,7 +228,7 @@ class Show extends Component {
 
     const newData = debugging
       ? Promise.resolve(show.next_episode)
-      : Trakt.nextEpisodeForRewatch({ ...show, show });
+      : Trakt.nextEpisodeForRewatch(show);
     await Helpers.sleep(350);
     this.setState(prevState => ({
       ...prevState,
