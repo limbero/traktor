@@ -226,32 +226,31 @@ class Trakt {
       .filter(season => season.number !== 0)
       .flatMap(season => season.episodes.map(ep => ({...ep, season: season.number})));
 
-    const nextEps = [...episodes.slice(1), null];
-
-    const epsAndNexts = episodes.map((ep, i) => ({episode: ep, next: nextEps[i]}) );
-
-    const nextToWatch = epsAndNexts
-      .filter(({episode}) =>
+    const lastWatched = episodes
+      .map((ep, index) => ({...ep, index}))
+      .filter(episode =>
         episode.last_watched_at && Date.parse(episode.last_watched_at) > resetAt
       )
       .sort((a, b) => {
-        const aDate = Date.parse(a.episode.last_watched_at);
-        const bDate = Date.parse(b.episode.last_watched_at);
+        const aDate = Date.parse(a.last_watched_at);
+        const bDate = Date.parse(b.last_watched_at);
         if (aDate !== bDate) {
           return bDate - aDate
-        } else if (a.episode.season !== b.episode.season) {
-          return b.episode.season - a.episode.season;
+        } else if (a.season !== b.season) {
+          return b.season - a.season;
         } else {
-          return b.episode.number - a.episode.number;
+          return b.number - a.number;
         }
-      })[0].next;
+      })[0];
 
-    if (nextToWatch) {
-      return Trakt.getEpisode(
-        show.ids.trakt,
-        nextToWatch.season,
-        nextToWatch.number
-      );
+    for (let i = lastWatched.index; i < episodes.length; i++) {
+      if (!episodes[i].last_watched_at) {
+        return Trakt.getEpisode(
+          show.ids.trakt,
+          episodes[i].season,
+          episodes[i].number
+        );
+      }
     }
 
     return Promise.resolve(null);
