@@ -4,6 +4,7 @@ import Trakt from "../apis/Trakt";
 import Show from "./Show";
 import ProgressCircle from "./ProgressCircle";
 import AddShow from "./AddShow";
+import Statistics from "./Statistics";
 
 let first = true;
 
@@ -137,6 +138,8 @@ class Shows extends Component {
     const { shows, loading, prevPercent, percent } = this.state;
     const { hasHover } = this.props;
 
+    const showIds = shows.map(show => show.ids.trakt);
+
     if (loading) {
       return (
         <div className="center">
@@ -149,7 +152,7 @@ class Shows extends Component {
         <div className="center">
           <AddShow
             addShow={show => this.addShow(show)}
-            showIds={shows.map(show => show.ids.trakt)}
+            showIds={showIds}
           />
         {
           isIosPwa() ?
@@ -175,6 +178,7 @@ class Shows extends Component {
             <Show key={show.ids.trakt} show={show} hasHover={hasHover} />
           ))}
         </div>
+        <Statistics showIds={showIds} />
       </div>
     );
   }

@@ -155,6 +155,10 @@ class Trakt {
     );
   }
 
+  static async getShowForStatistics(id) {
+    return Trakt.get(`https://api.trakt.tv/shows/${id}/progress/watched?extended=full`);
+  }
+
   static async getShowProgress(id) {
     return Trakt.get(`https://api.trakt.tv/shows/${id}/progress/watched`);
   }
