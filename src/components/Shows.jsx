@@ -86,10 +86,7 @@ class Shows extends Component {
       })
       .filter(show =>
         show.completed !== show.aired
-      ).map(async show => ({
-        ...show,
-        next_episode: (await Trakt.nextEpisodeForRewatch(show)),
-      }))
+      )
     );
     const shows = showPromises
       .filter(show => show.aired !== show.completed)
