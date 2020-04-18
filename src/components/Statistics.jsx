@@ -8,7 +8,7 @@ function sum(array) {
 }
 
 function humanTime(minutes) {
-  if (minutes === 0) { return 'No TV left to watch'}
+  if (minutes === 0) { return 'No TV left to watch'; }
   
   const minute = 1;
   const hour = 60 * minute;
