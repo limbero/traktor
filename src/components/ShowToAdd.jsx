@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import TheMovieDb from '../apis/TheMovieDb';
+import CircularButton from './elements/CircularButton';
 
 class ShowToAdd extends Component {
   constructor(props) {
@@ -28,14 +29,12 @@ class ShowToAdd extends Component {
           <p className="title">{show.title}</p>
           <div className="next-episode">
             <p className="success-0">Add show</p>
-            <button
-              className="small-btn btn circular center"
-              type="button"
+            <CircularButton
               onClick={() => addShow(show)}
               disabled={alreadyPresent}
             >
               <span>+</span>
-            </button>
+            </CircularButton>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactModal from 'react-modal';
 import Trakt from '../apis/Trakt';
 import ShowToAdd from './ShowToAdd';
+import CircularButton from './elements/CircularButton';
 
 ReactModal.setAppElement('#root');
 
@@ -98,13 +99,9 @@ class AddShow extends Component {
     const { showIds } = this.props;
     return (
       <div>
-        <button
-          className="small-btn btn circular plus center"
-          type="button"
-          onClick={() => this.showSearchModal()}
-        >
+        <CircularButton type="button" onClick={() => this.showSearchModal()}>
           <span>+</span>
-        </button>
+        </CircularButton>
         <ReactModal
           isOpen={isOpen}
           contentLabel="Minimal Modal Example"
@@ -113,15 +110,22 @@ class AddShow extends Component {
           className="Modal"
           overlayClassName="modalOverlay"
         >
-          <button
-            className="small-btn btn circular modalX"
+          <CircularButton
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              zIndex: 1000,
+              transform: 'translate(-40%, -40%)',
+              backgroundColor: 'var(--primary-color)',
+            }}
             onClick={() => this.hideSearchModal()}
             type="button"
           >
             <span role="img" aria-label="close">
               ✕
             </span>
-          </button>
+          </CircularButton>
           <div className="inner">
             <form className="center" action="#">
               <input

@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const CircularButton = styled.button`
+const StyledCircularButton = styled.button`
   color: #fff;
-  background-color: #37f;
+  background-color: ${(props) => (props.color ? props.color : '#37f')};
 
   border-radius: 100px;
   padding: 5px 5px 8px 5px;
@@ -16,5 +16,11 @@ const CircularButton = styled.button`
 
   cursor: pointer;
 `;
+
+const CircularButton = ({ children, ...rest }) => (
+  <StyledCircularButton type="button" {...rest}>
+    {children}
+  </StyledCircularButton>
+);
 
 export default CircularButton;
