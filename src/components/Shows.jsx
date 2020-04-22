@@ -8,12 +8,6 @@ import Statistics from "./Statistics";
 
 let first = true;
 
-// kudos to https://stackoverflow.com/a/50544192
-// Detects if device is in standalone mode
-function isIosPwa() {
-  return ('standalone' in window.navigator) && (window.navigator.standalone);
-}
-
 class Shows extends Component {
   constructor(props) {
     super(props);
@@ -154,19 +148,6 @@ class Shows extends Component {
             addShow={show => this.addShow(show)}
             showIds={showIds}
           />
-        {
-          isIosPwa() ?
-          (
-            <button
-              className="small-btn btn circular refresh"
-              type="button"
-              onClick={() => window.location.reload(true)}
-            >
-              <span>&#8635;</span>
-            </button>
-          ) :
-          null
-        }
         </div>
         <div
           className="shows"
