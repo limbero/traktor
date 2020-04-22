@@ -16,6 +16,8 @@ class Shows extends Component {
       loading: true,
       prevPercent: 0,
       percent: 0,
+      hiddenShows: [],
+      apiWatchedShows: [],
     };
     this.setup();
   }
@@ -40,6 +42,13 @@ class Shows extends Component {
     ]);
 
     const hiddenShows = apiHiddenShows.map((hidden) => hidden.show.ids.trakt);
+    this.setState((prevState) => ({
+      ...prevState,
+      hiddenShows,
+      apiWatchedShows: apiWatchedShows.map(
+        (watchedShow) => watchedShow.show.ids.trakt
+      ),
+    }));
 
     const watchedShows = apiWatchedShows
       .filter(
@@ -130,7 +139,14 @@ class Shows extends Component {
   }
 
   render() {
-    const { shows, loading, prevPercent, percent } = this.state;
+    const {
+      apiWatchedShows,
+      hiddenShows,
+      shows,
+      loading,
+      prevPercent,
+      percent,
+    } = this.state;
     const { hasHover } = this.props;
 
     const showIds = shows.map((show) => show.ids.trakt);
@@ -157,7 +173,12 @@ class Shows extends Component {
             <Show key={show.ids.trakt} show={show} hasHover={hasHover} />
           ))}
         </div>
-        <Statistics showIds={showIds} />
+        <Statistics
+          showIds={showIds}
+          includedShows={apiWatchedShows.filter(
+            (showId) => !hiddenShows.includes(showId)
+          )}
+        />
       </div>
     );
   }

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import Trakt from '../apis/Trakt';
 
 function sum(array) {
@@ -9,8 +8,10 @@ function sum(array) {
 }
 
 function humanTime(minutes) {
-  if (minutes === 0) {
-    return 'No TV left to watch';
+  if (minutes < 0) {
+    return `minus ${humanTime(-minutes)}`;
+  } else if (minutes === 0) {
+    return '0 minutes';
   }
 
   const minute = 1;
@@ -54,21 +55,66 @@ function humanTime(minutes) {
         : '';
     });
 
+  if (valueStrings.length === 1) {
+    return valueStrings[0];
+  }
   return `${valueStrings.slice(0, -1).join(', ')}, and ${valueStrings.slice(
     -1
-  )} of TV left to watch`;
+  )}`;
 }
 
-const Statistics = ({ showIds }) => {
+const LOOKBACK_DAYS = 30;
+
+const Statistics = ({ showIds, includedShows }) => {
   const [shows, setShows] = useState([]);
+  const [historyEpisodes, setHistoryEpisodes] = useState([]);
+  const [calendarEpisodes, setCalendarEpisodes] = useState([]);
+  const [showToRuntimeMap, setShowToRuntimeMap] = useState({});
 
   useEffect(() => {
     (async () => {
-      setShows(
-        await Promise.all(
-          showIds.map((showId) => Trakt.getShowForStatistics(showId))
-        )
+      const fetchedShows = await Promise.all(
+        showIds.map((showId) => Trakt.getShowForStatistics(showId))
       );
+      setShows(fetchedShows);
+      const srMap = {};
+      fetchedShows.forEach((show, index) => {
+        srMap[showIds[index]] = show.next_episode.runtime;
+      });
+
+      const calEpsPromise = Trakt.getCalendarDaysBack(LOOKBACK_DAYS);
+      const hisEpsPromise = Trakt.getHistoryDaysBack(LOOKBACK_DAYS);
+
+      function filterHiddenAndSpecials(arr) {
+        return arr.filter(
+          (calendarEp) =>
+            includedShows.includes(calendarEp.show.ids.trakt) &&
+            calendarEp.episode.season !== 0
+        );
+      }
+
+      const calEps = filterHiddenAndSpecials(await calEpsPromise);
+      const hisEps = filterHiddenAndSpecials(await hisEpsPromise);
+      setCalendarEpisodes(calEps);
+      setHistoryEpisodes(hisEps);
+
+      function unknownLengths(arr) {
+        return arr
+          .filter((ep) => !srMap[ep.show.ids.trakt])
+          .map((ep) => ep.show.ids.trakt);
+      }
+
+      const unknownLengthShowIds = [
+        ...new Set([...unknownLengths(hisEps), ...unknownLengths(calEps)]),
+      ];
+
+      const additionalLengths = await Promise.all(
+        unknownLengthShowIds.map((showId) => Trakt.getShowForStatistics(showId))
+      );
+      additionalLengths.forEach((show, index) => {
+        srMap[unknownLengthShowIds[index]] = show.last_episode.runtime;
+      });
+      setShowToRuntimeMap(srMap);
     })();
   }, [showIds]);
 
@@ -81,11 +127,35 @@ const Statistics = ({ showIds }) => {
     )
   );
 
+  const addedMinutes = sum(
+    calendarEpisodes
+      .map((ep) => showToRuntimeMap[ep.show.ids.trakt])
+      .filter((ep) => typeof ep !== 'undefined')
+  );
+  const watchedMinutes = sum(
+    historyEpisodes
+      .map((ep) => showToRuntimeMap[ep.show.ids.trakt])
+      .filter((ep) => typeof ep !== 'undefined')
+  );
+
   return (
     <div style={{ margin: '0 2em 50px' }}>
       <p style={{ margin: 0 }}>{shows.length} unfinished shows</p>
       <p style={{ margin: 0 }}>{unfinishedEpisodes} unfinished episodes</p>
-      <p style={{ margin: 0 }}>{humanTime(unfinishedMinutes)}</p>
+      <p style={{ margin: 0 }}>
+        {humanTime(unfinishedMinutes)} of TV left to watch
+      </p>
+      <p style={{ marginBottom: 0 }}>Average per day over the past month:</p>
+      <p style={{ margin: 0 }}>
+        {humanTime(Math.floor(watchedMinutes / LOOKBACK_DAYS))} watched
+      </p>
+      <p style={{ margin: 0 }}>
+        {humanTime(Math.floor(addedMinutes / LOOKBACK_DAYS))} of new TV aired
+      </p>
+      <p style={{ margin: 0 }}>
+        Net velocity{' '}
+        {humanTime(Math.floor((addedMinutes - watchedMinutes) / LOOKBACK_DAYS))}
+      </p>
     </div>
   );
 };

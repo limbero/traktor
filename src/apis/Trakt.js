@@ -139,6 +139,30 @@ class Trakt {
     );
   }
 
+  static async getHistoryDaysBack(days) {
+    const toDate = new Date();
+    const fromDate = new Date(new Date().setDate(toDate.getDate() - days));
+    return Trakt.getHistory(fromDate, toDate);
+  }
+
+  static async getHistory(fromDate, toDate) {
+    const from = fromDate.toISOString();
+    const to = toDate.toISOString();
+    return Trakt.get(
+      `https://api.trakt.tv/users/me/history/shows?start_at=${from}&end_at=${to}&limit=500`
+    );
+  }
+
+  static async getCalendarDaysBack(days) {
+    const fromDate = new Date(new Date().setDate(new Date().getDate() - days));
+    return Trakt.getCalendar(fromDate, days);
+  }
+
+  static async getCalendar(fromDate, days) {
+    const from = fromDate.toISOString().slice(0, 10);
+    return Trakt.get(`https://api.trakt.tv/calendars/my/shows/${from}/${days}`);
+  }
+
   static async getRatings() {
     return Trakt.get('https://api.trakt.tv/users/me/ratings/shows');
   }
