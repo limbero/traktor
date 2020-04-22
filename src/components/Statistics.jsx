@@ -82,7 +82,7 @@ const Statistics = ({ showIds }) => {
   );
 
   return (
-    <div style={{ marginBottom: '50px' }}>
+    <div style={{ margin: '0 2em 50px' }}>
       <p style={{ margin: 0 }}>{shows.length} unfinished shows</p>
       <p style={{ margin: 0 }}>{unfinishedEpisodes} unfinished episodes</p>
       <p style={{ margin: 0 }}>{humanTime(unfinishedMinutes)}</p>
