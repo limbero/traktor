@@ -5,7 +5,6 @@
   "dependencies": {
     "@mars/heroku-js-runtime-env": "^3.0.2",
     "animate-css-grid": "1.4.1",
-    "eslint-plugin-react-hooks": "^1.7.0",
     "has-hover": "^1.0.1",
     "node-sass": "^4.13.0",
     "qs": "^6.5.2",
@@ -25,20 +24,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "lint": "node_modules/.bin/eslint src --ext .jsx,.js"
+    "lint": "prettier --write \"**/*.{js,json,jsx}\""
   },
   "devDependencies": {
-    "eslint-config-airbnb": "^18.0.1",
-    "eslint-config-prettier": "^6.1.0",
-    "eslint-config-react": "^1.1.7",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-jsx-a11y": "^6.0.3",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-prettier": "^3.1.0",
-    "eslint-plugin-promise": "^3.8.0",
-    "eslint-plugin-react": "^7.10.0",
-    "eslint-plugin-standard": "^3.1.0",
-    "prettier": "^1.18.2"
+    "prettier": "@2.0.5"
   },
   "browserslist": [
     ">0.2%",

@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import TheMovieDb from "../apis/TheMovieDb";
+import React, { Component } from 'react';
+import TheMovieDb from '../apis/TheMovieDb';
 
 class ShowToAdd extends Component {
   constructor(props) {
@@ -13,7 +13,7 @@ class ShowToAdd extends Component {
   async fetchImage() {
     const { show } = this.props;
     const image = await TheMovieDb.getImage(show.ids.tmdb);
-    this.setState(prevState => ({ ...prevState, image }));
+    this.setState((prevState) => ({ ...prevState, image }));
   }
 
   render() {
@@ -22,7 +22,7 @@ class ShowToAdd extends Component {
     return (
       <div
         className="show"
-        style={{ backgroundImage: image ? `url(${image})` : "none" }}
+        style={{ backgroundImage: image ? `url(${image})` : 'none' }}
       >
         <div>
           <p className="title">{show.title}</p>

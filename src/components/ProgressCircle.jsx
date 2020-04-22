@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import CountUp from "react-countup";
+import React, { Component } from 'react';
+import CountUp from 'react-countup';
 
 const zero = (-1 / 2) * Math.PI;
 const wholeLap = 2 * Math.PI;
@@ -10,7 +10,7 @@ let scaleFactor;
 
 class ProgressCircle extends Component {
   static backingScale() {
-    if ("devicePixelRatio" in window) {
+    if ('devicePixelRatio' in window) {
       return window.devicePixelRatio;
     }
     return 1;
@@ -31,7 +31,7 @@ class ProgressCircle extends Component {
     canvas.style.width = `${canvas.width / scaleFactor}px`;
     canvas.style.height = `${canvas.height / scaleFactor}px`;
     // update the context for the new canvas scale
-    ctx = canvas.getContext("2d");
+    ctx = canvas.getContext('2d');
     ctx.scale(scaleFactor, scaleFactor);
 
     const pct = percent / 100;
@@ -55,7 +55,7 @@ class ProgressCircle extends Component {
 
     ctx.beginPath();
     ctx.lineWidth = 5;
-    ctx.strokeStyle = "#e10000";
+    ctx.strokeStyle = '#e10000';
     ctx.arc(50, 50, 30, zero, zero + wholeLap * (cur + step));
     ctx.stroke();
 

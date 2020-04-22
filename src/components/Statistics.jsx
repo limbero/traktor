@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
-import Trakt from "../apis/Trakt";
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import Trakt from '../apis/Trakt';
 
 function sum(array) {
   return array.reduce(function (acc, cur) {
-    return acc + cur
+    return acc + cur;
   }, 0);
 }
 
 function humanTime(minutes) {
-  if (minutes === 0) { return 'No TV left to watch'; }
-  
+  if (minutes === 0) {
+    return 'No TV left to watch';
+  }
+
   const minute = 1;
   const hour = 60 * minute;
   const day = 24 * hour;
@@ -37,7 +40,7 @@ function humanTime(minutes) {
 
   let minutesLeft = minutes;
   Object.entries(units).forEach(([unitName, unitSize]) => {
-    while(minutesLeft > unitSize) {
+    while (minutesLeft > unitSize) {
       values[unitName]++;
       minutesLeft -= unitSize;
     }
@@ -46,23 +49,37 @@ function humanTime(minutes) {
   const valueStrings = Object.entries(values)
     .filter(([, unitValue]) => unitValue > 0)
     .map(([unitName, unitValue]) => {
-      return unitValue > 0 ? `${unitValue} ${unitName}${unitValue > 1 ? 's' : ''}` : '';
+      return unitValue > 0
+        ? `${unitValue} ${unitName}${unitValue > 1 ? 's' : ''}`
+        : '';
     });
-  
-  return `${valueStrings.slice(0, -1).join(', ')}, and ${valueStrings.slice(-1)} of TV left to watch`;
+
+  return `${valueStrings.slice(0, -1).join(', ')}, and ${valueStrings.slice(
+    -1
+  )} of TV left to watch`;
 }
 
-const Statistics = ({showIds}) => {
+const Statistics = ({ showIds }) => {
   const [shows, setShows] = useState([]);
 
   useEffect(() => {
     (async () => {
-      setShows(await Promise.all(showIds.map(showId => Trakt.getShowForStatistics(showId))));
+      setShows(
+        await Promise.all(
+          showIds.map((showId) => Trakt.getShowForStatistics(showId))
+        )
+      );
     })();
   }, [showIds]);
 
-  const unfinishedEpisodes = sum(shows.map(show => show.aired - show.completed));
-  const unfinishedMinutes = sum(shows.map(show => (show.aired - show.completed) * show.next_episode.runtime));
+  const unfinishedEpisodes = sum(
+    shows.map((show) => show.aired - show.completed)
+  );
+  const unfinishedMinutes = sum(
+    shows.map(
+      (show) => (show.aired - show.completed) * show.next_episode.runtime
+    )
+  );
 
   return (
     <div style={{ marginBottom: '50px' }}>

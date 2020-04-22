@@ -1,10 +1,10 @@
-import React, { Component } from "react";
-import { wrapGrid } from "animate-css-grid";
-import Trakt from "../apis/Trakt";
-import Show from "./Show";
-import ProgressCircle from "./ProgressCircle";
-import AddShow from "./AddShow";
-import Statistics from "./Statistics";
+import React, { Component } from 'react';
+import { wrapGrid } from 'animate-css-grid';
+import Trakt from '../apis/Trakt';
+import Show from './Show';
+import ProgressCircle from './ProgressCircle';
+import AddShow from './AddShow';
+import Statistics from './Statistics';
 
 let first = true;
 
@@ -27,7 +27,7 @@ class Shows extends Component {
       wrapGrid(this.grid, {
         stagger: 0,
         duration: 400,
-        easing: "backOut",
+        easing: 'backOut',
       });
     }
   }
@@ -39,11 +39,13 @@ class Shows extends Component {
       this.trackForLoading(Trakt.getRatings(), 5),
     ]);
 
-    const hiddenShows = apiHiddenShows.map(hidden => hidden.show.ids.trakt);
+    const hiddenShows = apiHiddenShows.map((hidden) => hidden.show.ids.trakt);
 
     const watchedShows = apiWatchedShows
-      .filter(watchedShow => !hiddenShows.includes(watchedShow.show.ids.trakt))
-      .map(watchedShow => ({
+      .filter(
+        (watchedShow) => !hiddenShows.includes(watchedShow.show.ids.trakt)
+      )
+      .map((watchedShow) => ({
         ...watchedShow,
         watched_since_reset: Trakt.countWatchedSinceReset(
           watchedShow,
@@ -52,12 +54,12 @@ class Shows extends Component {
       }));
 
     const ratedShowMap = {};
-    apiRatings.forEach(ratedShow => {
+    apiRatings.forEach((ratedShow) => {
       ratedShowMap[ratedShow.show.ids.trakt] = ratedShow.rating;
     });
 
     const allShows = await Promise.all(
-      watchedShows.map(watched =>
+      watchedShows.map((watched) =>
         this.trackForLoading(
           Trakt.getShowProgress(watched.show.ids.trakt),
           70 / watchedShows.length
@@ -65,26 +67,25 @@ class Shows extends Component {
       )
     );
     const showPromises = await Promise.all(
-      allShows.map((show, index) => {
-        const watched = watchedShows[index];
-        return {
-          addedFromSearch: false,
-          title: watched.show.title,
-          ids: watched.show.ids,
-          aired: show.aired,
-          completed: watched.watched_since_reset,
-          last_watched_at: watched.last_watched_at,
-          reset_at: Trakt.showResetAt(watched),
-          seasons: show.seasons,
-          rating: ratedShowMap[watched.show.ids.trakt],
-        };
-      })
-      .filter(show =>
-        show.completed !== show.aired
-      )
+      allShows
+        .map((show, index) => {
+          const watched = watchedShows[index];
+          return {
+            addedFromSearch: false,
+            title: watched.show.title,
+            ids: watched.show.ids,
+            aired: show.aired,
+            completed: watched.watched_since_reset,
+            last_watched_at: watched.last_watched_at,
+            reset_at: Trakt.showResetAt(watched),
+            seasons: show.seasons,
+            rating: ratedShowMap[watched.show.ids.trakt],
+          };
+        })
+        .filter((show) => show.completed !== show.aired)
     );
     const shows = showPromises
-      .filter(show => show.aired !== show.completed)
+      .filter((show) => show.aired !== show.completed)
       .sort((a, b) => {
         if (a.rating > b.rating) {
           return -1;
@@ -99,7 +100,7 @@ class Shows extends Component {
         }
       });
 
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       shows,
       loading: false,
@@ -107,14 +108,14 @@ class Shows extends Component {
   }
 
   addShow(show) {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       shows: [show, ...prevState.shows],
     }));
   }
 
   increaseLoading(percent) {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       prevPercent: prevState.percent,
       percent: prevState.percent + percent,
@@ -122,7 +123,7 @@ class Shows extends Component {
   }
 
   trackForLoading(promise, worth) {
-    return promise.then(result => {
+    return promise.then((result) => {
       this.increaseLoading(worth);
       return result;
     });
@@ -132,7 +133,7 @@ class Shows extends Component {
     const { shows, loading, prevPercent, percent } = this.state;
     const { hasHover } = this.props;
 
-    const showIds = shows.map(show => show.ids.trakt);
+    const showIds = shows.map((show) => show.ids.trakt);
 
     if (loading) {
       return (
@@ -144,18 +145,15 @@ class Shows extends Component {
     return (
       <div>
         <div className="center">
-          <AddShow
-            addShow={show => this.addShow(show)}
-            showIds={showIds}
-          />
+          <AddShow addShow={(show) => this.addShow(show)} showIds={showIds} />
         </div>
         <div
           className="shows"
-          ref={el => {
+          ref={(el) => {
             this.grid = el;
           }}
         >
-          {shows.map(show => (
+          {shows.map((show) => (
             <Show key={show.ids.trakt} show={show} hasHover={hasHover} />
           ))}
         </div>

@@ -1,23 +1,23 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import "./index.css";
-import Router from "./Router";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import Router from './Router';
 import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(<Router />, document.getElementById("root"));
+ReactDOM.render(<Router />, document.getElementById('root'));
 
 serviceWorker.register({
   // kudos to https://stackoverflow.com/a/58596965
-  onUpdate: registration => {
-    const waitingServiceWorker = registration.waiting
+  onUpdate: (registration) => {
+    const waitingServiceWorker = registration.waiting;
 
     if (waitingServiceWorker) {
-      waitingServiceWorker.addEventListener("statechange", event => {
-        if (event.target.state === "activated") {
-          window.location.reload()
+      waitingServiceWorker.addEventListener('statechange', (event) => {
+        if (event.target.state === 'activated') {
+          window.location.reload();
         }
       });
-      waitingServiceWorker.postMessage({ type: "SKIP_WAITING" });
+      waitingServiceWorker.postMessage({ type: 'SKIP_WAITING' });
     }
-  }
+  },
 });

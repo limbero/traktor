@@ -1,7 +1,7 @@
-import runtimeEnv from "@mars/heroku-js-runtime-env";
-import store from "../redux/store";
-import { setToken } from "../redux/actions";
-import { Util, CorsError } from "../Util";
+import runtimeEnv from '@mars/heroku-js-runtime-env';
+import store from '../redux/store';
+import { setToken } from '../redux/actions';
+import { Util, CorsError } from '../Util';
 
 const env = runtimeEnv();
 let getNewToken = false;
@@ -19,11 +19,11 @@ class Trakt {
   static async headers() {
     const token = await Trakt.token();
     return {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-      "trakt-api-version": "2",
-      "trakt-api-key": env.REACT_APP_TRAKT_CLIENT_ID,
-      "Authorization": `Bearer ${token.access_token}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'trakt-api-version': '2',
+      'trakt-api-key': env.REACT_APP_TRAKT_CLIENT_ID,
+      Authorization: `Bearer ${token.access_token}`,
     };
   }
 
@@ -35,27 +35,27 @@ class Trakt {
     }
     if (getNewToken) {
       getNewToken = false;
-      onGoingTokenRequest = Trakt.refreshToken(token).then(response => {
+      onGoingTokenRequest = Trakt.refreshToken(token).then((response) => {
         onGoingTokenRequest = null;
         return response;
       });
       const freshToken = await onGoingTokenRequest;
-      localStorage.setItem("traktor_trakt_token", JSON.stringify(freshToken));
+      localStorage.setItem('traktor_trakt_token', JSON.stringify(freshToken));
       store.dispatch(setToken(freshToken));
       return freshToken;
     }
 
     if (token === null) {
       const localStorageToken = JSON.parse(
-        localStorage.getItem("traktor_trakt_token")
+        localStorage.getItem('traktor_trakt_token')
       );
       if (localStorageToken === null) {
-        throw Error("Not authenticated");
+        throw Error('Not authenticated');
       }
 
       const freshToken = await Trakt.refreshTokenIfNecessary(localStorageToken);
       if (freshToken.created_at !== localStorageToken.created_at) {
-        localStorage.setItem("traktor_trakt_token", JSON.stringify(freshToken));
+        localStorage.setItem('traktor_trakt_token', JSON.stringify(freshToken));
       }
       store.dispatch(setToken(freshToken));
       return freshToken;
@@ -65,7 +65,7 @@ class Trakt {
 
     if (freshToken.created_at !== token.created_at) {
       store.dispatch(setToken(freshToken));
-      localStorage.setItem("traktor_trakt_token", JSON.stringify(freshToken));
+      localStorage.setItem('traktor_trakt_token', JSON.stringify(freshToken));
     }
     return freshToken;
   }
@@ -74,16 +74,16 @@ class Trakt {
     return Trakt.postToTokenEndpoint({
       ...Trakt.basicTokenPayload(),
       code,
-      grant_type: "authorization_code",
+      grant_type: 'authorization_code',
     });
   }
 
   static async postToTokenEndpoint(payload) {
-    return Util.fetchJson("https://api.trakt.tv/oauth/token", {
-      method: "POST",
+    return Util.fetchJson('https://api.trakt.tv/oauth/token', {
+      method: 'POST',
       headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
     });
@@ -93,9 +93,9 @@ class Trakt {
     return Trakt.postToTokenEndpoint({
       ...Trakt.basicTokenPayload(),
       refresh_token: token.refresh_token,
-      grant_type: "refresh_token",
+      grant_type: 'refresh_token',
     }).catch(() => {
-      localStorage.removeItem("traktor_trakt_token");
+      localStorage.removeItem('traktor_trakt_token');
       window.location.reload();
     });
   }
@@ -113,12 +113,12 @@ class Trakt {
 
   static async get(url) {
     const init = {
-      method: "GET",
+      method: 'GET',
       headers: await Trakt.headers(),
-      cache: "no-store",
+      cache: 'no-store',
     };
 
-    return Util.fetchJsonWithRetry(url, init, 3).catch(error => {
+    return Util.fetchJsonWithRetry(url, init, 3).catch((error) => {
       if (error instanceof CorsError) {
         getNewToken = true;
         return Trakt.get(url);
@@ -135,28 +135,28 @@ class Trakt {
 
   static async getHiddenShows() {
     return Trakt.get(
-      "https://api.trakt.tv/users/hidden/progress_watched?type=show&limit=100"
+      'https://api.trakt.tv/users/hidden/progress_watched?type=show&limit=100'
     );
   }
 
   static async getRatings() {
-    return Trakt.get("https://api.trakt.tv/users/me/ratings/shows");
+    return Trakt.get('https://api.trakt.tv/users/me/ratings/shows');
   }
 
   static async getResetShows() {
     return Trakt.get(
-      "https://api.trakt.tv/users/hidden/progress_watched_reset?type=show&limit=100"
+      'https://api.trakt.tv/users/hidden/progress_watched_reset?type=show&limit=100'
     );
   }
 
   static async getShows() {
-    return Trakt.get(
-      "https://api.trakt.tv/users/me/watched/shows"
-    );
+    return Trakt.get('https://api.trakt.tv/users/me/watched/shows');
   }
 
   static async getShowForStatistics(id) {
-    return Trakt.get(`https://api.trakt.tv/shows/${id}/progress/watched?extended=full`);
+    return Trakt.get(
+      `https://api.trakt.tv/shows/${id}/progress/watched?extended=full`
+    );
   }
 
   static async getShowProgress(id) {
@@ -174,9 +174,9 @@ class Trakt {
     };
 
     return Util.fetchJsonWithRetry(
-      "https://api.trakt.tv/sync/history",
+      'https://api.trakt.tv/sync/history',
       {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify(watched),
         headers: await Trakt.headers(),
       },
@@ -194,9 +194,9 @@ class Trakt {
     };
 
     return Util.fetchJsonWithRetry(
-      "https://api.trakt.tv/users/hidden/progress_watched",
+      'https://api.trakt.tv/users/hidden/progress_watched',
       {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify(payload),
         headers: await Trakt.headers(),
       },
@@ -212,10 +212,10 @@ class Trakt {
 
   static countWatchedSinceReset(show, resetAt) {
     return show.seasons
-      .filter(season => season.number !== 0)
-      .map(season =>
+      .filter((season) => season.number !== 0)
+      .map((season) =>
         season.episodes
-          .map(episode =>
+          .map((episode) =>
             Date.parse(episode.last_watched_at) > resetAt ? 1 : 0
           )
           .reduce((a, b) => a + b, 0)
@@ -227,19 +227,23 @@ class Trakt {
     const resetAt = this.showResetAt(show);
 
     const episodes = show.seasons
-      .filter(season => season.number !== 0)
-      .flatMap(season => season.episodes.map(ep => ({...ep, season: season.number})));
+      .filter((season) => season.number !== 0)
+      .flatMap((season) =>
+        season.episodes.map((ep) => ({ ...ep, season: season.number }))
+      );
 
     const lastWatched = episodes
-      .map((ep, index) => ({...ep, index}))
-      .filter(episode =>
-        episode.last_watched_at && Date.parse(episode.last_watched_at) > resetAt
+      .map((ep, index) => ({ ...ep, index }))
+      .filter(
+        (episode) =>
+          episode.last_watched_at &&
+          Date.parse(episode.last_watched_at) > resetAt
       )
       .sort((a, b) => {
         const aDate = Date.parse(a.last_watched_at);
         const bDate = Date.parse(b.last_watched_at);
         if (aDate !== bDate) {
-          return bDate - aDate
+          return bDate - aDate;
         } else if (a.season !== b.season) {
           return b.season - a.season;
         } else {
@@ -261,9 +265,7 @@ class Trakt {
   }
 
   static showResetAt(show) {
-    return !show.reset_at
-      ? new Date(0)
-      : Date.parse(show.reset_at);
+    return !show.reset_at ? new Date(0) : Date.parse(show.reset_at);
   }
 }
 

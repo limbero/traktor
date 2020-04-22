@@ -1,10 +1,10 @@
-import React, { Component } from "react";
-import CountUp from "react-countup";
-import Helpers from "../Helpers";
-import Trakt from "../apis/Trakt";
-import TheMovieDb from "../apis/TheMovieDb";
-import { Util } from "../Util";
-import ShowProgressBar from "./ShowProgressBar";
+import React, { Component } from 'react';
+import CountUp from 'react-countup';
+import Helpers from '../Helpers';
+import Trakt from '../apis/Trakt';
+import TheMovieDb from '../apis/TheMovieDb';
+import { Util } from '../Util';
+import ShowProgressBar from './ShowProgressBar';
 
 class Show extends Component {
   constructor(props) {
@@ -32,7 +32,7 @@ class Show extends Component {
 
   async getNext(show) {
     const next_episode = await Trakt.nextEpisodeForRewatch(show);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       show: {
         ...prevState.show,
@@ -43,11 +43,11 @@ class Show extends Component {
 
   resetOrToss() {
     const { xOffset, xSpeed, swiping } = this.state;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       swiping: 0,
     }));
-    if (xSpeed > 10 && swiping === 2 ) {
+    if (xSpeed > 10 && swiping === 2) {
       const xVelocity = xOffset > 0 ? xSpeed : -xSpeed;
       this.tossStep(xVelocity);
     } else {
@@ -63,15 +63,17 @@ class Show extends Component {
   async tossStep(velocity) {
     const { xOffset, elementWidth, show } = this.state;
     if (Math.abs(xOffset) < elementWidth) {
-      this.setState(prevState => ({
+      this.setState((prevState) => ({
         ...prevState,
-        xOffset: xOffset+velocity,
+        xOffset: xOffset + velocity,
       }));
       window.requestAnimationFrame(() => this.tossStep(velocity));
-    } else if (window.confirm(`Do you want to permanently hide ${show.title}?`)) {
+    } else if (
+      window.confirm(`Do you want to permanently hide ${show.title}?`)
+    ) {
       const response = await Trakt.hideShow(show.ids);
       if (response.added.shows === 1) {
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           ...prevState,
           seenEverything: true,
         }));
@@ -85,14 +87,14 @@ class Show extends Component {
 
   resetStep(velocity) {
     const { xOffset } = this.state;
-    if (Math.abs(xOffset) > Math.abs(xOffset-velocity)) {
-      this.setState(prevState => ({
+    if (Math.abs(xOffset) > Math.abs(xOffset - velocity)) {
+      this.setState((prevState) => ({
         ...prevState,
-        xOffset: xOffset-velocity,
+        xOffset: xOffset - velocity,
       }));
       window.requestAnimationFrame(() => this.resetStep(velocity));
     } else {
-      this.setState(prevState => ({
+      this.setState((prevState) => ({
         ...prevState,
         initialX: Number.MIN_VALUE,
         lastX: Number.MIN_VALUE,
@@ -109,7 +111,7 @@ class Show extends Component {
       e.persist();
     }
     if (e.touches && e.touches.length > 1) {
-      this.setState(prevState => ({
+      this.setState((prevState) => ({
         ...prevState,
         swiping: 0,
       }));
@@ -118,7 +120,7 @@ class Show extends Component {
     }
     const clientX = e.clientX || e.changedTouches[0].clientX;
     const clientY = e.clientY || e.changedTouches[0].clientY;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       swiping: 1,
       initialX: clientX,
@@ -131,11 +133,7 @@ class Show extends Component {
     if (typeof e.persist === 'function') {
       e.persist();
     }
-    const {
-      swiping,
-      lastX,
-      lastY,
-    } = this.state;
+    const { swiping, lastX, lastY } = this.state;
     if (swiping === 0) {
       return;
     }
@@ -145,7 +143,7 @@ class Show extends Component {
     const yDiff = clientY - lastY;
     const xSpeed = Math.abs(xDiff);
     const ySpeed = Math.abs(yDiff);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       xSpeed,
     }));
@@ -153,19 +151,19 @@ class Show extends Component {
       case 1:
         if (ySpeed >= xSpeed) {
           if (ySpeed > 0) {
-            this.setState(prevState => ({
+            this.setState((prevState) => ({
               ...prevState,
               swiping: 0,
             }));
           }
           return;
         }
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           ...prevState,
           swiping: 2,
         }));
       case 2:
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           ...prevState,
           xOffset: prevState.xOffset + xDiff,
           lastX: clientX,
@@ -176,22 +174,28 @@ class Show extends Component {
   }
 
   updateElementWidth() {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       elementWidth: this.showElement.current.offsetWidth,
     }));
-    this.showElement.current.addEventListener('touchstart', e => this.onDown(e));
-    this.showElement.current.addEventListener('touchmove', e => this.onMove(e));
-    this.showElement.current.addEventListener('touchend', e => this.resetOrToss(e));
-  };
+    this.showElement.current.addEventListener('touchstart', (e) =>
+      this.onDown(e)
+    );
+    this.showElement.current.addEventListener('touchmove', (e) =>
+      this.onMove(e)
+    );
+    this.showElement.current.addEventListener('touchend', (e) =>
+      this.resetOrToss(e)
+    );
+  }
 
   componentDidMount() {
-    window.addEventListener("resize", () => this.updateElementWidth());
+    window.addEventListener('resize', () => this.updateElementWidth());
     this.updateElementWidth();
   }
 
   componentWillUnmount() {
-    window.removeEventListener("resize", () => this.updateElementWidth());
+    window.removeEventListener('resize', () => this.updateElementWidth());
   }
 
   async markNextWatched() {
@@ -199,7 +203,7 @@ class Show extends Component {
 
     const debugging = false;
 
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       loading: true,
       show: {
@@ -210,7 +214,7 @@ class Show extends Component {
 
     if (!debugging) {
       await Trakt.markEpisodeWatched(show.next_episode.ids).catch(() => {
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           ...prevState,
           success: 0,
           loading: false,
@@ -227,7 +231,7 @@ class Show extends Component {
 
     const newCompleted = debugging ? show.aired : show.completed;
 
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       success: 1,
       loading: false,
@@ -242,7 +246,7 @@ class Show extends Component {
       ? Promise.resolve(show.next_episode)
       : Trakt.nextEpisodeForRewatch(show);
     await Helpers.sleep(350);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       success: 2,
     }));
@@ -252,7 +256,7 @@ class Show extends Component {
     }
 
     const [, newNext] = await Promise.all([Helpers.sleep(350), newData]);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       success: 0,
       show: {
@@ -266,7 +270,7 @@ class Show extends Component {
   async fetchImage() {
     const { show } = this.state;
     const image = await TheMovieDb.getImage(show.ids.tmdb);
-    this.setState(prevState => ({ ...prevState, image }));
+    this.setState((prevState) => ({ ...prevState, image }));
   }
 
   render() {
@@ -293,7 +297,7 @@ class Show extends Component {
       show.completed === show.aired && [0, 2].includes(success);
     if (seenAllAndReadyToRemove) {
       setTimeout(() => {
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           ...prevState,
           seenEverything: true,
         }));
@@ -303,67 +307,65 @@ class Show extends Component {
     return (
       <div>
         <div
-          onMouseDown={e => this.onDown(e)}
-          onMouseMove={e => this.onMove(e)}
-          onMouseUp={e => this.resetOrToss(e)}
-          onMouseLeave={e => this.resetOrToss()}
-          className={`show${!hasHover ? " no-hover" : ""}${
-            show.addedFromSearch ? " added-from-search" : ""
-          }${seenAllAndReadyToRemove ? " seen-everything" : ""}`}
+          onMouseDown={(e) => this.onDown(e)}
+          onMouseMove={(e) => this.onMove(e)}
+          onMouseUp={(e) => this.resetOrToss(e)}
+          onMouseLeave={(e) => this.resetOrToss()}
+          className={`show${!hasHover ? ' no-hover' : ''}${
+            show.addedFromSearch ? ' added-from-search' : ''
+          }${seenAllAndReadyToRemove ? ' seen-everything' : ''}`}
           style={{
-            backgroundImage: image ? `url(${image})` : "none",
+            backgroundImage: image ? `url(${image})` : 'none',
             transform: `translateX(${xOffset}px)`,
-            opacity: 1 - (Math.abs(xOffset) / elementWidth),
+            opacity: 1 - Math.abs(xOffset) / elementWidth,
             zIndex: swiping,
           }}
           ref={this.showElement}
         >
           <div className="show-top-area">
-            <ShowProgressBar show={show}/>
+            <ShowProgressBar show={show} />
             <p className="title">{show.title}</p>
           </div>
-          {
-            next ? (
-              <div className="next-episode">
-                <p className="prefix">Next up</p>
-                <a
-                  href={`https://trakt.tv/shows/${show.ids.slug}/seasons/${show.next_episode.season}/episodes/${show.next_episode.number}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`episode-info success-${success}`}
-                >
-                  <p className="season-and-episode-number">
-                    {`S${Util.zeropad(next.season)}E${Util.zeropad(next.number)}`}
-                  </p>
-                  <p className="episode-title">{next.title}</p>
-                </a>
-                <div className="progress-text">
-                  <p className="percentage">
-                    <CountUp
-                      start={prevPct}
-                      end={completedFraction}
-                      duration={1.5}
-                      useEasing
-                      separator=" "
-                      decimals={1}
-                      decimal="."
-                      suffix="%"
-                    />
-                  </p>
-                  <p className="absolute">{`[${show.completed}/${show.aired}]`}</p>
-                </div>
-                <button
-                  className={`small-btn btn${
-                    success > 0 || done ? " success" : ""
-                  }${loading ? " loading" : ""}`}
-                  type="button"
-                  onClick={done ? null : e => this.markNextWatched(e)}
-                >
-                  <span>&gt;</span>
-                </button>
+          {next ? (
+            <div className="next-episode">
+              <p className="prefix">Next up</p>
+              <a
+                href={`https://trakt.tv/shows/${show.ids.slug}/seasons/${show.next_episode.season}/episodes/${show.next_episode.number}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`episode-info success-${success}`}
+              >
+                <p className="season-and-episode-number">
+                  {`S${Util.zeropad(next.season)}E${Util.zeropad(next.number)}`}
+                </p>
+                <p className="episode-title">{next.title}</p>
+              </a>
+              <div className="progress-text">
+                <p className="percentage">
+                  <CountUp
+                    start={prevPct}
+                    end={completedFraction}
+                    duration={1.5}
+                    useEasing
+                    separator=" "
+                    decimals={1}
+                    decimal="."
+                    suffix="%"
+                  />
+                </p>
+                <p className="absolute">{`[${show.completed}/${show.aired}]`}</p>
               </div>
-            ) : null
-          }
+              <button
+                className={`small-btn btn${
+                  success > 0 || done ? ' success' : ''
+                }${loading ? ' loading' : ''}`}
+                type="button"
+                onClick={done ? null : (e) => this.markNextWatched(e)}
+              >
+                <span>&gt;</span>
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     );

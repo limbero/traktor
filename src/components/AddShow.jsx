@@ -1,22 +1,22 @@
-import React, { Component } from "react";
-import ReactModal from "react-modal";
-import Trakt from "../apis/Trakt";
-import ShowToAdd from "./ShowToAdd";
+import React, { Component } from 'react';
+import ReactModal from 'react-modal';
+import Trakt from '../apis/Trakt';
+import ShowToAdd from './ShowToAdd';
 
-ReactModal.setAppElement("#root");
+ReactModal.setAppElement('#root');
 
 class AddShow extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isOpen: false,
-      query: "",
+      query: '',
       results: [],
     };
   }
 
   setQuery(query) {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       query,
     }));
@@ -32,14 +32,14 @@ class AddShow extends Component {
   }
 
   async search() {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       results: [],
     }));
     const { query } = this.state;
     const results = await Trakt.search(query, 20);
 
-    const progressPromises = results.map(result =>
+    const progressPromises = results.map((result) =>
       Trakt.getShowProgress(result.show.ids.trakt)
     );
     const progresses = await Promise.all(progressPromises);
@@ -57,17 +57,17 @@ class AddShow extends Component {
           seasons: show.seasons,
         };
       })
-      .filter(show => show.aired !== show.completed)
+      .filter((show) => show.aired !== show.completed)
       .slice(0, 9);
 
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       results: shows,
     }));
   }
 
   hideSearchModal() {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       isOpen: false,
       results: [],
@@ -75,7 +75,7 @@ class AddShow extends Component {
   }
 
   handleKeyPress(e) {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       this.search();
       e.preventDefault();
     }
@@ -83,7 +83,7 @@ class AddShow extends Component {
 
   showSearchModal() {
     this.setState(
-      prevState => ({
+      (prevState) => ({
         ...prevState,
         isOpen: true,
       }),
@@ -127,9 +127,9 @@ class AddShow extends Component {
               <input
                 type="search"
                 value={query}
-                onChange={e => this.setQuery(e.target.value)}
-                onKeyPress={e => this.handleKeyPress(e)}
-                ref={input => {
+                onChange={(e) => this.setQuery(e.target.value)}
+                onKeyPress={(e) => this.handleKeyPress(e)}
+                ref={(input) => {
                   this.queryInput = input;
                 }}
               />
@@ -144,7 +144,7 @@ class AddShow extends Component {
               </button>
             </form>
             <div className="results shows">
-              {results.map(result => (
+              {results.map((result) => (
                 <ShowToAdd
                   key={result.ids.trakt}
                   show={result}

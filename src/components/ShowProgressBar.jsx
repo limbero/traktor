@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
-export default function ShowProgressBar({show}) {
-  const episodes = show.seasons.flatMap(season => season.episodes);
+export default function ShowProgressBar({ show }) {
+  const episodes = show.seasons.flatMap((season) => season.episodes);
   const oneEpisodeWidth = 100 / episodes.length;
   return episodes.map((ep, id) => (
     <div
