@@ -9,7 +9,7 @@ function sum(array) {
 
 function humanTime(minutes) {
   if (minutes < 0) {
-    return `minus ${humanTime(-minutes)}`;
+    return humanTime(-minutes);
   } else if (minutes === 0) {
     return '0 minutes';
   }
@@ -127,16 +127,27 @@ const Statistics = ({ showIds, includedShows }) => {
     )
   );
 
-  const addedMinutes = sum(
+  const addedMinutes = Math.round(sum(
     calendarEpisodes
       .map((ep) => showToRuntimeMap[ep.show.ids.trakt])
       .filter((ep) => typeof ep !== 'undefined')
-  );
-  const watchedMinutes = sum(
+  ) / LOOKBACK_DAYS);
+  const watchedMinutes = Math.round(sum(
     historyEpisodes
       .map((ep) => showToRuntimeMap[ep.show.ids.trakt])
       .filter((ep) => typeof ep !== 'undefined')
-  );
+  ) / LOOKBACK_DAYS);
+
+  const velocity = addedMinutes - watchedMinutes;
+  const sign = (() => {
+    if (velocity > 0) {
+      return '+';
+    } else if (velocity === 0) {
+      return '±';
+    } else {
+      return '-';
+    }
+  })();
 
   return (
     <div style={{ margin: '0 2em 50px' }}>
@@ -147,14 +158,13 @@ const Statistics = ({ showIds, includedShows }) => {
       </p>
       <p style={{ marginBottom: 0 }}>Average per day over the past month:</p>
       <p style={{ margin: 0 }}>
-        {humanTime(Math.floor(watchedMinutes / LOOKBACK_DAYS))} watched
+        {humanTime(watchedMinutes)} watched
       </p>
       <p style={{ margin: 0 }}>
-        {humanTime(Math.floor(addedMinutes / LOOKBACK_DAYS))} of new TV aired
+        {humanTime(addedMinutes)} of new TV aired
       </p>
       <p style={{ margin: 0 }}>
-        Net velocity{' '}
-        {humanTime(Math.floor((addedMinutes - watchedMinutes) / LOOKBACK_DAYS))}
+        Net velocity {sign} {humanTime(velocity)} per day
       </p>
     </div>
   );
