@@ -45,6 +45,9 @@ function humanTime(minutes) {
       values[unitName]++;
       minutesLeft -= unitSize;
     }
+    if (unitName === 'minute') {
+      values[unitName]++;
+    }
   });
 
   const valueStrings = Object.entries(values)
@@ -164,7 +167,7 @@ const Statistics = ({ showIds, includedShows }) => {
         {humanTime(addedMinutes)} of new TV aired
       </p>
       <p style={{ margin: 0 }}>
-        Net velocity {sign} {humanTime(velocity)} per day
+        Net velocity {sign}{humanTime(velocity)} per day
       </p>
     </div>
   );
