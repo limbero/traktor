@@ -22,7 +22,9 @@ class TheMovieDb {
     }
     const cached = localStorage.getItem(id);
     if (cached && cached.startsWith('https://')) {
-      return cached;
+      if ((await fetch(cached)).status === 200) {
+        return cached;
+      }
     }
 
     return TheMovieDb.get(`https://api.themoviedb.org/3/tv/${id}/images`)
