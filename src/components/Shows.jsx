@@ -94,7 +94,7 @@ class Shows extends Component {
         .filter((show) => show.completed !== show.aired)
     );
     const shows = showPromises
-      .filter((show) => show.aired !== show.completed)
+      .filter((show) => show.aired > show.completed)
       .sort((a, b) => {
         if (a.rating > b.rating) {
           return -1;
