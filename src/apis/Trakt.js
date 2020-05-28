@@ -275,7 +275,7 @@ class Trakt {
         }
       })[0];
 
-    for (let i = lastWatched.index; i < episodes.length; i++) {
+    for (let i = lastWatched?.index || 0; i < episodes.length; i++) {
       if (!episodes[i].last_watched_at) {
         return Trakt.getEpisode(
           show.ids.trakt,
