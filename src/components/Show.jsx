@@ -199,7 +199,13 @@ class Show extends Component {
   }
 
   async markNextWatched() {
-    let { show } = this.state;
+    const { show } = this.state;
+
+    let showNotFromSearch = {
+      ...show,
+      addedFromSearch: false,
+    }
+
 
     const debugging = false;
 
@@ -213,23 +219,23 @@ class Show extends Component {
     }));
 
     if (!debugging) {
-      await Trakt.markEpisodeWatched(show.next_episode.ids).catch(() => {
+      await Trakt.markEpisodeWatched(showNotFromSearch.next_episode.ids).catch(() => {
         this.setState((prevState) => ({
           ...prevState,
           success: 0,
           loading: false,
         }));
       });
-      const newProgress = await Trakt.getShowProgress(show.ids.trakt);
-      show = {
-        ...show,
+      const newProgress = await Trakt.getShowProgress(showNotFromSearch.ids.trakt);
+      showNotFromSearch = {
+        ...showNotFromSearch,
         ...newProgress,
         show: newProgress,
-        next_episode: show.next_episode,
+        next_episode: showNotFromSearch.next_episode,
       };
     }
 
-    const newCompleted = debugging ? show.aired : show.completed;
+    const newCompleted = debugging ? showNotFromSearch.aired : showNotFromSearch.completed;
 
     this.setState((prevState) => ({
       ...prevState,
@@ -237,21 +243,21 @@ class Show extends Component {
       loading: false,
       show: {
         ...prevState.show,
-        ...show,
+        ...showNotFromSearch,
         completed: newCompleted,
       },
     }));
 
     const newData = debugging
-      ? Promise.resolve(show.next_episode)
-      : Trakt.nextEpisodeForRewatch(show);
+      ? Promise.resolve(showNotFromSearch.next_episode)
+      : Trakt.nextEpisodeForRewatch(showNotFromSearch);
     await Helpers.sleep(350);
     this.setState((prevState) => ({
       ...prevState,
       success: 2,
     }));
 
-    if (show.completed === show.aired) {
+    if (showNotFromSearch.completed === showNotFromSearch.aired) {
       return;
     }
 
@@ -263,7 +269,7 @@ class Show extends Component {
         ...prevState.show,
         next_episode: newNext,
       },
-      prevPct: 100 * (show.completed / show.aired),
+      prevPct: 100 * (showNotFromSearch.completed / showNotFromSearch.aired),
     }));
   }
 
