@@ -312,66 +312,66 @@ class Show extends Component {
     const done = false;
     return (
       <div>
-        <div
-          onMouseDown={(e) => this.onDown(e)}
-          onMouseMove={(e) => this.onMove(e)}
-          onMouseUp={(e) => this.resetOrToss(e)}
-          onMouseLeave={(e) => this.resetOrToss()}
-          className={`show${!hasHover ? ' no-hover' : ''}${
-            show.addedFromSearch ? ' added-from-search' : ''
-          }${seenAllAndReadyToRemove ? ' seen-everything' : ''}`}
-          style={{
-            backgroundImage: image ? `url(${image})` : 'none',
-            transform: `translateX(${xOffset}px)`,
-            opacity: 1 - Math.abs(xOffset) / elementWidth,
-            zIndex: swiping,
-          }}
-          ref={this.showElement}
-        >
-          <div className="show-top-area">
-            <ShowProgressBar show={show} />
-            <p className="title">{show.title}</p>
-          </div>
-          {next ? (
-            <div className="next-episode">
-              <p className="prefix">Next up</p>
-              <a
-                href={`https://trakt.tv/shows/${show.ids.slug}/seasons/${show.next_episode.season}/episodes/${show.next_episode.number}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`episode-info success-${success}`}
-              >
-                <p className="season-and-episode-number">
-                  {`S${Util.zeropad(next.season)}E${Util.zeropad(next.number)}`}
-                </p>
-                <p className="episode-title">{next.title}</p>
-              </a>
-              <div className="progress-text">
-                <p className="percentage">
-                  <CountUp
-                    start={prevPct}
-                    end={completedFraction}
-                    duration={1.5}
-                    useEasing
-                    separator=" "
-                    decimals={1}
-                    decimal="."
-                    suffix="%"
-                  />
-                </p>
-                <p className="absolute">{`[${show.completed}/${show.aired}]`}</p>
-              </div>
-              <button
-                className={`small-btn btn${
-                  success > 0 || done ? ' success' : ''
-                }${loading ? ' loading' : ''}`}
-                type="button"
-                onClick={done ? null : (e) => this.markNextWatched(e)}
-              >
-                <span>&gt;</span>
-              </button>
+        <div className={show.addedFromSearch ? 'added-from-search' : ''}>
+          <div
+            onMouseDown={(e) => this.onDown(e)}
+            onMouseMove={(e) => this.onMove(e)}
+            onMouseUp={(e) => this.resetOrToss(e)}
+            onMouseLeave={(e) => this.resetOrToss()}
+            className={`show${!hasHover ? ' no-hover' : ''}${seenAllAndReadyToRemove ? ' seen-everything' : ''}`}
+            style={{
+              backgroundImage: image ? `url(${image})` : 'none',
+              transform: `translateX(${xOffset}px)`,
+              opacity: 1 - Math.abs(xOffset) / elementWidth,
+              zIndex: swiping,
+            }}
+            ref={this.showElement}
+          >
+            <div className="show-top-area">
+              <ShowProgressBar show={show} />
+              <p className="title">{show.title}</p>
             </div>
-          ) : null}
+            {next ? (
+              <div className="next-episode">
+                <p className="prefix">Next up</p>
+                <a
+                  href={`https://trakt.tv/shows/${show.ids.slug}/seasons/${show.next_episode.season}/episodes/${show.next_episode.number}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`episode-info success-${success}`}
+                >
+                  <p className="season-and-episode-number">
+                    {`S${Util.zeropad(next.season)}E${Util.zeropad(next.number)}`}
+                  </p>
+                  <p className="episode-title">{next.title}</p>
+                </a>
+                <div className="progress-text">
+                  <p className="percentage">
+                    <CountUp
+                      start={prevPct}
+                      end={completedFraction}
+                      duration={1.5}
+                      useEasing
+                      separator=" "
+                      decimals={1}
+                      decimal="."
+                      suffix="%"
+                    />
+                  </p>
+                  <p className="absolute">{`[${show.completed}/${show.aired}]`}</p>
+                </div>
+                <button
+                  className={`small-btn btn${
+                    success > 0 || done ? ' success' : ''
+                  }${loading ? ' loading' : ''}`}
+                  type="button"
+                  onClick={done ? null : (e) => this.markNextWatched(e)}
+                >
+                  <span>&gt;</span>
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     );

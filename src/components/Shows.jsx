@@ -30,6 +30,9 @@ class Shows extends Component {
         stagger: 0,
         duration: 400,
         easing: 'backOut',
+        onEnd: () => {
+          document.querySelector('.shows').children[0].children[0].classList.add('visible');
+        },
       });
     }
   }
