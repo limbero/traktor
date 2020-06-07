@@ -198,6 +198,22 @@ class Show extends Component {
     window.removeEventListener('resize', () => this.updateElementWidth());
   }
 
+  async updateProgress() {
+    const { show } = this.state;
+    const newProgress = await Trakt.getShowProgress(show.ids.trakt);
+    this.setState((prevState) => ({
+      ...prevState,
+      show: {
+        ...prevState.show,
+        ...newProgress,
+        show: {
+          ...prevState.show.show,
+          ...newProgress,
+        },
+      },
+    }));
+  }
+
   async markNextWatched() {
     const { show } = this.state;
 
@@ -329,7 +345,11 @@ class Show extends Component {
           >
             <div className="show-top-area">
               <ShowProgressBar show={show} />
-              <p className="title">{show.title}</p>
+              <p
+                className="title"
+                onClick={() => this.updateProgress()}
+                style={{ cursor: 'pointer' }}
+              >{show.title}</p>
             </div>
             {next ? (
               <div className="next-episode">
