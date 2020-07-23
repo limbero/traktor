@@ -15,7 +15,7 @@ class Show extends Component {
       loading: false,
       show,
       image: null,
-      prevPct: 0,
+      prevPct: 100 * (show.completed / show.aired),
       seenEverything: false,
       initialX: Number.MIN_VALUE,
       lastX: Number.MIN_VALUE,
@@ -251,8 +251,11 @@ class Show extends Component {
       };
     }
 
-    const newCompleted = debugging ? showNotFromSearch.aired : showNotFromSearch.completed;
-
+    const newCompleted = debugging ? showNotFromSearch.aired : Trakt.countWatchedSinceReset(showNotFromSearch);
+    showNotFromSearch = {
+      ...showNotFromSearch,
+      completed: newCompleted,
+    };
     this.setState((prevState) => ({
       ...prevState,
       success: 1,
@@ -260,7 +263,6 @@ class Show extends Component {
       show: {
         ...prevState.show,
         ...showNotFromSearch,
-        completed: newCompleted,
       },
     }));
 
@@ -273,7 +275,7 @@ class Show extends Component {
       success: 2,
     }));
 
-    if (showNotFromSearch.completed === showNotFromSearch.aired) {
+    if (Trakt.countWatchedSinceReset(showNotFromSearch) === showNotFromSearch.aired) {
       return;
     }
 

@@ -234,7 +234,8 @@ class Trakt {
     );
   }
 
-  static countWatchedSinceReset(show, resetAt) {
+  static countWatchedSinceReset(show) {
+    const resetAt = this.showResetAt(show);
     return show.seasons
       .filter((season) => season.number !== 0)
       .map((season) =>
@@ -249,7 +250,6 @@ class Trakt {
 
   static async nextEpisodeForRewatch(show) {
     const resetAt = this.showResetAt(show);
-
     const episodes = show.seasons
       .filter((season) => season.number !== 0)
       .flatMap((season) =>
@@ -274,9 +274,11 @@ class Trakt {
           return b.number - a.number;
         }
       })[0];
-
+    if (!lastWatched) {
+      return Trakt.getEpisode(show.ids.trakt, 1, 1);
+    }
     for (let i = lastWatched?.index || 0; i < episodes.length; i++) {
-      if (!episodes[i].last_watched_at) {
+      if (!episodes[i].last_watched_at || Date.parse(episodes[i].last_watched_at) < resetAt) {
         return Trakt.getEpisode(
           show.ids.trakt,
           episodes[i].season,
@@ -289,7 +291,17 @@ class Trakt {
   }
 
   static showResetAt(show) {
-    return !show.reset_at ? new Date(0) : Date.parse(show.reset_at);
+    if (!show.reset_at) {
+      return new Date(0).getTime();
+    } else if (typeof show.reset_at === 'number') {
+      return show.reset_at;
+    } else if (typeof show.reset_at === 'string') {
+      return Date.parse(show.reset_at);
+    } else if (show.reset_at instanceof Date) {
+      return show.reset_at.getTime();
+    } else {
+      throw new Error('wtf did you just pass to showResetAt?');
+    }
   }
 }
 

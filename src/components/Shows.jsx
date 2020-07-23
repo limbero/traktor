@@ -56,14 +56,7 @@ class Shows extends Component {
     const watchedShows = apiWatchedShows
       .filter(
         (watchedShow) => !hiddenShows.includes(watchedShow.show.ids.trakt)
-      )
-      .map((watchedShow) => ({
-        ...watchedShow,
-        watched_since_reset: Trakt.countWatchedSinceReset(
-          watchedShow,
-          Trakt.showResetAt(watchedShow)
-        ),
-      }));
+      );
 
     const ratedShowMap = {};
     apiRatings.forEach((ratedShow) => {
@@ -87,7 +80,7 @@ class Shows extends Component {
             title: watched.show.title,
             ids: watched.show.ids,
             aired: show.aired,
-            completed: watched.watched_since_reset,
+            completed: Trakt.countWatchedSinceReset(show),
             last_watched_at: watched.last_watched_at,
             reset_at: Trakt.showResetAt(watched),
             seasons: show.seasons,
