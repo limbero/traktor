@@ -82,7 +82,7 @@ const Statistics = ({ showIds, includedShows }) => {
       setShows(fetchedShows);
       const srMap = {};
       fetchedShows.forEach((show, index) => {
-        srMap[showIds[index]] = show.next_episode.runtime;
+        srMap[showIds[index]] = show.next_episode?.runtime || show.last_episode?.runtime;
       });
 
       const calEpsPromise = Trakt.getCalendarDaysBack(LOOKBACK_DAYS);
@@ -115,7 +115,7 @@ const Statistics = ({ showIds, includedShows }) => {
         unknownLengthShowIds.map((showId) => Trakt.getShowForStatistics(showId))
       );
       additionalLengths.forEach((show, index) => {
-        srMap[unknownLengthShowIds[index]] = show.last_episode.runtime;
+        srMap[unknownLengthShowIds[index]] = show.next_episode?.runtime || show.last_episode?.runtime;
       });
       setShowToRuntimeMap(srMap);
     })();
@@ -126,7 +126,10 @@ const Statistics = ({ showIds, includedShows }) => {
   );
   const unfinishedMinutes = sum(
     shows.map(
-      (show) => (show.aired - show.completed) * show.next_episode.runtime
+      (show) => {
+        const runtime = show.next_episode?.runtime || show.last_episode?.runtime;
+        return (show.aired - show.completed) * runtime;
+      }
     )
   );
 
