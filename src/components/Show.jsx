@@ -200,17 +200,23 @@ class Show extends Component {
 
   async updateProgress() {
     const { show } = this.state;
-    const newProgress = await Trakt.getShowProgress(show.ids.trakt);
+    let newProgress = await Trakt.getShowProgress(show.ids.trakt);
+    newProgress = {
+      ...show,
+      ...newProgress,
+      show: {
+        ...show.show,
+        ...newProgress,
+      },
+    };
+    newProgress = {
+      ...newProgress,
+      completed: Trakt.countWatchedSinceReset(newProgress),
+      next_episode: await Trakt.nextEpisodeForRewatch(newProgress),
+    };
     this.setState((prevState) => ({
       ...prevState,
-      show: {
-        ...prevState.show,
-        ...newProgress,
-        show: {
-          ...prevState.show.show,
-          ...newProgress,
-        },
-      },
+      show: newProgress,
     }));
   }
 
