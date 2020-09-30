@@ -278,13 +278,28 @@ class Trakt {
       return Trakt.getEpisode(show.ids.trakt, 1, 1);
     }
     for (let i = lastWatched?.index || 0; i < episodes.length; i++) {
-      if (!episodes[i].last_watched_at || Date.parse(episodes[i].last_watched_at) < resetAt) {
+      if (!episodes[i].last_watched_at || Date.parse(episodes[i].last_watched_at) <= resetAt) {
         return Trakt.getEpisode(
           show.ids.trakt,
           episodes[i].season,
           episodes[i].number
         );
       }
+    }
+
+    if (Trakt.countWatchedSinceReset(show) < show.aired) {
+      const firstUnwatched = episodes
+        .map((ep, index) => ({ ...ep, index }))
+        .filter(
+          (episode) =>
+            !episode.last_watched_at ||
+            Date.parse(episode.last_watched_at) <= resetAt
+        )[0];
+      return Trakt.getEpisode(
+          show.ids.trakt,
+          firstUnwatched.season,
+          firstUnwatched.number
+        );
     }
 
     return Promise.resolve(null);
