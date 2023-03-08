@@ -127,6 +127,12 @@ class Trakt {
     });
   }
 
+  static async getCurrentUser() {
+    return Trakt.get(
+      `https://api.trakt.tv/users/me`
+    );
+  }
+
   static async getEpisode(showId, season, episode) {
     return Trakt.get(
       `https://api.trakt.tv/shows/${showId}/seasons/${season}/episodes/${episode}`

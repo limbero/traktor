@@ -5,6 +5,7 @@ import Trakt from '../apis/Trakt';
 import TheMovieDb from '../apis/TheMovieDb';
 import { Util } from '../Util';
 import ShowProgressBar from './ShowProgressBar';
+import StreamButton from './StreamButton';
 
 class Show extends Component {
   constructor(props) {
@@ -315,7 +316,7 @@ class Show extends Component {
       elementWidth,
       swiping,
     } = this.state;
-    const { hasHover } = this.props;
+    const { hasHover, user } = this.props;
 
     const next = show.next_episode;
     const completedFraction = 100 * (show.completed / show.aired);
@@ -358,6 +359,7 @@ class Show extends Component {
                 onClick={() => this.updateProgress()}
                 style={{ cursor: 'pointer' }}
               >{show.title}</p>
+              <StreamButton title={show.title} username={user.username}/>
             </div>
             {next ? (
               <div className="next-episode">

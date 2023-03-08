@@ -38,16 +38,18 @@ class Shows extends Component {
   }
 
   async setup() {
-    const [apiHiddenShows, apiWatchedShows, apiRatings] = await Promise.all([
+    const [apiHiddenShows, apiWatchedShows, apiRatings, user] = await Promise.all([
       this.trackForLoading(Trakt.getHiddenShows(), 3),
       this.trackForLoading(Trakt.getShows(), 20),
       this.trackForLoading(Trakt.getRatings(), 5),
+      Trakt.getCurrentUser(),
     ]);
 
     const hiddenShows = apiHiddenShows.map((hidden) => hidden.show.ids.trakt);
     this.setState((prevState) => ({
       ...prevState,
       hiddenShows,
+      user,
       apiWatchedShows: apiWatchedShows.map(
         (watchedShow) => watchedShow.show.ids.trakt
       ),
@@ -142,6 +144,7 @@ class Shows extends Component {
       loading,
       prevPercent,
       percent,
+      user,
     } = this.state;
     const { hasHover } = this.props;
 
@@ -166,7 +169,7 @@ class Shows extends Component {
           }}
         >
           {shows.map((show) => (
-            <Show key={show.ids.trakt} show={show} hasHover={hasHover} />
+            <Show key={show.ids.trakt} show={show} hasHover={hasHover} user={user} />
           ))}
         </div>
         <Statistics
