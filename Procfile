@@ -1,1 +1,0 @@
-web: bun run build && bun run preview --port $PORT
