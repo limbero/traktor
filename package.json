@@ -7,7 +7,7 @@
     "animate-css-grid": "1.4.1",
     "has-hover": "^1.0.1",
     "node-sass": "^6.0.1",
-    "qs": "^6.5.2",
+    "qs": "^6.9.7",
     "react": "^16.8",
     "react-countup": "^3.0.3",
     "react-dom": "^16.8",
