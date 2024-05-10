@@ -15,51 +15,6 @@ const StyledStreamButton = styled.div`
   }
 `;
 
-function linkToIcon(link) {
-  if (link.includes("amazon")) {
-    return "icons/amazon.png";
-  }
-  if (link.includes("apple")) {
-    return "icons/apple.jpeg";
-  }
-  if (link.includes("bbc.")) {
-    return "icons/bbc.png";
-  }
-  if (link.includes("cineasterna")) {
-    return "icons/cineasterna.png";
-  }
-  if (link.includes("cmore")) {
-    return "icons/cmore.png";
-  }
-  if (link.includes("disneyp")) {
-    return "icons/disney.png";
-  }
-  if (link.includes("hbom")) {
-    return "icons/hbo.png";
-  }
-  if (link.includes("itv.")) {
-    return "icons/itv.png";
-  }
-  if (link.includes("mubi")) {
-    return "icons/mubi.png";
-  }
-  if (link.includes("netflix")) {
-    return "icons/netflix.png";
-  }
-  if (link.includes("now")) {
-    return "icons/nowtv.png";
-  }
-  if (link.includes("paramount")) {
-    return "icons/paramount.png";
-  }
-  if (link.includes("plex.tv")) {
-    return "icons/plex.png";
-  }
-  if (link.includes("svtpl")) {
-    return "icons/svt.png";
-  }
-}
-
 function StreamButton({title, username}) {
   const [streamingLinks, setStreamingLinks] = useState([]);
   useEffect(() => {
@@ -78,8 +33,8 @@ function StreamButton({title, username}) {
   return <StyledStreamButton>
     {
       streamingLinks.map(link => (
-        <a href={link} target="_blank" rel="noopener noreferrer">
-          <img src={linkToIcon(link)} width={20} />
+        <a href={link.url} target="_blank" rel="noopener noreferrer">
+          <img src={link.icon} width={20} />
         </a>
       ))
     }
