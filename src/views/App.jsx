@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
-import runtimeEnv from '@mars/heroku-js-runtime-env';
 import Shows from '../components/Shows';
 import Trakt from '../apis/Trakt';
 import './App.scss';
 
 import CircularButton from '../components/elements/CircularButton';
 
-const hasHover = require('has-hover');
-
-const env = runtimeEnv();
+// const hasHover = require('has-hover');
+const hasHover = false;
 
 // kudos to https://stackoverflow.com/a/50544192
 // Detects if device is in standalone mode
@@ -69,7 +67,7 @@ class App extends Component {
             <p>
               <a
                 className="btn"
-                href={`https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${env.REACT_APP_TRAKT_CLIENT_ID}&redirect_uri=${window.location.origin}/redirect`}
+                href={`https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${import.meta.env.VITE_TRAKT_CLIENT_ID}&redirect_uri=${window.location.origin}/redirect`}
               >
                 Login
               </a>

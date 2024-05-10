@@ -1,17 +1,15 @@
-import runtimeEnv from '@mars/heroku-js-runtime-env';
 import store from '../redux/store';
 import { setToken } from '../redux/actions';
 import { Util, CorsError } from '../Util';
 
-const env = runtimeEnv();
 let getNewToken = false;
 let onGoingTokenRequest = null;
 
 class Trakt {
   static basicTokenPayload() {
     return {
-      client_id: env.REACT_APP_TRAKT_CLIENT_ID,
-      client_secret: env.REACT_APP_TRAKT_CLIENT_SECRET,
+      client_id: import.meta.env.VITE_TRAKT_CLIENT_ID,
+      client_secret: import.meta.env.VITE_TRAKT_CLIENT_SECRET,
       redirect_uri: `${window.location.origin}/redirect`,
     };
   }
@@ -22,7 +20,7 @@ class Trakt {
       Accept: 'application/json',
       'Content-Type': 'application/json',
       'trakt-api-version': '2',
-      'trakt-api-key': env.REACT_APP_TRAKT_CLIENT_ID,
+      'trakt-api-key': import.meta.env.VITE_TRAKT_CLIENT_ID,
       Authorization: `Bearer ${token.access_token}`,
     };
   }

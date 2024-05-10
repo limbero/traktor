@@ -1,11 +1,7 @@
-import runtimeEnv from '@mars/heroku-js-runtime-env';
-
-const env = runtimeEnv();
-
 class TheMovieDb {
   static async get(url) {
     const urlWithApiKey = `${url + (url.includes('?') ? '&' : '?')}api_key=${
-      env.REACT_APP_THEMOVIEDB_APIKEY
+      import.meta.env.VITE_THEMOVIEDB_APIKEY
     }`;
 
     return fetch(urlWithApiKey).then((response) => {
