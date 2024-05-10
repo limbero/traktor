@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 import qs from 'qs';
+import App from './App';
 import Trakt from '../apis/Trakt';
 
 import store from '../redux/store';
@@ -39,7 +39,7 @@ class AuthRedirect extends Component {
     if (!authed && !error) {
       return null;
     }
-    return <Redirect to="/" />;
+    return <App />;
   }
 }
 
