@@ -10,7 +10,7 @@ class Trakt {
     return {
       client_id: import.meta.env.VITE_TRAKT_CLIENT_ID,
       client_secret: import.meta.env.VITE_TRAKT_CLIENT_SECRET,
-      redirect_uri: `${window.location.origin}`,
+      redirect_uri: `${window.location.origin}/redirect`,
     };
   }
 

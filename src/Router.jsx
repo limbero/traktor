@@ -1,18 +1,20 @@
 import React from 'react';
-import qs from 'qs';
+import { BrowserRouter, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import App from './views/App';
 import AuthRedirect from './views/AuthRedirect';
 
 import store from './redux/store';
 
-const Router = () => {
-  const { code } = qs.parse(window.location.search.slice(1));
-  if (code) {
-    return (<Provider store={store}><AuthRedirect location={window.location}/></Provider>);
-  } else {
-    return (<Provider store={store}><App /></Provider>);
-  }
-};
+const Router = () => (
+  <Provider store={store}>
+    <BrowserRouter>
+      <div>
+        <Route exact path="/" component={App} />
+        <Route path="/redirect" component={AuthRedirect} />
+      </div>
+    </BrowserRouter>
+  </Provider>
+);
 
 export default Router;

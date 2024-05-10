@@ -66,7 +66,7 @@ class App extends Component {
             <p>
               <a
                 className="btn"
-                href={`https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${import.meta.env.VITE_TRAKT_CLIENT_ID}&redirect_uri=${window.location.origin}`}
+                href={`https://api.trakt.tv/oauth/authorize?response_type=code&client_id=${import.meta.env.VITE_TRAKT_CLIENT_ID}&redirect_uri=${window.location.origin}/redirect`}
               >
                 Login
               </a>
