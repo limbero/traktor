@@ -5,8 +5,7 @@ import './App.scss';
 
 import CircularButton from '../components/elements/CircularButton';
 
-// const hasHover = require('has-hover');
-const hasHover = false;
+const hasHover = window.matchMedia("(hover: hover)").matches;
 
 // kudos to https://stackoverflow.com/a/50544192
 // Detects if device is in standalone mode
