@@ -3,7 +3,7 @@ import { BrowserRouter, Route } from 'react-router-dom';
 
 import './App.scss';
 
-import Shows from '../components/Shows';
+import Shows from './Shows';
 import Watchlist from './Watchlist';
 import Trakt from '../apis/Trakt';
 import CircularButton from '../components/elements/CircularButton';
@@ -38,7 +38,7 @@ const AppParent = () => {
             left: '27px',
           }}
         >
-          <CircularButton onClick={() => window.location.reload(true)}>
+          <CircularButton onClick={() => window.location.reload()}>
             <span>&#8635;</span>
           </CircularButton>
         </div>
