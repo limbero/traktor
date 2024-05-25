@@ -30,14 +30,14 @@ const StyledStreamButtons = styled.div`
   }
 `;
 
-type AppProps = {
+type ShowToAddProps = {
   addShow: Function;
   show: TraktShow;
   alreadyPresent: boolean;
   streamingServices: string[];
 };
 
-function ShowToAdd({ addShow, show, alreadyPresent, streamingServices }: AppProps) {
+function ShowToAdd({ addShow, show, alreadyPresent, streamingServices }: ShowToAddProps) {
   const [image, setImage] = useState<string>("");
   async function fetchImage() {
     const image = await TheMovieDb.getImage(show.ids.tmdb.toString());

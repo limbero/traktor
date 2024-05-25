@@ -1,14 +1,22 @@
 import React, { Component } from 'react';
 import CountUp from 'react-countup';
 
-const zero = (-1 / 2) * Math.PI;
-const wholeLap = 2 * Math.PI;
+const zero: number = (-1 / 2) * Math.PI;
+const wholeLap: number = 2 * Math.PI;
 
-let canvas;
-let ctx;
+const backingScale: number = 'devicePixelRatio' in window ? window.devicePixelRatio : 1;
+
+let canvas: HTMLCanvasElement | null;
+let ctx: CanvasRenderingContext2D | null;
 let scaleFactor;
 
-class ProgressCircle extends Component {
+type ProgressCircleProps = {
+  prevPercent: number;
+  percent: number;
+};
+
+class ProgressCircle extends Component<ProgressCircleProps, any> {
+  canvas: React.RefObject<HTMLCanvasElement>;
   static backingScale() {
     if ('devicePixelRatio' in window) {
       return window.devicePixelRatio;
@@ -16,7 +24,7 @@ class ProgressCircle extends Component {
     return 1;
   }
 
-  constructor(props) {
+  constructor(props: ProgressCircleProps) {
     super(props);
     this.canvas = React.createRef();
   }
@@ -24,15 +32,17 @@ class ProgressCircle extends Component {
   componentDidMount() {
     const { percent } = this.props;
     canvas = this.canvas.current;
-    scaleFactor = Math.max(this.constructor.backingScale(ctx), 2);
+    scaleFactor = Math.max(backingScale, 2);
 
+    if (canvas === null) { return; }
     canvas.width *= scaleFactor;
     canvas.height *= scaleFactor;
     canvas.style.width = `${canvas.width / scaleFactor}px`;
     canvas.style.height = `${canvas.height / scaleFactor}px`;
+
     // update the context for the new canvas scale
     ctx = canvas.getContext('2d');
-    ctx.scale(scaleFactor, scaleFactor);
+    ctx?.scale(scaleFactor, scaleFactor);
 
     const pct = percent / 100;
 
@@ -50,7 +60,8 @@ class ProgressCircle extends Component {
     );
   }
 
-  animate(cur, step, cap) {
+  animate(cur: number, step: number, cap: number) {
+    if (ctx === null || canvas === null) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     ctx.beginPath();
@@ -65,7 +76,7 @@ class ProgressCircle extends Component {
   }
 
   render() {
-    const { prevPercent, percent } = this.props;
+    const { prevPercent, percent }: ProgressCircleProps = this.props;
     return (
       <div className="progress-circle">
         <div className="canvas">

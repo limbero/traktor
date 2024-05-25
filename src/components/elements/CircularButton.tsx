@@ -17,14 +17,14 @@ const StyledCircularButton = styled.button`
   cursor: pointer;
 `;
 
-type AppProps = {
+type CircularButtonProps = {
   children: React.ReactNode;
   disabled?: boolean;
   onClick: MouseEventHandler;
   style?: CSSProperties;
 };
 
-const CircularButton = ({ children, disabled, onClick, style }: AppProps) => (
+const CircularButton = ({ children, disabled, onClick, style }: CircularButtonProps) => (
   <StyledCircularButton
     type="button"
     onClick={onClick}
