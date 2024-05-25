@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Trakt, { genres, User, WatchlistItem } from '../apis/Trakt.js';
 import TheMovieDb from '../apis/TheMovieDb.js';
 
-// import StreamButton from '../components/StreamButton.jsx';
+import ProgressCircle from '../components/ProgressCircle';
 import ShowToAdd from '../components/ShowToAdd';
 import StreamingServices, { streamingServicesMap } from '../components/StreamingServices.js';
 import TraktorStreaming from '../apis/TraktorStreaming.js';
@@ -41,8 +41,23 @@ interface imagesMap {
 interface genresBooleanMap {
   [key: string]: boolean;
 };
-function Watchlist({newShows, setNewShows}: {newShows: string[], setNewShows: Function}) {
+type LoadedPercentage = {
+  current: number;
+  previous: number;
+};
+
+function Watchlist({ newShows, setNewShows }: { newShows: string[], setNewShows: Function }) {
   const [watchlist, setWatchlist] = useState<WatchlistItem[] | null>(null);
+  const [loadedPercentage, setLoadedPercentage] = useState<LoadedPercentage>({
+    current: 0,
+    previous: 0,
+  });
+  const incrementLoadedPercentage = (increment: number) => {
+    setLoadedPercentage((prevLoadedPercentage: LoadedPercentage) => ({
+      current: prevLoadedPercentage.current + increment,
+      previous: prevLoadedPercentage.current,
+    }));
+  };
 
   const [showGenres, setShowGenres] = useState<boolean>(false);
   const [genresFilter, setGenresFilter] = useState<genresBooleanMap | null>(null);
@@ -55,12 +70,24 @@ function Watchlist({newShows, setNewShows}: {newShows: string[], setNewShows: Fu
   const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
     (async () => {
-      const traktUserPromise = Trakt.getCurrentUser();
+      const traktUserPromise = Trakt.getCurrentUser().then(resp => {
+        incrementLoadedPercentage(10);
+        return resp;
+      });
 
-      const watchlistItems = await Trakt.getWatchlist();
+      const watchlistItems = await Trakt.getWatchlist().then(resp => {
+        incrementLoadedPercentage(50);
+        return resp;
+      });
 
-      const imagePromisesForItems = watchlistItems.map((item) => TheMovieDb.getImage(item.show.ids.tmdb.toString()));
-      const streamingLocationPromises = watchlistItems.map((item) => TraktorStreaming.getLocationsForShow(item.show.title));
+      const imagePromisesForItems = watchlistItems.map((item) => TheMovieDb.getImage(item.show.ids.tmdb.toString()).then(resp => {
+        incrementLoadedPercentage(20 / watchlistItems.length);
+        return resp;
+      }));
+      const streamingLocationPromises = watchlistItems.map((item) => TraktorStreaming.getLocationsForShow(item.show.title).then(resp => {
+        incrementLoadedPercentage(20 / watchlistItems.length);
+        return resp;
+      }));
 
       const imagesForItems = await Promise.all(imagePromisesForItems);
       const imagesObject: imagesMap = {};
@@ -93,7 +120,12 @@ function Watchlist({newShows, setNewShows}: {newShows: string[], setNewShows: Fu
   }, [watchlist])
 
   if (watchlist === null || images === null || user === null || streamingServices === null || genresFilter === null) {
-    return null;
+    return (<>
+      <h1 style={{ textAlign: "center" }}>Watchlist</h1>
+      <div className="center">
+        <ProgressCircle percent={loadedPercentage.current} prevPercent={loadedPercentage.previous} />
+      </div>
+    </>);
   }
 
   const myServices = Object.keys(streamingServices).filter(key => streamingServices[key]);

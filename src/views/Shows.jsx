@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { wrapGrid } from 'animate-css-grid';
 import Trakt from '../apis/Trakt';
-import Show from './Show';
-import ProgressCircle from './ProgressCircle';
-import AddShow from './AddShow';
-import Statistics from './Statistics';
+import Show from '../components/Show';
+import ProgressCircle from '../components/ProgressCircle';
+import AddShow from '../components/AddShow';
+import Statistics from '../components/Statistics';
 
 let first = true;
 
