@@ -22,8 +22,9 @@ class Shows extends Component {
     this.setup();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     const { loading } = this.state;
+    const { newShows } = this.props;
     if (!loading && first) {
       first = false;
       wrapGrid(this.grid, {
@@ -34,6 +35,8 @@ class Shows extends Component {
           document.querySelector('.shows').children[0].children[0].classList.add('visible');
         },
       });
+    } else if (newShows.length > prevProps.newShows.length) {
+      console.log(`a new show was added: ${newShows[newShows.length-1]}`);
     }
   }
 

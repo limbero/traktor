@@ -99,7 +99,7 @@ class AddShow extends Component {
     const { showIds } = this.props;
     return (
       <div>
-        <CircularButton type="button" onClick={() => this.showSearchModal()}>
+        <CircularButton onClick={() => this.showSearchModal()}>
           <span>+</span>
         </CircularButton>
         <ReactModal
@@ -120,7 +120,6 @@ class AddShow extends Component {
               backgroundColor: 'var(--primary-color)',
             }}
             onClick={() => this.hideSearchModal()}
-            type="button"
           >
             <span role="img" aria-label="close">
               ✕
