@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocalStorage } from 'usehooks-ts';
 import styled from 'styled-components';
 
 const StyledStreamButton = styled.div`
@@ -15,25 +16,24 @@ const StyledStreamButton = styled.div`
   }
 `;
 
-function StreamButton({title, username}) {
+function StreamButton({title}) {
   const [streamingLinks, setStreamingLinks] = useState([]);
+  const [streamingServices, setStreamingServices, removeStreamingServices] = useLocalStorage("traktor-streaming-services", null);
   useEffect(() => {
     (async () => {
-      // const data = await fetch(`http://localhost:9001/traktor-streaming?title=${encodeURIComponent(title)}&username=${encodeURIComponent(username)}`).then((response) => response.json()).catch(e => []);
-      const data = await fetch(`https://home.limbe.ro/trast/traktor-streaming?title=${encodeURIComponent(title)}&username=${encodeURIComponent(username)}`).then((response) => response.json()).catch(e => []);
-      // const data = await fetch(`http://192.168.0.105:9001/traktor-streaming?title=${encodeURIComponent(title)}&username=${encodeURIComponent(username)}`).then((response) => response.json()).catch(e => []);
+      const data = await fetch(`https://home.limbe.ro/trast/traktor-streaming?title=${encodeURIComponent(title)}`).then((response) => response.json()).catch(e => []);
       setStreamingLinks(data);
    })();
   }, [title]);
 
-  if (streamingLinks.length === 0) {
+  if (streamingLinks.length === 0 || streamingServices === null) {
     return null;
   }
 
   return <StyledStreamButton>
     {
-      streamingLinks.map(link => (
-        <a href={link.url} target="_blank" rel="noopener noreferrer">
+      streamingLinks.filter(link => streamingServices[link.technical_name]).map(link => (
+        <a key={link.technical_name} href={link.url} target="_blank" rel="noopener noreferrer">
           <img src={link.icon} width={20} />
         </a>
       ))

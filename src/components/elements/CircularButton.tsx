@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { CSSProperties, MouseEventHandler } from 'react';
 import styled from 'styled-components';
 
 const StyledCircularButton = styled.button`
@@ -17,8 +17,20 @@ const StyledCircularButton = styled.button`
   cursor: pointer;
 `;
 
-const CircularButton = ({ children, ...rest }) => (
-  <StyledCircularButton type="button" {...rest}>
+type AppProps = {
+  children: React.ReactNode;
+  disabled?: boolean;
+  onClick: MouseEventHandler;
+  style?: CSSProperties;
+};
+
+const CircularButton = ({ children, disabled, onClick, style }: AppProps) => (
+  <StyledCircularButton
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    style={style}
+  >
     {children}
   </StyledCircularButton>
 );
