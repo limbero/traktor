@@ -53,7 +53,6 @@ const MenuNav = styled.nav`
 
 const AppParent = () => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  const [newShows, setNewShows] = useState<string[]>([]);
 
   const [showStreamingServices, setShowStreamingServices] = useState<boolean>(false);
 
@@ -117,7 +116,7 @@ const AppParent = () => {
                 <ShowsProgress />
               </Route>
               <Route path="/watchlist">
-                <Watchlist newShows={newShows} setNewShows={setNewShows} />
+                <Watchlist />
               </Route>
             </div>
           </BrowserRouter>

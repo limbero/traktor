@@ -10,12 +10,12 @@ import Show from '../components/Show.jsx';
 import ProgressCircle from '../components/ProgressCircle.js';
 import AddShow from '../components/AddShow.jsx';
 import Statistics from '../components/Statistics.jsx';
+import { useNewShowStore } from '../zustand/NewShowStore.js';
 
 function ShowsProgress() {
-  const {
-    shows,
-    setShows,
-  } = useShowsProgressStore();
+  const { shows, setShows, prependShow } = useShowsProgressStore();
+  const { clearNewShow, newShow } = useNewShowStore();
+
   const [loadedPercentage, incrementLoadedPercentage] = useLoading();
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -27,12 +27,25 @@ function ShowsProgress() {
   };
 
   useEffect(() => {
+    if (newShow === null || shows === null) { return; }
+    clearNewShow();
+    prependShow(newShow);
+  }, [shows, newShow]);
+
+  useEffect(() => {
     if (shows === null || !gridRef.current) { return; }
     wrapGrid(gridRef.current, {
       stagger: 0,
       duration: 400,
       easing: 'backOut',
       onEnd: () => {
+        if (!shows[0].addedFromSearch) { return; }
+        const [addedShow, ...restofShows] = shows;
+        const newAddedShow = {
+          ...addedShow,
+          addedFromSearch: false,
+        };
+        setShows([newAddedShow, ...restofShows]);
         document.querySelector('.shows')?.children[0].children[0].classList.add('visible');
       },
     });

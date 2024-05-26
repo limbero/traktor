@@ -15,9 +15,14 @@ export type ShowWithProgress = {
 interface ShowsProgressStore {
   shows: ShowWithProgress[] | null;
   setShows: (shws: ShowWithProgress[]) => void;
+  prependShow: (shw: ShowWithProgress) => void;
 }
 
 export const useShowsProgressStore = create<ShowsProgressStore>((set) => ({
   shows: null,
   setShows: (shws: ShowWithProgress[]) => set(() => ({ shows: shws })),
+  prependShow: (shw: ShowWithProgress) => set((state) => {
+    if (state.shows === null) { return state; }
+    return { shows: [shw, ...state.shows] };
+  }),
 }));

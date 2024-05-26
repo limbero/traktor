@@ -5,13 +5,15 @@ import styled from 'styled-components';
 import Trakt, { genres } from '../apis/Trakt.js';
 import TheMovieDb from '../apis/TheMovieDb.js';
 
+import { useNewShowStore } from '../zustand/NewShowStore';
 import { useWatchlistStore } from '../zustand/WatchlistStore';
-import useLoading from '../hooks/useLoading.js';
+import useLoading from '../hooks/useLoading';
 
 import { streamingServicesMap } from '../components/StreamingServices.js';
 import ProgressCircle from '../components/ProgressCircle';
 import ShowToAdd from '../components/ShowToAdd';
 import TraktorStreaming from '../apis/TraktorStreaming.js';
+import { useHistory } from 'react-router-dom';
 
 const GenrePicker = styled.div`
   display: flex;
@@ -37,8 +39,12 @@ interface genresBooleanMap {
   [key: string]: boolean;
 };
 
-function Watchlist({ newShows, setNewShows }: { newShows: string[], setNewShows: Function }) {
+function Watchlist() {
+  const history = useHistory();
+
   const { watchlist, setWatchlist } = useWatchlistStore();
+  const { addNewShow } = useNewShowStore();
+
   const [loadedPercentage, incrementLoadedPercentage] = useLoading();
 
   const [showGenres, setShowGenres] = useState<boolean>(false);
@@ -183,8 +189,20 @@ function Watchlist({ newShows, setNewShows }: { newShows: string[], setNewShows:
           <ShowToAdd
             key={item.id}
             show={item.show}
-            addShow={() => {
-              setNewShows([...newShows, item.show.ids.slug]);
+            addShow={async () => {
+              const showProgress = await Trakt.getShowProgress(item.show.ids.trakt);
+              addNewShow({
+                addedFromSearch: true,
+                title: item.show.title,
+                ids: item.show.ids,
+                aired: item.show.aired_episodes,
+                completed: showProgress.completed,
+                last_watched_at: showProgress.last_watched_at,
+                reset_at: Trakt.showResetAt(showProgress),
+                seasons: showProgress.seasons,
+              });
+              setWatchlist(watchlist.filter(wlitem => wlitem.id !== item.id));
+              history.push("/");
             }}
             alreadyPresent={false}
             streamingServices={myServices}
