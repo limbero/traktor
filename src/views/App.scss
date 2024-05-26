@@ -1,23 +1,32 @@
 @import url('https://fonts.googleapis.com/css?family=News+Cycle:400,700');
 
-$primaryColor: #e10000;
-
 :root {
-  --primary-color: #{$primaryColor};
+  --primary-color: #e10000;
+  --primary-color-2: #e15555;
+
+  @media (prefers-color-scheme: dark), (prefers-color-scheme: no-preference) {
+    --fg-color: #FFF;
+    --bg-color: #222;
+    --bg-color-2: #444;
+    --bg-color-3: #555;
+    --bg-color-4: #777;
+  }
+  @media (prefers-color-scheme: light) {
+    --fg-color: #000;
+    --bg-color: #FFF;
+    --bg-color-2: #DDD;
+    --bg-color-3: #CCC;
+    --bg-color-4: #AAA;
+  }
+
+  color: var(--fg-color);
+  background-color: var(--bg-color);
 }
 
 body {
   font-family: 'News Cycle';
   font-weight: 400;
 
-  @media (prefers-color-scheme: dark), (prefers-color-scheme: no-preference) {
-    background-color: #222;
-    color: #FFF;
-  }
-  @media (prefers-color-scheme: light) {
-    background-color: #FFF;
-    color: #000;
-  }
   overflow-x: hidden;
 }
 

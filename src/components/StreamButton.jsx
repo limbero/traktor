@@ -26,13 +26,14 @@ function StreamButton({title}) {
    })();
   }, [title]);
 
-  if (streamingLinks.length === 0 || streamingServices === null) {
+  const filteredStreamingLinks = streamingLinks.filter(link => streamingServices[link.technical_name]);
+  if (filteredStreamingLinks.length === 0 || streamingServices === null) {
     return null;
   }
 
   return <StyledStreamButton>
     {
-      streamingLinks.filter(link => streamingServices[link.technical_name]).map(link => (
+      filteredStreamingLinks.map(link => (
         <a key={link.technical_name} href={link.url} target="_blank" rel="noopener noreferrer">
           <img src={link.icon} width={20} />
         </a>

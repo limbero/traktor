@@ -2,21 +2,15 @@ import { useEffect, useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 import styled from 'styled-components';
 
-import Trakt, { genres, User, WatchlistItem } from '../apis/Trakt.js';
+import Trakt, { genres } from '../apis/Trakt.js';
 import TheMovieDb from '../apis/TheMovieDb.js';
 
+import { useWatchlistStore } from '../zustand/WatchlistStore';
+
+import { streamingServicesMap } from '../components/StreamingServices.js';
 import ProgressCircle from '../components/ProgressCircle';
 import ShowToAdd from '../components/ShowToAdd';
-import StreamingServices, { streamingServicesMap } from '../components/StreamingServices.js';
 import TraktorStreaming from '../apis/TraktorStreaming.js';
-
-const StreamingPicker = styled.div`
-  display: flex;
-  flex-flow: column wrap;
-  align-content: center;
-  gap: 8px 30px;
-  height: 450px;
-`;
 
 const GenrePicker = styled.div`
   display: flex;
@@ -47,7 +41,7 @@ type LoadedPercentage = {
 };
 
 function Watchlist({ newShows, setNewShows }: { newShows: string[], setNewShows: Function }) {
-  const [watchlist, setWatchlist] = useState<WatchlistItem[] | null>(null);
+  const { watchlist, setWatchlist } = useWatchlistStore();
   const [loadedPercentage, setLoadedPercentage] = useState<LoadedPercentage>({
     current: 0,
     previous: 0,
@@ -62,36 +56,22 @@ function Watchlist({ newShows, setNewShows }: { newShows: string[], setNewShows:
   const [showGenres, setShowGenres] = useState<boolean>(false);
   const [genresFilter, setGenresFilter] = useState<genresBooleanMap | null>(null);
 
-  const [showStreamingServices, setShowStreamingServices] = useState<boolean>(false);
+  const [streamingServices] = useLocalStorage<streamingServicesMap | null>("traktor-streaming-services", null);
   const [filterOnStreaming, setFilterOnStreaming] = useState<boolean>(false);
 
-  const [streamingServices] = useLocalStorage<streamingServicesMap | null>("traktor-streaming-services", null);
   const [images, setImages] = useState<imagesMap | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
     (async () => {
-      const traktUserPromise = Trakt.getCurrentUser().then(resp => {
-        incrementLoadedPercentage(10);
-        return resp;
-      });
-
+      if (watchlist) { return; }
       const watchlistItems = await Trakt.getWatchlist().then(resp => {
-        incrementLoadedPercentage(50);
+        incrementLoadedPercentage(60);
         return resp;
       });
 
-      const imagePromisesForItems = watchlistItems.map((item) => TheMovieDb.getImage(item.show.ids.tmdb.toString()).then(resp => {
-        incrementLoadedPercentage(20 / watchlistItems.length);
-        return resp;
-      }));
       const streamingLocationPromises = watchlistItems.map((item) => TraktorStreaming.getLocationsForShow(item.show.title).then(resp => {
         incrementLoadedPercentage(20 / watchlistItems.length);
         return resp;
       }));
-
-      const imagesForItems = await Promise.all(imagePromisesForItems);
-      const imagesObject: imagesMap = {};
-      imagesForItems.forEach((image, idx) => imagesObject[watchlistItems[idx].id] = image);
 
       const streamingLocations = await Promise.all(streamingLocationPromises);
       const watchlistWithServices = watchlistItems.map((item, idx) => ({
@@ -103,29 +83,37 @@ function Watchlist({ newShows, setNewShows }: { newShows: string[], setNewShows:
       }));
 
       setWatchlist(watchlistWithServices);
-      setUser(await traktUserPromise);
-      setImages(imagesObject);
     })();
   }, []);
+
   useEffect(() => {
-    if (watchlist === null) {
-      return;
-    }
-    const newGenresFilter: genresBooleanMap = {};
-    const genresFromShows = new Set(watchlist.flatMap(item => item.show.genres));
-    Array.from(genresFromShows).sort().forEach(genre => {
-      newGenresFilter[genre] = false;
-    });
-    setGenresFilter(newGenresFilter);
+    (async () => {
+      if (watchlist === null) { return; }
+
+      const imagePromisesForItems = watchlist.map((item) => TheMovieDb.getImage(item.show.ids.tmdb.toString()).then(resp => {
+        incrementLoadedPercentage(20 / watchlist.length);
+        return resp;
+      }));
+
+      const imagesForItems = await Promise.all(imagePromisesForItems);
+      const imagesObject: imagesMap = {};
+      imagesForItems.forEach((image, idx) => imagesObject[watchlist[idx].id] = image);
+
+      setImages(imagesObject);
+
+      const newGenresFilter: genresBooleanMap = {};
+      const genresFromShows = new Set(watchlist.flatMap(item => item.show.genres));
+      Array.from(genresFromShows).sort().forEach(genre => {
+        newGenresFilter[genre] = false;
+      });
+      setGenresFilter(newGenresFilter);
+    })();
   }, [watchlist])
 
-  if (watchlist === null || images === null || user === null || streamingServices === null || genresFilter === null) {
-    return (<>
-      <h1 style={{ textAlign: "center" }}>Watchlist</h1>
-      <div className="center">
-        <ProgressCircle percent={loadedPercentage.current} prevPercent={loadedPercentage.previous} />
-      </div>
-    </>);
+  if (watchlist === null || images === null || streamingServices === null || genresFilter === null) {
+    return (<div className="center">
+      <ProgressCircle percent={loadedPercentage.current} prevPercent={loadedPercentage.previous} />
+    </div>);
   }
 
   const myServices = Object.keys(streamingServices).filter(key => streamingServices[key]);
@@ -157,7 +145,6 @@ function Watchlist({ newShows, setNewShows }: { newShows: string[], setNewShows:
   const genresWithShows = genres.filter(genre => genresFromShows.has(genre.slug));
 
   return (<>
-    <h1 style={{ textAlign: "center" }}>Watchlist</h1>
     <div>
       <h2
         style={{ textAlign: "center", cursor: "pointer" }}
@@ -186,17 +173,6 @@ function Watchlist({ newShows, setNewShows }: { newShows: string[], setNewShows:
           ))
         }
       </GenrePicker>
-    </div>
-    <div>
-      <h2
-        style={{ textAlign: "center", cursor: "pointer" }}
-        onClick={() => setShowStreamingServices(!showStreamingServices)}
-      >
-        Streaming Services <span style={{ fontSize: "0.5em", verticalAlign: "middle" }}>{showStreamingServices ? "▲" : "▼"}</span>
-      </h2>
-      <StreamingPicker style={{ display: showStreamingServices ? "flex" : "none" }}>
-        <StreamingServices />
-      </StreamingPicker>
     </div>
     <div>
       <Filters>
