@@ -228,8 +228,8 @@ class Show extends Component {
 
     let showNotFromSearch = {
       ...show,
-      addedFromSearch: false,
-    }
+      addedFromSearchOrWatchlist: false,
+    };
 
 
     const debugging = false;
@@ -239,7 +239,7 @@ class Show extends Component {
       loading: true,
       show: {
         ...prevState.show,
-        addedFromSearch: false,
+        addedFromSearchOrWatchlist: false,
       },
     }));
 
@@ -338,7 +338,7 @@ class Show extends Component {
     const done = false;
     return (
       <div>
-        <div className={show.addedFromSearch ? 'added-from-search' : ''}>
+        <div className={show.addedFromSearchOrWatchlist ? 'added-from-search visible' : ''}>
           <div
             onMouseDown={(e) => this.onDown(e)}
             onMouseMove={(e) => this.onMove(e)}
@@ -360,7 +360,7 @@ class Show extends Component {
                 onClick={() => this.updateProgress()}
                 style={{ cursor: 'pointer' }}
               >{show.title}</p>
-              <StreamButton title={show.title}/>
+              <StreamButton title={show.title} />
             </div>
             {next ? (
               <div className="next-episode">
@@ -392,9 +392,8 @@ class Show extends Component {
                   <p className="absolute">{`[${show.completed}/${show.aired}]`}</p>
                 </div>
                 <button
-                  className={`small-btn btn${
-                    success > 0 || done ? ' success' : ''
-                  }${loading ? ' loading' : ''}`}
+                  className={`small-btn btn${success > 0 || done ? ' success' : ''
+                    }${loading ? ' loading' : ''}`}
                   type="button"
                   onClick={done ? null : (e) => this.markNextWatched(e)}
                 >

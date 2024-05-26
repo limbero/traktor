@@ -5,6 +5,10 @@ const StyledCircularButton = styled.button`
   color: #fff;
   background-color: ${(props) => (props.color ? props.color : '#37f')};
 
+  &[disabled] {
+    background-color: #999;
+  }
+
   border-radius: 100px;
   padding: 5px 5px 8px 5px;
   width: 41px;

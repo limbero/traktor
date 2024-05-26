@@ -192,7 +192,7 @@ function Watchlist() {
             addShow={async () => {
               const showProgress = await Trakt.getShowProgress(item.show.ids.trakt);
               addNewShow({
-                addedFromSearch: true,
+                addedFromSearchOrWatchlist: true,
                 title: item.show.title,
                 ids: item.show.ids,
                 aired: item.show.aired_episodes,

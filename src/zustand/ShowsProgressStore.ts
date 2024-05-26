@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { SeasonWithProgress, TraktIds } from '../apis/Trakt';
 
 export type ShowWithProgress = {
-  addedFromSearch: boolean;
+  addedFromSearchOrWatchlist: boolean;
   title: string;
   ids: TraktIds;
   aired: number;

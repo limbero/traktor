@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { wrapGrid } from 'animate-css-grid';
 
 import Trakt, { HiddenItem, getAllShowsProgressShow } from '../apis/Trakt';
 
@@ -14,7 +13,7 @@ import { useNewShowStore } from '../zustand/NewShowStore.js';
 
 function ShowsProgress() {
   const { shows, setShows, prependShow } = useShowsProgressStore();
-  const { clearNewShow, newShow } = useNewShowStore();
+  const { addNewShow, clearNewShow, newShow } = useNewShowStore();
 
   const [loadedPercentage, incrementLoadedPercentage] = useLoading();
   const gridRef = useRef<HTMLDivElement>(null);
@@ -28,28 +27,18 @@ function ShowsProgress() {
 
   useEffect(() => {
     if (newShow === null || shows === null) { return; }
-    clearNewShow();
-    prependShow(newShow);
+    if (newShow.ids.trakt === shows[0].ids.trakt) {
+      clearNewShow();
+      setTimeout(() => {
+        setShows(shows.map(show => ({
+          ...show,
+          addedFromSearchOrWatchlist: false,
+        })))
+      }, 500)
+    } else {
+      prependShow(newShow);
+    }
   }, [shows, newShow]);
-
-  useEffect(() => {
-    if (shows === null || !gridRef.current) { return; }
-    wrapGrid(gridRef.current, {
-      stagger: 0,
-      duration: 400,
-      easing: 'backOut',
-      onEnd: () => {
-        if (!shows[0].addedFromSearch) { return; }
-        const [addedShow, ...restofShows] = shows;
-        const newAddedShow = {
-          ...addedShow,
-          addedFromSearch: false,
-        };
-        setShows([newAddedShow, ...restofShows]);
-        document.querySelector('.shows')?.children[0].children[0].classList.add('visible');
-      },
-    });
-  }, [shows]);
 
   useEffect(() => {
     (async () => {
@@ -78,7 +67,7 @@ function ShowsProgress() {
         .map((show, index): ShowWithProgress => {
           const watched = nonHiddenShows[index];
           return {
-            addedFromSearch: false,
+            addedFromSearchOrWatchlist: false,
             title: watched.show.title,
             ids: watched.show.ids,
             aired: show.aired,
@@ -116,7 +105,7 @@ function ShowsProgress() {
   return (
     <div>
       <div className="center">
-        <AddShow addShow={() => null} showIds={showIds} />
+        <AddShow addShow={addNewShow} showIds={showIds} />
       </div>
       <div
         className="shows"
