@@ -6,6 +6,7 @@ import Trakt, { genres } from '../apis/Trakt.js';
 import TheMovieDb from '../apis/TheMovieDb.js';
 
 import { useWatchlistStore } from '../zustand/WatchlistStore';
+import useLoading from '../hooks/useLoading.js';
 
 import { streamingServicesMap } from '../components/StreamingServices.js';
 import ProgressCircle from '../components/ProgressCircle';
@@ -35,23 +36,10 @@ interface imagesMap {
 interface genresBooleanMap {
   [key: string]: boolean;
 };
-type LoadedPercentage = {
-  current: number;
-  previous: number;
-};
 
 function Watchlist({ newShows, setNewShows }: { newShows: string[], setNewShows: Function }) {
   const { watchlist, setWatchlist } = useWatchlistStore();
-  const [loadedPercentage, setLoadedPercentage] = useState<LoadedPercentage>({
-    current: 0,
-    previous: 0,
-  });
-  const incrementLoadedPercentage = (increment: number) => {
-    setLoadedPercentage((prevLoadedPercentage: LoadedPercentage) => ({
-      current: prevLoadedPercentage.current + increment,
-      previous: prevLoadedPercentage.current,
-    }));
-  };
+  const [loadedPercentage, incrementLoadedPercentage] = useLoading();
 
   const [showGenres, setShowGenres] = useState<boolean>(false);
   const [genresFilter, setGenresFilter] = useState<genresBooleanMap | null>(null);

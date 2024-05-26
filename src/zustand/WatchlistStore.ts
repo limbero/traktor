@@ -3,7 +3,7 @@ import { WatchlistItem } from '../apis/Trakt';
 
 interface WatchlistStore {
   watchlist: WatchlistItem[] | null;
-  setWatchlist: (wl: WatchlistItem[]) => any;
+  setWatchlist: (wl: WatchlistItem[]) => void;
 }
 
 export const useWatchlistStore = create<WatchlistStore>((set) => ({

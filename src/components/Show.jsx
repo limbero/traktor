@@ -7,6 +7,8 @@ import { Util } from '../Util';
 import ShowProgressBar from './ShowProgressBar';
 import StreamButton from './StreamButton';
 
+const hasHover = window.matchMedia("(hover: hover)").matches;
+
 class Show extends Component {
   constructor(props) {
     super(props);
@@ -316,7 +318,6 @@ class Show extends Component {
       elementWidth,
       swiping,
     } = this.state;
-    const { hasHover, user } = this.props;
 
     const next = show.next_episode;
     const completedFraction = 100 * (show.completed / show.aired);
@@ -359,7 +360,7 @@ class Show extends Component {
                 onClick={() => this.updateProgress()}
                 style={{ cursor: 'pointer' }}
               >{show.title}</p>
-              <StreamButton title={show.title} username={user.username}/>
+              <StreamButton title={show.title}/>
             </div>
             {next ? (
               <div className="next-episode">

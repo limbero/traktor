@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import './App.scss';
 
-import Shows from './Shows';
+import ShowsProgress from './ShowsProgress.tsx';
 import Watchlist from './Watchlist';
 import Trakt from '../apis/Trakt';
 import StreamingServices from '../components/StreamingServices.js';
@@ -42,6 +42,7 @@ const MenuNav = styled.nav`
       background-color: var(--bg-color-3);
     }
     &.active {
+      color: #FFF;
       background-color: var(--primary-color);
       &:hover {
         background-color: var(--primary-color-2);
@@ -113,7 +114,7 @@ const AppParent = () => {
             </MenuNav>
             <div>
               <Route exact path="/">
-                <Shows hasHover={hasHover} newShows={newShows} />
+                <ShowsProgress />
               </Route>
               <Route path="/watchlist">
                 <Watchlist newShows={newShows} setNewShows={setNewShows} />
