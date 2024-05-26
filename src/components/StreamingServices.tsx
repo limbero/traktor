@@ -8,7 +8,7 @@ export interface streamingServicesMap {
 
 function Watchlist() {
   const [streamingServices, setStreamingServices] = useState<StreamingService[] | null>(null);
-  const [checkBoxes, setCheckBoxes, removeCheckBoxes] = useLocalStorage<streamingServicesMap | null>("traktor-streaming-services", null);
+  const [checkBoxes, setCheckBoxes] = useLocalStorage<streamingServicesMap | null>("traktor-streaming-services", null);
   useEffect(() => {
     (async () => {
       const streamers: StreamingService[] = await TraktorStreaming.getAllServices();
