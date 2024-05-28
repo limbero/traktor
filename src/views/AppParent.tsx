@@ -23,6 +23,16 @@ const StreamingPicker = styled.div`
 
   text-align: left;
   height: 450px;
+  @media only screen and (max-width: 950px) {
+    height: 600px;
+  }
+  @media only screen and (max-width: 750px) {
+    height: 900px;
+  }
+  @media only screen and (max-width: 500px) {
+    height: auto;
+  }
+  margin-bottom: 20px;
 `;
 
 const MenuNav = styled.nav`
