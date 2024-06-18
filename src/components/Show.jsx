@@ -5,7 +5,7 @@ import Trakt from '../apis/Trakt';
 import TheMovieDb from '../apis/TheMovieDb';
 import { Util } from '../Util';
 import ShowProgressBar from './ShowProgressBar';
-import StreamButton from './StreamButton';
+import StreamButton from './StreamButtons';
 
 const hasHover = window.matchMedia("(hover: hover)").matches;
 

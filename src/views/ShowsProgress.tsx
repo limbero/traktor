@@ -2,14 +2,15 @@ import { useEffect, useRef } from 'react';
 
 import Trakt, { HiddenItem, getAllShowsProgressShow } from '../apis/Trakt';
 
-import { useShowsProgressStore, ShowWithProgress } from '../zustand/ShowsProgressStore';
+import { useShowsProgressStore, ZustandShowWithProgress } from '../zustand/ShowsProgressStore';
 import useLoading from '../hooks/useLoading';
 
-import Show from '../components/Show.jsx';
+import Show from '../components/ChatGptShowRewrite';
 import ProgressCircle from '../components/ProgressCircle.js';
 import AddShow from '../components/AddShow.jsx';
 import Statistics from '../components/Statistics.jsx';
 import { useNewShowStore } from '../zustand/NewShowStore.js';
+import TraktorStreaming from '../apis/TraktorStreaming.js';
 
 function ShowsProgress() {
   const { shows, setShows, prependShow } = useShowsProgressStore();
@@ -25,6 +26,13 @@ function ShowsProgress() {
     });
   };
 
+  const getNext = async (show: ZustandShowWithProgress): Promise<ZustandShowWithProgress> => {
+    return Trakt.nextEpisodeForRewatch(show).then(next_episode => ({
+      ...show,
+      next_episode,
+    }));
+  };
+
   useEffect(() => {
     if (newShow === null || shows === null) { return; }
     if (newShow.ids.trakt === shows[0].ids.trakt) {
@@ -36,7 +44,13 @@ function ShowsProgress() {
         })))
       }, 500)
     } else {
-      prependShow(newShow);
+      Promise.all([
+        getNext(newShow),
+        TraktorStreaming.getLocationsForShow(newShow.title),
+      ]).then(([showWithNext, showStreamingLocations]) => prependShow({
+        ...showWithNext,
+        streaming_locations: showStreamingLocations,
+      }));
     }
   }, [shows, newShow]);
 
@@ -64,7 +78,7 @@ function ShowsProgress() {
         )
       );
       const fetchedShows = nonHiddenShowsProgress
-        .map((show, index): ShowWithProgress => {
+        .map((show, index): ZustandShowWithProgress => {
           const watched = nonHiddenShows[index];
           return {
             addedFromSearchOrWatchlist: false,
@@ -88,7 +102,13 @@ function ShowsProgress() {
           }
         });
 
-      setShows(fetchedShows);
+      const showsWithNextEpisodePromises = fetchedShows.map(getNext);
+      const showsStreamingLocations = await Promise.all(fetchedShows.map((show) => TraktorStreaming.getLocationsForShow(show.title)));
+      const showsWithNextEpisode = await Promise.all(showsWithNextEpisodePromises);
+      setShows(showsWithNextEpisode.map((show, idx) => ({
+        ...show,
+        streaming_locations: showsStreamingLocations[idx],
+      })));
     })();
   }, [shows]);
 
@@ -101,7 +121,7 @@ function ShowsProgress() {
   }
 
   const showIds = shows.map(show => show.ids.trakt);
-  
+
   return (
     <div>
       <div className="center">

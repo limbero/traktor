@@ -1,14 +1,14 @@
 import { create } from 'zustand';
-import { ShowWithProgress } from './ShowsProgressStore';
+import { ZustandShowWithProgress } from './ShowsProgressStore';
 
 interface NewShowStore {
-  newShow: ShowWithProgress | null;
-  addNewShow: (newShow: ShowWithProgress) => void;
+  newShow: ZustandShowWithProgress | null;
+  addNewShow: (newShow: ZustandShowWithProgress) => void;
   clearNewShow: () => void;
 }
 
 export const useNewShowStore = create<NewShowStore>((set) => ({
   newShow: null,
-  addNewShow: (newShow: ShowWithProgress) => set(() => ({ newShow: newShow })),
+  addNewShow: (newShow: ZustandShowWithProgress) => set(() => ({ newShow: newShow })),
   clearNewShow: () => set(() => ({ newShow: null })),
 }));

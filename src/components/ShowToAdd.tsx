@@ -4,6 +4,7 @@ import TheMovieDb from '../apis/TheMovieDb';
 import CircularButton from './elements/CircularButton';
 import { TraktShow } from '../apis/Trakt';
 import { useEffect, useState } from 'react';
+import StreamButtons from './StreamButtons';
 
 const StyledShowToAdd = styled.div`
   & button {
@@ -16,28 +17,13 @@ const StyledShowToAdd = styled.div`
   }
 `;
 
-const StyledStreamButtons = styled.div`
-  position: absolute;
-  top: 40px;
-  left: 5px;
-
-  background-color: rgba(255,255,255, 0.7);
-  padding: 3px 3px 0px;
-  border-radius: 5px;
-
-  & img {
-    margin: 3px 3px 0;
-  }
-`;
-
 type ShowToAddProps = {
   addShow: Function;
   show: TraktShow;
   alreadyPresent: boolean;
-  streamingServices: string[];
 };
 
-function ShowToAdd({ addShow, show, alreadyPresent, streamingServices }: ShowToAddProps) {
+function ShowToAdd({ addShow, show, alreadyPresent }: ShowToAddProps) {
   const [image, setImage] = useState<string>("");
   async function fetchImage() {
     const image = await TheMovieDb.getImage(show.ids.tmdb.toString());
@@ -47,7 +33,6 @@ function ShowToAdd({ addShow, show, alreadyPresent, streamingServices }: ShowToA
     fetchImage();
   }, [show]);
 
-  const myStreamingLocations = (show?.streaming_locations || []).filter(link => streamingServices.includes(link.technical_name));
   return (
     <StyledShowToAdd
       className="show"
@@ -63,19 +48,7 @@ function ShowToAdd({ addShow, show, alreadyPresent, streamingServices }: ShowToA
               {show.title}
             </a>
           </p>
-          {
-            myStreamingLocations.length > 0 ? (
-              <StyledStreamButtons>
-                {
-                  (show?.streaming_locations || []).filter(link => streamingServices.includes(link.technical_name)).map(link => (
-                    <a key={link.technical_name} href={link.url} target="_blank" rel="noopener noreferrer">
-                      <img src={link.icon} width={20} />
-                    </a>
-                  ))
-                }
-              </StyledStreamButtons>
-            ) : null
-          }
+          <StreamButtons showStreamingLocations={show?.streaming_locations || []} />
         </div>
         <div className="next-episode">
           <p className="success-0">Add show</p>

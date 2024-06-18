@@ -1,12 +1,196 @@
 import store from '../redux/store';
 import { setToken } from '../redux/actions';
 import { Util, CorsError } from '../Util';
+import { StreamingLocation } from "./TraktorStreaming";
+import { ZustandShowWithProgress } from '../zustand/ShowsProgressStore';
+
+export type Token = {
+  access_token: string;
+  created_at: number;
+  expires_in: number;
+  refresh_token: string;
+  scope: string;
+  token_type: string;
+};
+
+export type User = {
+  "username": string;
+  "private": boolean;
+  "name": string;
+  "vip": boolean;
+  "vip_ep": boolean;
+  "ids": {
+    "slug": string;
+  };
+};
+
+export type TraktIds = {
+  "trakt": number;
+  "slug": string;
+  "tvdb": number;
+  "imdb": string;
+  "tmdb": number;
+  "tvrage": null;
+};
+
+export type TraktShow = {
+  "title": string;
+  "year": number;
+  "ids": TraktIds;
+  "tagline": string;
+  "overview": string;
+  "first_aired": string;
+  "airs": {
+    "day": string;
+    "time": string;
+    "timezone": string;
+  };
+  "runtime": number;
+  "certification": string;
+  "country": string;
+  "status": string;
+  "rating": number;
+  "votes": number;
+  "comment_count": number;
+  "trailer": string;
+  "homepage": string;
+  "network": string;
+  "updated_at": string;
+  "language": string;
+  "languages": string[];
+  "available_translations": string[];
+  "genres": string[];
+  "aired_episodes": number;
+  "streaming_locations"?: StreamingLocation[];
+};
+
+export type EpisodeWithProgress = {
+  "number": number;
+  "completed": boolean;
+  "last_watched_at": string;
+};
+
+export type SeasonWithProgress = {
+  "number": number;
+  "title": string | null;
+  "aired": number;
+  "completed": number;
+  "episodes": EpisodeWithProgress[];
+};
+
+export type NextLastEpisode = {
+  "season": number;
+  "number": number;
+  "title": string;
+  "ids": TraktIds;
+};
+
+export type TraktShowWithProgress = {
+  "aired": number;
+  "completed": number;
+  "last_watched_at": string;
+  "reset_at": string | null;
+  "seasons": SeasonWithProgress[];
+  "hidden_seasons": any[];
+  "next_episode": NextLastEpisode | null;
+  "last_episode": NextLastEpisode | null;
+  "streaming_locations"?: StreamingLocation[];
+};
+
+export type getAllShowsProgressShow = {
+  "plays": number;
+  "last_watched_at": string;
+  "last_updated_at": string;
+  "reset_at": string;
+  "show": {
+    "title": string;
+    "year": number;
+    "ids": TraktIds;
+  },
+  "seasons": [
+    {
+      "number": number;
+      "episodes": [
+        {
+          "number": number;
+          "plays": number;
+          "last_watched_at": string;
+        },
+      ]
+    },
+  ]
+};
+
+export type HiddenItem = {
+  "hidden_at": string;
+  "type": string;
+  "show": {
+    "title": string;
+    "year": number;
+    "ids": TraktIds;
+  }
+};
+
+export type HiddenShowResponse = {
+  "added": {
+    "movies": number;
+    "shows": number;
+    "seasons": number;
+    "users": number;
+  },
+  "not_found": {
+    "movies": {
+      "ids": TraktIds;
+    }[];
+    "shows": {
+      "ids": TraktIds;
+    }[];
+    "seasons": {
+      "ids": TraktIds;
+    }[];
+    "users": {
+      "ids": TraktIds;
+    }[];
+  }
+};
+
+export type WatchlistItem = {
+  "rank": number;
+  "id": number;
+  "listed_at": string;
+  "notes": string;
+  "type": string;
+  "show": TraktShow;
+};
+
+export type Genre = {
+  name: string,
+  slug: string
+};
+
+export type RefreshToken = {
+  "access_token": string;
+  "token_type": string;
+  "expires_in": number;
+  "refresh_token": string;
+  "scope": string;
+  "created_at": number;
+};
+
+type TokenPayload = {
+  client_id: string;
+  client_secret: string;
+  redirect_uri: string;
+  refresh_token?: string;
+  grant_type?: string;
+  code?: string;
+};
 
 let getNewToken = false;
-let onGoingTokenRequest = null;
+let onGoingTokenRequest: Promise<void | RefreshToken> | null = null;
 
 class Trakt {
-  static basicTokenPayload() {
+  static basicTokenPayload(): TokenPayload {
     return {
       client_id: import.meta.env.VITE_TRAKT_CLIENT_ID,
       client_secret: import.meta.env.VITE_TRAKT_CLIENT_SECRET,
@@ -21,38 +205,43 @@ class Trakt {
       'Content-Type': 'application/json',
       'trakt-api-version': '2',
       'trakt-api-key': import.meta.env.VITE_TRAKT_CLIENT_ID,
-      Authorization: `Bearer ${token.access_token}`,
+      Authorization: `Bearer ${token?.access_token}`,
     };
   }
 
-  static async token() {
+  static async token(): Promise<void | RefreshToken> {
     const { token } = store.getState();
 
     if (onGoingTokenRequest) {
       return onGoingTokenRequest;
     }
-    if (getNewToken) {
+    if (getNewToken && token) {
       getNewToken = false;
       onGoingTokenRequest = Trakt.refreshToken(token).then((response) => {
         onGoingTokenRequest = null;
         return response;
       });
       const freshToken = await onGoingTokenRequest;
+      if (!freshToken) { return; }
       localStorage.setItem('traktor_trakt_token', JSON.stringify(freshToken));
       store.dispatch(setToken(freshToken));
       return freshToken;
     }
 
     if (token === null) {
-      const localStorageToken = JSON.parse(
-        localStorage.getItem('traktor_trakt_token')
+      const localStorageToken: RefreshToken | null = JSON.parse(
+        localStorage.getItem('traktor_trakt_token') || "{}"
       );
       if (localStorageToken === null) {
         throw Error('Not authenticated');
       }
 
       const freshToken = await Trakt.refreshTokenIfNecessary(localStorageToken);
-      if (freshToken.created_at !== localStorageToken.created_at) {
+
+      if (!freshToken) {
+        throw Error('Not authenticated');
+      }
+      if (freshToken?.created_at !== localStorageToken.created_at) {
         localStorage.setItem('traktor_trakt_token', JSON.stringify(freshToken));
       }
       store.dispatch(setToken(freshToken));
@@ -60,15 +249,18 @@ class Trakt {
     }
 
     const freshToken = await Trakt.refreshTokenIfNecessary(token);
+    if (!freshToken) {
+      throw Error('Not authenticated');
+    }
 
-    if (freshToken.created_at !== token.created_at) {
+    if (freshToken?.created_at !== token.created_at) {
       store.dispatch(setToken(freshToken));
       localStorage.setItem('traktor_trakt_token', JSON.stringify(freshToken));
     }
     return freshToken;
   }
 
-  static async getTokenFromCode(code) {
+  static async getTokenFromCode(code: string) {
     return Trakt.postToTokenEndpoint({
       ...Trakt.basicTokenPayload(),
       code,
@@ -76,7 +268,7 @@ class Trakt {
     });
   }
 
-  static async postToTokenEndpoint(payload) {
+  static async postToTokenEndpoint(payload: TokenPayload): Promise<RefreshToken> {
     return Util.fetchJson('https://api.trakt.tv/oauth/token', {
       method: 'POST',
       headers: {
@@ -87,7 +279,7 @@ class Trakt {
     });
   }
 
-  static async refreshToken(token) {
+  static async refreshToken(token: RefreshToken): Promise<void | RefreshToken> {
     return Trakt.postToTokenEndpoint({
       ...Trakt.basicTokenPayload(),
       refresh_token: token.refresh_token,
@@ -98,7 +290,7 @@ class Trakt {
     });
   }
 
-  static async refreshTokenIfNecessary(token) {
+  static async refreshTokenIfNecessary(token: RefreshToken): Promise<void | RefreshToken> {
     const expirationDate = (token.created_at + token.expires_in) * 1000;
     const aDay = 1000 * 60 * 60 * 24;
 
@@ -109,8 +301,8 @@ class Trakt {
     return token;
   }
 
-  static async get(url) {
-    const init = {
+  static async get(url: RequestInfo | URL): Promise<any> {
+    const init: RequestInit = {
       method: 'GET',
       headers: await Trakt.headers(),
       cache: 'no-store',
@@ -125,31 +317,31 @@ class Trakt {
     });
   }
 
-  static async getCurrentUser() {
+  static async getCurrentUser(): Promise<User> {
     return Trakt.get(
       `https://api.trakt.tv/users/me`
     );
   }
 
-  static async getEpisode(showId, season, episode) {
+  static async getEpisode(showId: number, season: number, episode: number) {
     return Trakt.get(
       `https://api.trakt.tv/shows/${showId}/seasons/${season}/episodes/${episode}`
     );
   }
 
-  static async getHiddenShows() {
+  static async getHiddenShows(): Promise<HiddenItem[]> {
     return Trakt.get(
       'https://api.trakt.tv/users/hidden/progress_watched?type=show&limit=100'
     );
   }
 
-  static async getHistoryDaysBack(days) {
+  static async getHistoryDaysBack(days: number) {
     const toDate = new Date();
     const fromDate = new Date(new Date().setDate(toDate.getDate() - days));
     return Trakt.getHistory(fromDate, toDate);
   }
 
-  static async getHistory(fromDate, toDate) {
+  static async getHistory(fromDate: Date, toDate: Date) {
     const from = fromDate.toISOString();
     const to = toDate.toISOString();
     return Trakt.get(
@@ -157,12 +349,12 @@ class Trakt {
     );
   }
 
-  static async getCalendarDaysBack(days) {
+  static async getCalendarDaysBack(days: number) {
     const fromDate = new Date(new Date().setDate(new Date().getDate() - days));
     return Trakt.getCalendar(fromDate, days);
   }
 
-  static async getCalendar(fromDate, days) {
+  static async getCalendar(fromDate: Date, days: number) {
     const from = fromDate.toISOString().slice(0, 10);
     return Trakt.get(`https://api.trakt.tv/calendars/my/shows/${from}/${days}`);
   }
@@ -177,25 +369,25 @@ class Trakt {
     );
   }
 
-  static async getShows() {
+  static async getShows(): Promise<getAllShowsProgressShow[]> {
     return Trakt.get('https://api.trakt.tv/users/me/watched/shows');
   }
 
-  static async getShowForStatistics(id) {
+  static async getShowForStatistics(id: number) {
     return Trakt.get(
       `https://api.trakt.tv/shows/${id}/progress/watched?extended=full`
     );
   }
 
-  static async getShowProgress(id) {
+  static async getShowProgress(id: number): Promise<TraktShowWithProgress> {
     return Trakt.get(`https://api.trakt.tv/shows/${id}/progress/watched`);
   }
 
-  static async getWatchlist() {
+  static async getWatchlist(): Promise<WatchlistItem[]> {
     return Trakt.get('https://api.trakt.tv/users/me/watchlist/shows/added?extended=full');
   }
 
-  static async markEpisodeWatched(ids) {
+  static async markEpisodeWatched(ids: TraktIds) {
     const watched = {
       episodes: [
         {
@@ -216,7 +408,7 @@ class Trakt {
     );
   }
 
-  static async hideShow(ids) {
+  static async hideShow(ids: TraktIds): Promise<HiddenShowResponse> {
     const payload = {
       shows: [
         {
@@ -236,31 +428,31 @@ class Trakt {
     );
   }
 
-  static async search(query, limit = 9, page = 1) {
+  static async search(query: string, limit = 9, page = 1) {
     return Trakt.get(
       `https://api.trakt.tv/search/show?query=${query}&limit=${limit}&page=${page}`
     );
   }
 
-  static countWatchedSinceReset(show) {
+  static countWatchedSinceReset(show: ZustandShowWithProgress | TraktShowWithProgress): number {
     const resetAt = this.showResetAt(show);
     return show.seasons
       .filter((season) => season.number !== 0)
-      .map((season) =>
+      .map((season: SeasonWithProgress) =>
         season.episodes
           .map((episode) =>
             Date.parse(episode.last_watched_at) > resetAt ? 1 : 0
           )
-          .reduce((a, b) => a + b, 0)
+          .reduce((a: number, b: number) => a + b, 0)
       )
-      .reduce((a, b) => a + b, 0);
+      .reduce((a: number, b: number) => a + b, 0);
   }
 
-  static async nextEpisodeForRewatch(show) {
+  static async nextEpisodeForRewatch(show:  ZustandShowWithProgress) {
     const resetAt = this.showResetAt(show);
     const episodes = show.seasons
       .filter((season) => season.number !== 0)
-      .flatMap((season) =>
+      .flatMap((season: SeasonWithProgress) =>
         season.episodes.map((ep) => ({ ...ep, season: season.number }))
       );
 
@@ -304,31 +496,31 @@ class Trakt {
             Date.parse(episode.last_watched_at) <= resetAt
         )[0];
       return Trakt.getEpisode(
-          show.ids.trakt,
-          firstUnwatched.season,
-          firstUnwatched.number
-        );
+        show.ids.trakt,
+        firstUnwatched.season,
+        firstUnwatched.number
+      );
     }
 
     return Promise.resolve(null);
   }
 
-  static showResetAt(show) {
+  static showResetAt(show:  ZustandShowWithProgress | TraktShowWithProgress | getAllShowsProgressShow) {
     if (!show.reset_at) {
       return new Date(0).getTime();
     } else if (typeof show.reset_at === 'number') {
       return show.reset_at;
     } else if (typeof show.reset_at === 'string') {
       return Date.parse(show.reset_at);
-    } else if (show.reset_at instanceof Date) {
-      return show.reset_at.getTime();
+    // } else if (show.reset_at instanceof Date) {
+    //   return show.reset_at.getTime();
     } else {
       throw new Error('wtf did you just pass to showResetAt?');
     }
   }
 }
 
-export const genres = [
+export const genres: Genre[] = [
   {
     "name": "Action",
     "slug": "action"

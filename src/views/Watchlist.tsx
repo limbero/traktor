@@ -110,13 +110,13 @@ function Watchlist() {
     </div>);
   }
 
-  const myServices = Object.keys(streamingServices).filter(key => streamingServices[key]);
+  const userStreamingServices = Object.keys(streamingServices).filter(key => streamingServices[key]);
   let filteredWatchlist = watchlist;
   if (filterOnStreaming) {
     filteredWatchlist = filteredWatchlist.filter(item => {
       if (!item.show?.streaming_locations) return false;
       for (let idx = 0; idx < item.show.streaming_locations.length; idx++) {
-        if (myServices.includes(item.show.streaming_locations[idx].technical_name)) {
+        if (userStreamingServices.includes(item.show.streaming_locations[idx].technical_name)) {
           return true;
         }
       }
@@ -205,7 +205,6 @@ function Watchlist() {
               history.push("/");
             }}
             alreadyPresent={false}
-            streamingServices={myServices}
           />
         ))
       }

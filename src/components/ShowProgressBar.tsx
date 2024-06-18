@@ -1,7 +1,11 @@
-import React from 'react';
 import Trakt from '../apis/Trakt';
+import { ZustandShowWithProgress } from '../zustand/ShowsProgressStore';
 
-export default function ShowProgressBar({ show }) {
+type ShowProgressBarProps = {
+  show: ZustandShowWithProgress;
+};
+
+export default function ShowProgressBar({ show }: ShowProgressBarProps) {
   const episodes = show.seasons.flatMap((season) => season.episodes);
   const oneEpisodeWidth = 100 / episodes.length;
   const resetAt = Trakt.showResetAt(show);

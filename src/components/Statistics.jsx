@@ -76,6 +76,7 @@ const Statistics = ({ showIds, includedShows }) => {
 
   useEffect(() => {
     (async () => {
+      if (shows.length > showIds.length) { return; } //finished a show, doesn't mean we need a refetch
       const fetchedShows = await Promise.all(
         showIds.map((showId) => Trakt.getShowForStatistics(showId))
       );

@@ -1,5 +1,5 @@
 class Helpers {
-  static async sleep(ms) {
+  static async sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

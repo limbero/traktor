@@ -2,7 +2,7 @@ import CorsError from './errors/CorsError';
 import FetchError from './errors/FetchError';
 
 class Util {
-  static async fetch(url, init) {
+  static async fetch(url: RequestInfo | URL, init: RequestInit | undefined): Promise<Response> {
     return fetch(url, init).then((response) => {
       if (!response.ok) {
         return Promise.reject(
@@ -13,11 +13,11 @@ class Util {
     });
   }
 
-  static async fetchJson(url, init) {
+  static async fetchJson(url: RequestInfo | URL, init: RequestInit | undefined): Promise<any> {
     return Util.fetch(url, init).then((res) => res.json());
   }
 
-  static async fetchWithRetry(url, init, attempts) {
+  static async fetchWithRetry(url: RequestInfo | URL, init: RequestInit | undefined, attempts: number): Promise<Response> {
     return Util.fetch(url, init).catch((error) => {
       if (error instanceof TypeError) {
         // probably CORS issue
@@ -30,11 +30,11 @@ class Util {
     });
   }
 
-  static async fetchJsonWithRetry(url, init, attempts) {
+  static async fetchJsonWithRetry(url: RequestInfo | URL, init: RequestInit | undefined, attempts: number): Promise<any> {
     return Util.fetchWithRetry(url, init, attempts).then((res) => res.json());
   }
 
-  static leftpad(string, paddingCharacter, desiredLength) {
+  static leftpad(string: string, paddingCharacter: string, desiredLength: number) {
     const numMissingCharacters = desiredLength - string.length;
     if (numMissingCharacters > 0) {
       return `${new Array(numMissingCharacters)
@@ -45,7 +45,7 @@ class Util {
     }
   }
 
-  static zeropad(number, desiredLength = 2) {
+  static zeropad(number: number, desiredLength = 2) {
     return Util.leftpad(number.toString(10), '0', desiredLength);
   }
 }

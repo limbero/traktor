@@ -1,9 +1,11 @@
 class FetchError extends Error {
-  constructor(statusCode, statusText) {
+  statusCode: number;
+  statusText: string;
+  constructor(statusCode: number, statusText: string) {
     super(`${statusCode}${statusText}`);
     this.statusCode = statusCode;
     this.statusText = statusText;
-    Error.captureStackTrace(this, FetchError);
+    // Error.captureStackTrace(this, FetchError);
   }
 }
 
