@@ -18,6 +18,7 @@ export type ZustandShowWithProgress = {
     ids: TraktIds;
   };
   streaming_locations?: StreamingLocation[];
+  runtime?: number;
 };
 
 interface ShowsProgressStore {

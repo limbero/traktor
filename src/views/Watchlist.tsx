@@ -190,7 +190,7 @@ function Watchlist() {
             key={item.id}
             show={item.show}
             addShow={async () => {
-              const showProgress = await Trakt.getShowProgress(item.show.ids.trakt);
+              const showProgress = await Trakt.getShowProgressExtended(item.show.ids.trakt);
               addNewShow({
                 addedFromSearchOrWatchlist: true,
                 title: item.show.title,
@@ -200,6 +200,7 @@ function Watchlist() {
                 last_watched_at: showProgress.last_watched_at,
                 reset_at: Trakt.showResetAt(showProgress),
                 seasons: showProgress.seasons,
+                runtime: showProgress.last_episode?.runtime || showProgress.next_episode?.runtime,
               });
               setWatchlist(watchlist.filter(wlitem => wlitem.id !== item.id));
               history.push("/");

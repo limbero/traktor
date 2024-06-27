@@ -41,7 +41,7 @@ class AddShow extends Component {
     const results = await Trakt.search(query, 20);
 
     const progressPromises = results.map((result) =>
-      Trakt.getShowProgress(result.show.ids.trakt)
+      Trakt.getShowProgressExtended(result.show.ids.trakt)
     );
     const progresses = await Promise.all(progressPromises);
 
@@ -56,6 +56,7 @@ class AddShow extends Component {
           last_watched_at: show.last_watched_at,
           next_episode: show.next_episode,
           seasons: show.seasons,
+          runtime: show.last_episode?.runtime || show.next_episode?.runtime,
         };
       })
       .filter((show) => show.aired !== show.completed)

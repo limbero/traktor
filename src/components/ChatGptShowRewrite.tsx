@@ -154,7 +154,7 @@ const Show: React.FunctionComponent<ShowProps> = (props: ShowProps) => {
   };
 
   const updateProgress = async (currentShow: ZustandShowWithProgress) => {
-    const newProgress = await Trakt.getShowProgress(currentShow.ids.trakt);
+    const newProgress = await Trakt.getShowProgressExtended(currentShow.ids.trakt);
 
     let newProgressWithTitleAndIds: ZustandShowWithProgress = {
       ...currentShow,
@@ -163,6 +163,7 @@ const Show: React.FunctionComponent<ShowProps> = (props: ShowProps) => {
       last_watched_at: newProgress.last_watched_at,
       reset_at: Trakt.showResetAt(newProgress),
       seasons: newProgress.seasons,
+      runtime: newProgress.last_episode?.runtime || newProgress.next_episode?.runtime,
     };
     newProgressWithTitleAndIds.next_episode = await Trakt.nextEpisodeForRewatch(newProgressWithTitleAndIds);
     setShow(newProgressWithTitleAndIds);
@@ -194,7 +195,7 @@ const Show: React.FunctionComponent<ShowProps> = (props: ShowProps) => {
         setLoading(false);
         return;
       }
-      const newProgress = await Trakt.getShowProgress(showNotFromSearch.ids.trakt);
+      const newProgress = await Trakt.getShowProgressExtended(showNotFromSearch.ids.trakt);
       showNotFromSearch = {
         ...showNotFromSearch,
         aired: newProgress.aired,
@@ -203,6 +204,7 @@ const Show: React.FunctionComponent<ShowProps> = (props: ShowProps) => {
         reset_at: Trakt.showResetAt(newProgress),
         seasons: newProgress.seasons,
         next_episode: showNotFromSearch.next_episode,
+        runtime: newProgress.last_episode?.runtime || newProgress.next_episode?.runtime,
       };
     }
 

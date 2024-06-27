@@ -85,6 +85,19 @@ export type NextLastEpisode = {
   "ids": TraktIds;
 };
 
+type ExtendedNextLastEpisode = NextLastEpisode & {
+  "number_abs": number | null;
+  "overview": string;
+  "rating": number;
+  "votes": number;
+  "comment_count": number;
+  "first_aired": string;
+  "updated_at": string;
+  "available_translations": string[];
+  "runtime": number;
+  "episode_type": string;
+};
+
 export type TraktShowWithProgress = {
   "aired": number;
   "completed": number;
@@ -94,6 +107,18 @@ export type TraktShowWithProgress = {
   "hidden_seasons": any[];
   "next_episode": NextLastEpisode | null;
   "last_episode": NextLastEpisode | null;
+  "streaming_locations"?: StreamingLocation[];
+};
+
+export type ExtendedTraktShowWithProgress = {
+  "aired": number;
+  "completed": number;
+  "last_watched_at": string;
+  "reset_at": string | null;
+  "seasons": SeasonWithProgress[];
+  "hidden_seasons": any[];
+  "next_episode": ExtendedNextLastEpisode | null;
+  "last_episode": ExtendedNextLastEpisode | null;
   "streaming_locations"?: StreamingLocation[];
 };
 
@@ -119,48 +144,6 @@ export type getAllShowsProgressShow = {
       ]
     },
   ]
-};
-
-type StatisticsEpisode = {
-  "season": number;
-  "number": number;
-  "title": string;
-  "ids": TraktIds;
-  "number_abs": number | null;
-  "overview": string;
-  "rating": number;
-  "votes": number;
-  "comment_count": number;
-  "first_aired": string;
-  "updated_at": string;
-  "available_translations": string[];
-  "runtime": number;
-  "episode_type": string;
-};
-
-export type StatisticsShow = {
-  "aired": number;
-  "completed": number;
-  "last_watched_at": string;
-  "reset_at": string | null;
-  "seasons": [
-    {
-      "number": number;
-      "title": string | null;
-      "aired": number;
-      "completed": number;
-      "episodes": [
-        {
-          "number": number;
-          "completed": boolean;
-          "last_watched_at": string;
-        }
-      ];
-    }
-  ];
-  "hidden_seasons": any[];
-  "next_episode": StatisticsEpisode;
-  "last_episode": StatisticsEpisode;
 };
 
 export type HiddenItem = {
@@ -210,32 +193,14 @@ export type HistoryEpisode = {
   "watched_at": string;
   "action": string;
   "type": string;
-  "episode": {
-    "season": number;
-    "number": number;
-    "title": string;
-    "ids": TraktIds;
-  };
-  "show": {
-    "title": string;
-    "year": number;
-    "ids": TraktIds;
-  };
+  "episode": ExtendedNextLastEpisode;
+  "show": TraktShow;
 };
 
 export type CalendarEpisode = {
   "first_aired": string;
-  "episode": {
-    "season": number;
-    "number": number;
-    "title": string;
-    "ids": TraktIds;
-  };
-  "show": {
-    "title": string;
-    "year": number;
-    "ids": TraktIds;
-  };
+  "episode": ExtendedNextLastEpisode;
+  "show": TraktShow;
 };
 
 export type Genre = {
@@ -420,7 +385,7 @@ class Trakt {
     const from = fromDate.toISOString();
     const to = toDate.toISOString();
     return Trakt.get(
-      `https://api.trakt.tv/users/me/history/shows?start_at=${from}&end_at=${to}&limit=500`
+      `https://api.trakt.tv/users/me/history/shows?start_at=${from}&end_at=${to}&limit=500&extended=full`
     );
   }
 
@@ -431,7 +396,7 @@ class Trakt {
 
   static async getCalendar(fromDate: Date, days: number): Promise<CalendarEpisode[]> {
     const from = fromDate.toISOString().slice(0, 10);
-    return Trakt.get(`https://api.trakt.tv/calendars/my/shows/${from}/${days}`);
+    return Trakt.get(`https://api.trakt.tv/calendars/my/shows/${from}/${days}?extended=full`);
   }
 
   static async getRatings() {
@@ -444,18 +409,18 @@ class Trakt {
     );
   }
 
-  static async getShows(): Promise<getAllShowsProgressShow[]> {
+  static async getShowsProgress(): Promise<getAllShowsProgressShow[]> {
     return Trakt.get('https://api.trakt.tv/users/me/watched/shows');
-  }
-
-  static async getShowForStatistics(id: number): Promise<StatisticsShow> {
-    return Trakt.get(
-      `https://api.trakt.tv/shows/${id}/progress/watched?extended=full`
-    );
   }
 
   static async getShowProgress(id: number): Promise<TraktShowWithProgress> {
     return Trakt.get(`https://api.trakt.tv/shows/${id}/progress/watched`);
+  }
+
+  static async getShowProgressExtended(id: number): Promise<ExtendedTraktShowWithProgress> {
+    return Trakt.get(
+      `https://api.trakt.tv/shows/${id}/progress/watched?extended=full`
+    );
   }
 
   static async getWatchlist(): Promise<WatchlistItem[]> {

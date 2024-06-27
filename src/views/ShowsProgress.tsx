@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import Trakt, { HiddenItem, getAllShowsProgressShow } from '../apis/Trakt';
+import Trakt, { ExtendedTraktShowWithProgress, HiddenItem, getAllShowsProgressShow } from '../apis/Trakt';
 
 import { useShowsProgressStore, ZustandShowWithProgress } from '../zustand/ShowsProgressStore';
 import useLoading from '../hooks/useLoading';
@@ -59,7 +59,7 @@ function ShowsProgress() {
       if (shows !== null) { return; }
       const [apiHiddenShows, apiWatchedShows]: [HiddenItem[], getAllShowsProgressShow[]] = await Promise.all([
         trackForLoading(Trakt.getHiddenShows(), 10),
-        trackForLoading(Trakt.getShows(), 20),
+        trackForLoading(Trakt.getShowsProgress(), 20),
       ]);
 
       const hiddenShows = apiHiddenShows.map((hidden) => hidden.show.ids.trakt);
@@ -69,10 +69,10 @@ function ShowsProgress() {
           (watchedShow) => !hiddenShows.includes(watchedShow.show.ids.trakt)
         );
 
-      const nonHiddenShowsProgress = await Promise.all(
+      const nonHiddenShowsProgress: ExtendedTraktShowWithProgress[] = await Promise.all(
         nonHiddenShows.map((watched: getAllShowsProgressShow) =>
           trackForLoading(
-            Trakt.getShowProgress(watched.show.ids.trakt),
+            Trakt.getShowProgressExtended(watched.show.ids.trakt),
             70 / nonHiddenShows.length
           )
         )
@@ -89,6 +89,7 @@ function ShowsProgress() {
             last_watched_at: watched.last_watched_at,
             reset_at: Trakt.showResetAt(watched),
             seasons: show.seasons,
+            runtime: show.last_episode?.runtime || show.next_episode?.runtime,
           };
         })
         .filter((show) => show.aired > show.completed)
@@ -135,7 +136,7 @@ function ShowsProgress() {
           <Show key={show.ids.trakt} show={show} />
         ))}
       </div>
-      <Statistics showIds={showIds} />
+      <Statistics shows={shows} />
     </div>
   );
 }

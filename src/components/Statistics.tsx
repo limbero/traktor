@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import Trakt, { CalendarEpisode, HistoryEpisode, StatisticsShow } from '../apis/Trakt';
+import Trakt from '../apis/Trakt';
+import { ZustandShowWithProgress } from '../zustand/ShowsProgressStore';
 
 function sum(array: number[]) {
   return array.reduce(function (acc, cur) {
@@ -70,89 +71,52 @@ function humanTime(minutes: number) {
 const LOOKBACK_DAYS = 30;
 
 type StatisticsProps = {
-  showIds: number[];
+  shows: ZustandShowWithProgress[];
 };
 
-type ShowToRuntimeMap = {[key:string]: number};
+type ShowToRuntimeMap = { [key: string]: number | undefined };
 
-const Statistics = ({ showIds }: StatisticsProps) => {
-  const [shows, setShows] = useState<StatisticsShow[]>([]);
-  const [historyEpisodes, setHistoryEpisodes] = useState<HistoryEpisode[]>([]);
-  const [calendarEpisodes, setCalendarEpisodes] = useState<CalendarEpisode[]>([]);
-  const [showToRuntimeMap, setShowToRuntimeMap] = useState<ShowToRuntimeMap>({});
+const Statistics = ({ shows }: StatisticsProps) => {
+  const snMap: ShowToRuntimeMap = {};
+  shows.forEach(show => {
+    snMap[show.ids.slug] = show.aired - show.completed;
+  });
+  console.log(snMap);
+
+  const [watchedMinutes, setWatchedMinutes] = useState<number>(0);
+  const [airedMinutes, setAiredMinutes] = useState<number>(0);
 
   useEffect(() => {
     (async () => {
-      if (shows.length > showIds.length) { return; } //finished a show, doesn't mean we need a refetch
-      const fetchedShows = await Promise.all(
-        showIds.map((showId) => Trakt.getShowForStatistics(showId))
+      const showIds = shows.map(show => show.ids.trakt);
+      const calEps = (await Trakt.getCalendarDaysBack(LOOKBACK_DAYS)).filter(
+        (calendarEp) =>
+          showIds.includes(calendarEp.show.ids.trakt) &&
+          calendarEp.episode.season !== 0
       );
-      setShows(fetchedShows);
-      const srMap: ShowToRuntimeMap = {};
-      fetchedShows.forEach((show, index) => {
-        srMap[showIds[index].toString()] = show.next_episode?.runtime || show.last_episode?.runtime;
-      });
+      const hisEps = await Trakt.getHistoryDaysBack(LOOKBACK_DAYS);
 
-      const calEpsPromise = Trakt.getCalendarDaysBack(LOOKBACK_DAYS);
-      const hisEpsPromise = Trakt.getHistoryDaysBack(LOOKBACK_DAYS);
-
-      function filterHiddenAndSpecials(arr: CalendarEpisode[]) {
-        return arr.filter(
-          (calendarEp) =>
-            showIds.includes(calendarEp.show.ids.trakt) &&
-            calendarEp.episode.season !== 0
-        );
-      }
-
-      const calEps = filterHiddenAndSpecials(await calEpsPromise);
-      const hisEps = await hisEpsPromise;
-      setCalendarEpisodes(calEps);
-      setHistoryEpisodes(hisEps);
-
-      function unknownLengths(arr: CalendarEpisode[] | HistoryEpisode[]): number[] {
-        return arr
-          .filter((ep) => !srMap[ep.show.ids.trakt])
-          .map((ep) => ep.show.ids.trakt);
-      }
-
-      const unknownLengthShowIds = [
-        ...new Set([...unknownLengths(hisEps), ...unknownLengths(calEps)]),
-      ];
-
-      const additionalLengths = await Promise.all(
-        unknownLengthShowIds.map((showId) => Trakt.getShowForStatistics(showId))
+      setWatchedMinutes(
+        Math.round(
+          sum(
+            hisEps.map(hisEp => hisEp.episode.runtime)
+          ) / LOOKBACK_DAYS
+        )
       );
-      additionalLengths.forEach((show, index) => {
-        srMap[unknownLengthShowIds[index]] = show.next_episode?.runtime || show.last_episode?.runtime;
-      });
-      setShowToRuntimeMap(srMap);
+      setAiredMinutes(
+        Math.round(
+          sum(
+            calEps.map(calEp => calEp.episode.runtime)
+          ) / LOOKBACK_DAYS
+        )
+      );
     })();
-  }, [showIds]);
+  }, []);
 
-  const unfinishedEpisodes = sum(
-    shows.map((show) => show.aired - show.completed)
-  );
-  const unfinishedMinutes = sum(
-    shows.map(
-      (show) => {
-        const runtime = show.next_episode?.runtime || show.last_episode?.runtime;
-        return (show.aired - show.completed) * runtime;
-      }
-    )
-  );
-
-  const addedMinutes = Math.round(sum(
-    calendarEpisodes
-      .map((ep) => showToRuntimeMap[ep.show.ids.trakt.toString()])
-      .filter((ep) => typeof ep !== 'undefined')
-  ) / LOOKBACK_DAYS);
-  const watchedMinutes = Math.round(sum(
-    historyEpisodes
-      .map((ep) => showToRuntimeMap[ep.show.ids.trakt])
-      .filter((ep) => typeof ep !== 'undefined')
-  ) / LOOKBACK_DAYS);
-
-  const velocity = addedMinutes - watchedMinutes;
+  const unfinishedEpisodesList = shows.map((show) => show.aired - show.completed);
+  const unfinishedEpisodes = sum(unfinishedEpisodesList);
+  const unfinishedMinutes = sum(unfinishedEpisodesList.map((eps, idx) => eps * (shows[idx].runtime || 20)))
+  const velocity = airedMinutes - watchedMinutes;
   const sign = (() => {
     if (velocity > 0) {
       return '+';
@@ -175,7 +139,7 @@ const Statistics = ({ showIds }: StatisticsProps) => {
         {humanTime(watchedMinutes)} watched
       </p>
       <p style={{ margin: 0 }}>
-        {humanTime(addedMinutes)} of new TV aired
+        {humanTime(airedMinutes)} of new TV aired
       </p>
       <p style={{ margin: 0 }}>
         Net velocity {sign}{humanTime(velocity)} per day
