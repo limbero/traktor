@@ -135,10 +135,7 @@ function ShowsProgress() {
           <Show key={show.ids.trakt} show={show} />
         ))}
       </div>
-      <Statistics
-        showIds={showIds}
-        includedShows={shows}
-      />
+      <Statistics showIds={showIds} />
     </div>
   );
 }

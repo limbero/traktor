@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import Trakt from '../apis/Trakt';
+import { useEffect, useState } from 'react';
+import Trakt, { CalendarEpisode, HistoryEpisode, StatisticsShow } from '../apis/Trakt';
 
-function sum(array) {
+function sum(array: number[]) {
   return array.reduce(function (acc, cur) {
     return acc + cur;
   }, 0);
 }
 
-function humanTime(minutes) {
+function humanTime(minutes: number) {
   if (minutes < 0) {
     return humanTime(-minutes);
   } else if (minutes === 0) {
@@ -39,10 +39,11 @@ function humanTime(minutes) {
     minute: 0,
   };
 
+  type UnitName = "year" | "month" | "week" | "day" | "hour" | "minute";
   let minutesLeft = minutes;
-  Object.entries(units).forEach(([unitName, unitSize]) => {
+  Object.entries(units).forEach(([unitName, unitSize]: [string, number]) => {
     while (minutesLeft > unitSize) {
-      values[unitName]++;
+      values[unitName as UnitName]++;
       minutesLeft -= unitSize;
     }
     if (unitName === 'minute') {
@@ -68,11 +69,17 @@ function humanTime(minutes) {
 
 const LOOKBACK_DAYS = 30;
 
-const Statistics = ({ showIds, includedShows }) => {
-  const [shows, setShows] = useState([]);
-  const [historyEpisodes, setHistoryEpisodes] = useState([]);
-  const [calendarEpisodes, setCalendarEpisodes] = useState([]);
-  const [showToRuntimeMap, setShowToRuntimeMap] = useState({});
+type StatisticsProps = {
+  showIds: number[];
+};
+
+type ShowToRuntimeMap = {[key:string]: number};
+
+const Statistics = ({ showIds }: StatisticsProps) => {
+  const [shows, setShows] = useState<StatisticsShow[]>([]);
+  const [historyEpisodes, setHistoryEpisodes] = useState<HistoryEpisode[]>([]);
+  const [calendarEpisodes, setCalendarEpisodes] = useState<CalendarEpisode[]>([]);
+  const [showToRuntimeMap, setShowToRuntimeMap] = useState<ShowToRuntimeMap>({});
 
   useEffect(() => {
     (async () => {
@@ -81,28 +88,28 @@ const Statistics = ({ showIds, includedShows }) => {
         showIds.map((showId) => Trakt.getShowForStatistics(showId))
       );
       setShows(fetchedShows);
-      const srMap = {};
+      const srMap: ShowToRuntimeMap = {};
       fetchedShows.forEach((show, index) => {
-        srMap[showIds[index]] = show.next_episode?.runtime || show.last_episode?.runtime;
+        srMap[showIds[index].toString()] = show.next_episode?.runtime || show.last_episode?.runtime;
       });
 
       const calEpsPromise = Trakt.getCalendarDaysBack(LOOKBACK_DAYS);
       const hisEpsPromise = Trakt.getHistoryDaysBack(LOOKBACK_DAYS);
 
-      function filterHiddenAndSpecials(arr) {
+      function filterHiddenAndSpecials(arr: CalendarEpisode[]) {
         return arr.filter(
           (calendarEp) =>
-            includedShows.includes(calendarEp.show.ids.trakt) &&
+            showIds.includes(calendarEp.show.ids.trakt) &&
             calendarEp.episode.season !== 0
         );
       }
 
       const calEps = filterHiddenAndSpecials(await calEpsPromise);
-      const hisEps = filterHiddenAndSpecials(await hisEpsPromise);
+      const hisEps = await hisEpsPromise;
       setCalendarEpisodes(calEps);
       setHistoryEpisodes(hisEps);
 
-      function unknownLengths(arr) {
+      function unknownLengths(arr: CalendarEpisode[] | HistoryEpisode[]): number[] {
         return arr
           .filter((ep) => !srMap[ep.show.ids.trakt])
           .map((ep) => ep.show.ids.trakt);
@@ -136,7 +143,7 @@ const Statistics = ({ showIds, includedShows }) => {
 
   const addedMinutes = Math.round(sum(
     calendarEpisodes
-      .map((ep) => showToRuntimeMap[ep.show.ids.trakt])
+      .map((ep) => showToRuntimeMap[ep.show.ids.trakt.toString()])
       .filter((ep) => typeof ep !== 'undefined')
   ) / LOOKBACK_DAYS);
   const watchedMinutes = Math.round(sum(

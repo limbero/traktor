@@ -121,6 +121,48 @@ export type getAllShowsProgressShow = {
   ]
 };
 
+type StatisticsEpisode = {
+  "season": number;
+  "number": number;
+  "title": string;
+  "ids": TraktIds;
+  "number_abs": number | null;
+  "overview": string;
+  "rating": number;
+  "votes": number;
+  "comment_count": number;
+  "first_aired": string;
+  "updated_at": string;
+  "available_translations": string[];
+  "runtime": number;
+  "episode_type": string;
+};
+
+export type StatisticsShow = {
+  "aired": number;
+  "completed": number;
+  "last_watched_at": string;
+  "reset_at": string | null;
+  "seasons": [
+    {
+      "number": number;
+      "title": string | null;
+      "aired": number;
+      "completed": number;
+      "episodes": [
+        {
+          "number": number;
+          "completed": boolean;
+          "last_watched_at": string;
+        }
+      ];
+    }
+  ];
+  "hidden_seasons": any[];
+  "next_episode": StatisticsEpisode;
+  "last_episode": StatisticsEpisode;
+};
+
 export type HiddenItem = {
   "hidden_at": string;
   "type": string;
@@ -161,6 +203,39 @@ export type WatchlistItem = {
   "notes": string;
   "type": string;
   "show": TraktShow;
+};
+
+export type HistoryEpisode = {
+  "id": number;
+  "watched_at": string;
+  "action": string;
+  "type": string;
+  "episode": {
+    "season": number;
+    "number": number;
+    "title": string;
+    "ids": TraktIds;
+  };
+  "show": {
+    "title": string;
+    "year": number;
+    "ids": TraktIds;
+  };
+};
+
+export type CalendarEpisode = {
+  "first_aired": string;
+  "episode": {
+    "season": number;
+    "number": number;
+    "title": string;
+    "ids": TraktIds;
+  };
+  "show": {
+    "title": string;
+    "year": number;
+    "ids": TraktIds;
+  };
 };
 
 export type Genre = {
@@ -335,13 +410,13 @@ class Trakt {
     );
   }
 
-  static async getHistoryDaysBack(days: number) {
+  static async getHistoryDaysBack(days: number): Promise<HistoryEpisode[]> {
     const toDate = new Date();
     const fromDate = new Date(new Date().setDate(toDate.getDate() - days));
     return Trakt.getHistory(fromDate, toDate);
   }
 
-  static async getHistory(fromDate: Date, toDate: Date) {
+  static async getHistory(fromDate: Date, toDate: Date): Promise<HistoryEpisode[]> {
     const from = fromDate.toISOString();
     const to = toDate.toISOString();
     return Trakt.get(
@@ -349,12 +424,12 @@ class Trakt {
     );
   }
 
-  static async getCalendarDaysBack(days: number) {
+  static async getCalendarDaysBack(days: number): Promise<CalendarEpisode[]> {
     const fromDate = new Date(new Date().setDate(new Date().getDate() - days));
     return Trakt.getCalendar(fromDate, days);
   }
 
-  static async getCalendar(fromDate: Date, days: number) {
+  static async getCalendar(fromDate: Date, days: number): Promise<CalendarEpisode[]> {
     const from = fromDate.toISOString().slice(0, 10);
     return Trakt.get(`https://api.trakt.tv/calendars/my/shows/${from}/${days}`);
   }
@@ -373,7 +448,7 @@ class Trakt {
     return Trakt.get('https://api.trakt.tv/users/me/watched/shows');
   }
 
-  static async getShowForStatistics(id: number) {
+  static async getShowForStatistics(id: number): Promise<StatisticsShow> {
     return Trakt.get(
       `https://api.trakt.tv/shows/${id}/progress/watched?extended=full`
     );
@@ -448,7 +523,7 @@ class Trakt {
       .reduce((a: number, b: number) => a + b, 0);
   }
 
-  static async nextEpisodeForRewatch(show:  ZustandShowWithProgress) {
+  static async nextEpisodeForRewatch(show: ZustandShowWithProgress) {
     const resetAt = this.showResetAt(show);
     const episodes = show.seasons
       .filter((season) => season.number !== 0)
@@ -505,15 +580,15 @@ class Trakt {
     return Promise.resolve(null);
   }
 
-  static showResetAt(show:  ZustandShowWithProgress | TraktShowWithProgress | getAllShowsProgressShow) {
+  static showResetAt(show: ZustandShowWithProgress | TraktShowWithProgress | getAllShowsProgressShow) {
     if (!show.reset_at) {
       return new Date(0).getTime();
     } else if (typeof show.reset_at === 'number') {
       return show.reset_at;
     } else if (typeof show.reset_at === 'string') {
       return Date.parse(show.reset_at);
-    // } else if (show.reset_at instanceof Date) {
-    //   return show.reset_at.getTime();
+      // } else if (show.reset_at instanceof Date) {
+      //   return show.reset_at.getTime();
     } else {
       throw new Error('wtf did you just pass to showResetAt?');
     }
