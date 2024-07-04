@@ -29,9 +29,14 @@ function StreamButtons({ showStreamingLocations }: StreamButtonsProps) {
     return null;
   }
 
+  const filteredStreamingServices: StreamingLocation[] = (showStreamingLocations || []).filter(link => userStreamingServices.includes(link.technical_name));
+  if (filteredStreamingServices.length === 0) {
+    return null;
+  }
+
   return <StyledStreamButtons>
     {
-      (showStreamingLocations || []).filter(link => userStreamingServices.includes(link.technical_name)).map(link => (
+      filteredStreamingServices.map(link => (
         <a key={link.technical_name} href={link.url} target="_blank" rel="noopener noreferrer">
           <img src={link.icon} width={20} />
         </a>

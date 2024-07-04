@@ -81,7 +81,6 @@ const Statistics = ({ shows }: StatisticsProps) => {
   shows.forEach(show => {
     snMap[show.ids.slug] = show.aired - show.completed;
   });
-  console.log(snMap);
 
   const [watchedMinutes, setWatchedMinutes] = useState<number>(0);
   const [airedMinutes, setAiredMinutes] = useState<number>(0);
