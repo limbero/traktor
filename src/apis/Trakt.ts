@@ -208,15 +208,6 @@ export type Genre = {
   slug: string
 };
 
-export type RefreshToken = {
-  "access_token": string;
-  "token_type": string;
-  "expires_in": number;
-  "refresh_token": string;
-  "scope": string;
-  "created_at": number;
-};
-
 type TokenPayload = {
   client_id: string;
   client_secret: string;
@@ -227,7 +218,7 @@ type TokenPayload = {
 };
 
 let getNewToken = false;
-let onGoingTokenRequest: Promise<void | RefreshToken> | null = null;
+let onGoingTokenRequest: Promise<void | Token> | null = null;
 
 class Trakt {
   static basicTokenPayload(): TokenPayload {
@@ -249,7 +240,7 @@ class Trakt {
     };
   }
 
-  static async token(): Promise<void | RefreshToken> {
+  static async token(): Promise<void | Token> {
     const storeState = store.getState();
     const token =  JSON.stringify(storeState.token) === "{}" ? null : storeState.token;
 
@@ -270,8 +261,8 @@ class Trakt {
     }
 
     if (token === null) {
-      const localStorageToken: RefreshToken | null = JSON.parse(
-        localStorage.getItem('traktor_trakt_token') || "{}"
+      const localStorageToken: Token | null = JSON.parse(
+        localStorage.getItem('traktor_trakt_token') || "null"
       );
       if (localStorageToken === null) {
         throw Error('Not authenticated');
@@ -309,7 +300,7 @@ class Trakt {
     });
   }
 
-  static async postToTokenEndpoint(payload: TokenPayload): Promise<RefreshToken> {
+  static async postToTokenEndpoint(payload: TokenPayload): Promise<Token> {
     return Util.fetchJson('https://api.trakt.tv/oauth/token', {
       method: 'POST',
       headers: {
@@ -320,7 +311,7 @@ class Trakt {
     });
   }
 
-  static async refreshToken(token: RefreshToken): Promise<void | RefreshToken> {
+  static async refreshToken(token: Token): Promise<void | Token> {
     return Trakt.postToTokenEndpoint({
       ...Trakt.basicTokenPayload(),
       refresh_token: token.refresh_token,
@@ -331,7 +322,7 @@ class Trakt {
     });
   }
 
-  static async refreshTokenIfNecessary(token: RefreshToken): Promise<void | RefreshToken> {
+  static async refreshTokenIfNecessary(token: Token): Promise<void | Token> {
     const expirationDate = (token.created_at + token.expires_in) * 1000;
     const aDay = 1000 * 60 * 60 * 24;
 

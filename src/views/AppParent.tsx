@@ -9,6 +9,7 @@ import Watchlist from './Watchlist';
 import Trakt from '../apis/Trakt';
 import StreamingServices from '../components/StreamingServices.js';
 import CircularButton from '../components/elements/CircularButton';
+import { useTokenStore } from '../zustand/TokenStore.ts';
 
 const hasHover = window.matchMedia("(hover: hover)").matches;
 const isIosPwa = 'standalone' in window.navigator && window.navigator.standalone;
@@ -65,6 +66,7 @@ const AppParent = () => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
   const [showStreamingServices, setShowStreamingServices] = useState<boolean>(false);
+  const {token} = useTokenStore();
 
   useEffect(() => {
     Trakt.token()
@@ -74,8 +76,7 @@ const AppParent = () => {
       .catch(() => {
         setLoggedIn(false);
       });
-  }, []);
-
+  }, [token]);
 
   return (
     <div className={`app${hasHover ? '' : ' no-hover'}`}>

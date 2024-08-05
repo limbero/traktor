@@ -1,4 +1,4 @@
-import { RefreshToken } from '../apis/Trakt';
+import { Token } from '../apis/Trakt';
 import { SET_TOKEN } from './actions';
 
 const initialState: TokenState = {
@@ -6,12 +6,12 @@ const initialState: TokenState = {
 };
 
 export type TokenState = {
-  token: RefreshToken | null;
+  token: Token | null;
 };
 
 type Action = {
   type: string;
-  payload: RefreshToken;
+  payload: Token;
 };
 const rootReducer = (state = initialState, action: Action): TokenState => {
   switch (action.type) {
