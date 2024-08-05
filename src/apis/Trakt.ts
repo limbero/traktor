@@ -250,7 +250,8 @@ class Trakt {
   }
 
   static async token(): Promise<void | RefreshToken> {
-    const { token } = store.getState();
+    const storeState = store.getState();
+    const token =  JSON.stringify(storeState.token) === "{}" ? null : storeState.token;
 
     if (onGoingTokenRequest) {
       return onGoingTokenRequest;
