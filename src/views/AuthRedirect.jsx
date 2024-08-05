@@ -4,15 +4,13 @@ import qs from 'qs';
 
 import Trakt from '../apis/Trakt';
 
-import { useTokenStore } from '../zustand/TokenStore';
-import store from '../redux/store';
-import { setToken } from '../redux/actions';
+import { useTokenStore } from '../zustand/TokenStoreHook';
 
 const AuthRedirect = () => {
   const [authed, setAuthed] = useState(false);
   const [error, setError] = useState(null);
   const location = useLocation();
-  const tokenStore = useTokenStore();
+  const { setToken } = useTokenStore();
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -25,8 +23,7 @@ const AuthRedirect = () => {
         setError(fetchError);
         return;
       }
-      store.dispatch(setToken(token));
-      tokenStore.setToken(token);
+      setToken(token);
       localStorage.setItem('traktor_trakt_token', JSON.stringify(token));
       setAuthed(true);
     };

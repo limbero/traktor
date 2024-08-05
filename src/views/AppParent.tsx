@@ -9,7 +9,7 @@ import Watchlist from './Watchlist';
 import Trakt from '../apis/Trakt';
 import StreamingServices from '../components/StreamingServices.js';
 import CircularButton from '../components/elements/CircularButton';
-import { useTokenStore } from '../zustand/TokenStore.ts';
+import { useTokenStore } from '../zustand/TokenStoreHook';
 
 const hasHover = window.matchMedia("(hover: hover)").matches;
 const isIosPwa = 'standalone' in window.navigator && window.navigator.standalone;

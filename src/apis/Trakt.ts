@@ -1,8 +1,7 @@
-import store from '../redux/store';
-import { setToken } from '../redux/actions';
 import { Util, CorsError } from '../Util';
 import { StreamingLocation } from "./TraktorStreaming";
 import { ZustandShowWithProgress } from '../zustand/ShowsProgressStore';
+import tokenStore from '../zustand/TokenStore';
 
 export type Token = {
   access_token: string;
@@ -241,8 +240,8 @@ class Trakt {
   }
 
   static async token(): Promise<void | Token> {
-    const storeState = store.getState();
-    const token =  JSON.stringify(storeState.token) === "{}" ? null : storeState.token;
+    const tokenStoreState = tokenStore.getState();
+    const token = JSON.stringify(tokenStoreState.token) === "{}" ? null : tokenStoreState.token;
 
     if (onGoingTokenRequest) {
       return onGoingTokenRequest;
@@ -256,7 +255,7 @@ class Trakt {
       const freshToken = await onGoingTokenRequest;
       if (!freshToken) { return; }
       localStorage.setItem('traktor_trakt_token', JSON.stringify(freshToken));
-      store.dispatch(setToken(freshToken));
+      tokenStoreState.setToken(freshToken);
       return freshToken;
     }
 
@@ -276,7 +275,7 @@ class Trakt {
       if (freshToken?.created_at !== localStorageToken.created_at) {
         localStorage.setItem('traktor_trakt_token', JSON.stringify(freshToken));
       }
-      store.dispatch(setToken(freshToken));
+      tokenStoreState.setToken(freshToken);
       return freshToken;
     }
 
@@ -286,7 +285,7 @@ class Trakt {
     }
 
     if (freshToken?.created_at !== token.created_at) {
-      store.dispatch(setToken(freshToken));
+      tokenStoreState.setToken(freshToken);
       localStorage.setItem('traktor_trakt_token', JSON.stringify(freshToken));
     }
     return freshToken;

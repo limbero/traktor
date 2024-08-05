@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { createStore } from 'zustand/vanilla';
 import { Token } from '../apis/Trakt';
 
 interface TokenStore {
@@ -6,7 +6,9 @@ interface TokenStore {
   setToken: (tk: Token) => void;
 }
 
-export const useTokenStore = create<TokenStore>((set) => ({
+const tokenStore = createStore<TokenStore>((set) => ({
   token: null,
   setToken: (tk: Token) => set(() => ({ token: tk })),
 }));
+
+export default tokenStore;
