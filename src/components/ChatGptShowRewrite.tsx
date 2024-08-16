@@ -165,9 +165,13 @@ const Show: React.FunctionComponent<ShowProps> = (props: ShowProps) => {
       seasons: newProgress.seasons,
       runtime: newProgress.last_episode?.runtime || newProgress.next_episode?.runtime,
     };
-    newProgressWithTitleAndIds.next_episode = await Trakt.nextEpisodeForRewatch(newProgressWithTitleAndIds);
+
+    if (newProgressWithTitleAndIds.completed === newProgressWithTitleAndIds.aired) {
+      setTimeout(() => setSeenEverything(true), 350);
+    } else {
+      newProgressWithTitleAndIds.next_episode = await Trakt.nextEpisodeForRewatch(newProgressWithTitleAndIds);
+    }
     setShow(newProgressWithTitleAndIds);
-    // updateShow(newProgressWithTitleAndIds);
   };
 
   const markNextWatched = async () => {
