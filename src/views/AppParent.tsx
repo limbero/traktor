@@ -7,7 +7,7 @@ import './App.scss';
 import ShowsProgress from './ShowsProgress.tsx';
 import Watchlist from './Watchlist';
 import Trakt from '../apis/Trakt';
-import StreamingServices from '../components/StreamingServices.js';
+import StreamingServices from '../components/StreamingServices';
 import CircularButton from '../components/elements/CircularButton';
 import { useTokenStore } from '../zustand/TokenStoreHook';
 

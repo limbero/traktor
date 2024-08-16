@@ -2,17 +2,17 @@ import { useEffect, useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 import styled from 'styled-components';
 
-import Trakt, { genres } from '../apis/Trakt.js';
+import Trakt, { genres } from '../apis/Trakt.ts';
 import TheMovieDb from '../apis/TheMovieDb.js';
 
 import { useNewShowStore } from '../zustand/NewShowStore';
 import { useWatchlistStore } from '../zustand/WatchlistStore';
 import useLoading from '../hooks/useLoading';
 
-import { streamingServicesMap } from '../components/StreamingServices.js';
+import { streamingServicesMap } from '../components/StreamingServices';
 import ProgressCircle from '../components/ProgressCircle';
 import ShowToAdd from '../components/ShowToAdd';
-import TraktorStreaming from '../apis/TraktorStreaming.js';
+import TraktorStreaming from '../apis/TraktorStreaming.ts';
 import { useHistory } from 'react-router-dom';
 
 const GenrePicker = styled.div`

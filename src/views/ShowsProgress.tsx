@@ -5,12 +5,12 @@ import Trakt, { ExtendedTraktShowWithProgress, HiddenItem, getAllShowsProgressSh
 import { useShowsProgressStore, ZustandShowWithProgress } from '../zustand/ShowsProgressStore';
 import useLoading from '../hooks/useLoading';
 
-import Show from '../components/ChatGptShowRewrite';
-import ProgressCircle from '../components/ProgressCircle.js';
+import Show from '../components/Show';
+import ProgressCircle from '../components/ProgressCircle';
 import AddShow from '../components/AddShow.jsx';
-import Statistics from '../components/Statistics.jsx';
-import { useNewShowStore } from '../zustand/NewShowStore.js';
-import TraktorStreaming from '../apis/TraktorStreaming.js';
+import Statistics from '../components/Statistics';
+import { useNewShowStore } from '../zustand/NewShowStore.ts';
+import TraktorStreaming from '../apis/TraktorStreaming.ts';
 
 function ShowsProgress() {
   const { shows, setShows, prependShow } = useShowsProgressStore();
