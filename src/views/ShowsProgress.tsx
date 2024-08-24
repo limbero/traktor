@@ -103,9 +103,12 @@ function ShowsProgress() {
           }
         });
 
-      const showsWithNextEpisodePromises = fetchedShows.map(getNext);
+      setShows(fetchedShows);
+
+      const showsWithNextEpisode = await Promise.all(fetchedShows.map(getNext));
+      setShows(showsWithNextEpisode);
+
       const showsStreamingLocations = await Promise.all(fetchedShows.map((show) => TraktorStreaming.getLocationsForShow(show.title)));
-      const showsWithNextEpisode = await Promise.all(showsWithNextEpisodePromises);
       setShows(showsWithNextEpisode.map((show, idx) => ({
         ...show,
         streaming_locations: showsStreamingLocations[idx],
@@ -133,7 +136,7 @@ function ShowsProgress() {
         ref={gridRef}
       >
         {shows.map((show) => (
-          <Show key={show.ids.trakt} show={show} />
+          <Show key={show.ids.trakt} id={show.ids.trakt} />
         ))}
       </div>
       <Statistics shows={shows} />

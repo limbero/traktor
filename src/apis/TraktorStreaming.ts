@@ -14,11 +14,13 @@ export interface StreamingLocation {
 class TraktorStreaming {
   static async get(url: string) {
 
-    return fetch(url).then((response) => {
+    return fetch(url, { signal: AbortSignal.timeout(5000) }).then((response) => {
       if (!response.ok) {
         throw Error(response.statusText);
       }
       return response.json();
+    }).catch(e => {
+      return [];
     });
   }
 

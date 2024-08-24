@@ -23,13 +23,16 @@ export type ZustandShowWithProgress = {
 
 interface ShowsProgressStore {
   shows: ZustandShowWithProgress[] | null;
+  getShow: (id: number) => ZustandShowWithProgress | null;
   setShows: (shws: ZustandShowWithProgress[]) => void;
   prependShow: (shw: ZustandShowWithProgress) => void;
   updateShow: (shw: ZustandShowWithProgress) => void;
+  updateShowFn: (fn: (prev: ZustandShowWithProgress) => ZustandShowWithProgress, shwid: number) => void;
 }
 
-export const useShowsProgressStore = create<ShowsProgressStore>((set) => ({
+export const useShowsProgressStore = create<ShowsProgressStore>((set, get) => ({
   shows: null,
+  getShow: (shwid: number) => get().shows?.find(shw => shw.ids.trakt === shwid) || null,
   setShows: (shws: ZustandShowWithProgress[]) => set(() => ({ shows: shws })),
   prependShow: (shw: ZustandShowWithProgress) => set((state) => {
     if (state.shows === null) { return state; }
@@ -41,6 +44,14 @@ export const useShowsProgressStore = create<ShowsProgressStore>((set) => ({
     const indexToReplace = newShows.findIndex(oldShow => oldShow.ids.trakt === shw.ids.trakt);
     if (indexToReplace === -1) { return state; }
     newShows[indexToReplace] = shw;
+    return { shows: newShows };
+  }),
+  updateShowFn: (fn: (prev: ZustandShowWithProgress) => ZustandShowWithProgress, shwid: number) => set((state) => {
+    if (state.shows === null) { return state; }
+    const newShows = [...state.shows];
+    const indexToReplace = newShows.findIndex(oldShow => oldShow.ids.trakt === shwid);
+    if (indexToReplace === -1) { return state; }
+    newShows[indexToReplace] = fn(newShows[indexToReplace]);
     return { shows: newShows };
   }),
 }));

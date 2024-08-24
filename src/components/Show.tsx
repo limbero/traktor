@@ -11,7 +11,7 @@ import { ZustandShowWithProgress, useShowsProgressStore } from '../zustand/Shows
 const hasHover = window.matchMedia("(hover: hover)").matches;
 
 type ShowProps = {
-  show: ZustandShowWithProgress;
+  id: number;
 };
 
 function isTouchEvent(e: Event | React.TouchEvent | React.MouseEvent): e is React.TouchEvent {
@@ -22,12 +22,14 @@ function isMouseEvent(e: Event | React.TouchEvent | React.MouseEvent): e is Reac
   return e && 'screenX' in e;
 }
 
-const Show: React.FunctionComponent<ShowProps> = (props: ShowProps) => {
-  const initialShow = props.show;
+const Show: React.FunctionComponent<ShowProps> = ({ id }: ShowProps) => {
 
-  const { updateShow } = useShowsProgressStore();
+  const { getShow, updateShow, updateShowFn } = useShowsProgressStore();
+  const show = getShow(id);
+  if (show === null) { return null; }
 
-  const [show, setShow] = useState<ZustandShowWithProgress>(initialShow);
+  const [initialShow] = useState(show);
+
   const [success, setSuccess] = useState(0);
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState<string | null>(null);
@@ -44,7 +46,7 @@ const Show: React.FunctionComponent<ShowProps> = (props: ShowProps) => {
 
   useEffect(() => {
     fetchImage();
-  }, [initialShow.ids.trakt]);
+  }, [show.ids.trakt]);
 
   useEffect(() => {
     const handleResize = () => updateElementWidth();
@@ -171,7 +173,7 @@ const Show: React.FunctionComponent<ShowProps> = (props: ShowProps) => {
     } else {
       newProgressWithTitleAndIds.next_episode = await Trakt.nextEpisodeForRewatch(newProgressWithTitleAndIds);
     }
-    setShow(newProgressWithTitleAndIds);
+    updateShow(newProgressWithTitleAndIds);
   };
 
   const markNextWatched = async () => {
@@ -181,14 +183,14 @@ const Show: React.FunctionComponent<ShowProps> = (props: ShowProps) => {
     };
     if (!showNotFromSearch.next_episode) { return; }
     setLoading(true);
-    setShow((prevShow) => {
+    updateShowFn((prevShow) => {
       const prevShowNotFromSearch = {
         ...prevShow,
         addedFromSearchOrWatchlist: false,
       };
       // updateShow(prevShowNotFromSearch);
       return prevShowNotFromSearch;
-    });
+    }, id);
 
     const debugging = false;
     if (!debugging) {
@@ -218,8 +220,7 @@ const Show: React.FunctionComponent<ShowProps> = (props: ShowProps) => {
       completed: newCompleted,
     };
 
-    setShow(showNotFromSearch);
-    // updateShow(showNotFromSearch);
+    updateShow(showNotFromSearch);
     setSuccess(1);
     setLoading(false);
 
@@ -235,14 +236,14 @@ const Show: React.FunctionComponent<ShowProps> = (props: ShowProps) => {
 
     const [, newNext] = await Promise.all([Helpers.sleep(350), newData]);
     setSuccess(0);
-    setShow((prevShow) => {
+    updateShowFn((prevShow) => {
       const showWithNewNext = {
         ...prevShow,
         next_episode: newNext,
       };
       setTimeout(() => updateShow(showWithNewNext), 500);
       return showWithNewNext;
-    });
+    }, id);
     setPrevPct(100 * (showNotFromSearch.completed / showNotFromSearch.aired));
   };
 
