@@ -19,7 +19,7 @@ class TraktorStreaming {
         throw Error(response.statusText);
       }
       return response.json();
-    }).catch(e => {
+    }).catch(() => {
       return [];
     });
   }
