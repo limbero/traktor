@@ -12,7 +12,7 @@ const hasHover = window.matchMedia("(hover: hover)").matches;
 
 type ShowProps = {
   id: number;
-};
+};sdfsdfs
 
 function isTouchEvent(e: Event | React.TouchEvent | React.MouseEvent): e is React.TouchEvent {
   return e && 'touches' in e;
