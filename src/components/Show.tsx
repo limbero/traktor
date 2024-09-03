@@ -69,7 +69,7 @@ const Show: React.FunctionComponent<ShowProps> = ({ id }: ShowProps) => {
     resetStep(xOffset > 0 ? -30 : 30);
   };
 
-  const tossStep = async (velocity: number) => {
+  const tossStep = (velocity: number) => {
     setXOffset((prevOffset) => {
       if (Math.abs(prevOffset) < elementWidth) {
         window.requestAnimationFrame(() => tossStep(velocity));
