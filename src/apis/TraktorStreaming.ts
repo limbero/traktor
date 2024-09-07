@@ -25,12 +25,12 @@ class TraktorStreaming {
   }
 
   static async getAllServices(): Promise<StreamingService[]> {
-    return TraktorStreaming.get("https://home.limbe.ro/trast/traktor-streamers")
+    return TraktorStreaming.get("https://gcloud.limbe.ro/trast/traktor-streamers")
       .then((services: StreamingService[]) => services.sort((a, b) => a.clear_name.toLowerCase().localeCompare(b.clear_name.toLowerCase())));
   }
 
   static async getLocationsForShow(title: string): Promise<StreamingLocation[]> {
-    return TraktorStreaming.get(`https://home.limbe.ro/trast/traktor-streaming?title=${encodeURIComponent(title)}`)
+    return TraktorStreaming.get(`https://gcloud.limbe.ro/trast/traktor-streaming?title=${encodeURIComponent(title)}`)
       .catch((_: Error) => []);
   }
 }
