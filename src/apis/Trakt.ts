@@ -323,9 +323,9 @@ class Trakt {
 
   static async refreshTokenIfNecessary(token: Token): Promise<void | Token> {
     const expirationDate = (token.created_at + token.expires_in) * 1000;
-    const aDay = 1000 * 60 * 60 * 24;
+    const aMinute = 1000 * 60;
 
-    if (new Date() > new Date(expirationDate - aDay)) {
+    if (new Date() > new Date(expirationDate - aMinute)) {
       return Trakt.refreshToken(token);
     }
 
