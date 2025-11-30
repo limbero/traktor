@@ -362,7 +362,7 @@ class Trakt {
 
   static async getHiddenShows(): Promise<HiddenItem[]> {
     return Trakt.get(
-      'https://api.trakt.tv/users/hidden/progress_watched?type=show&limit=100'
+      'https://api.trakt.tv/users/hidden/dropped?type=show&limit=1000'
     );
   }
 
