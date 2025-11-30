@@ -449,7 +449,7 @@ class Trakt {
     };
 
     return Util.fetchJsonWithRetry(
-      'https://api.trakt.tv/users/hidden/progress_watched',
+      'https://api.trakt.tv/users/hidden/dropped',
       {
         method: 'POST',
         body: JSON.stringify(payload),
