@@ -80,12 +80,16 @@ function ShowsProgress() {
       const fetchedShows = nonHiddenShowsProgress
         .map((show, index): ZustandShowWithProgress => {
           const watched = nonHiddenShows[index];
+          const showWithCorrectResetAt = {
+            ...show,
+            reset_at: new Date(watched.reset_at).toISOString(),
+          };
           return {
             addedFromSearchOrWatchlist: false,
             title: watched.show.title,
             ids: watched.show.ids,
             aired: show.aired,
-            completed: Trakt.countWatchedSinceReset(show),
+            completed: Trakt.countWatchedSinceReset(showWithCorrectResetAt),
             last_watched_at: watched.last_watched_at,
             reset_at: Trakt.showResetAt(watched),
             seasons: show.seasons,

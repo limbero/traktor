@@ -44,6 +44,11 @@ const Show: React.FunctionComponent<ShowProps> = ({ id }: ShowProps) => {
   const [elementWidth, setElementWidth] = useState(Number.MIN_VALUE);
   const showElement = useRef<HTMLDivElement>(null);
 
+  const showWithCorrectResetAt = {
+    ...show,
+    reset_at: initialShow.reset_at,
+  };
+
   useEffect(() => {
     fetchImage();
   }, [show.ids.trakt]);
@@ -157,13 +162,17 @@ const Show: React.FunctionComponent<ShowProps> = ({ id }: ShowProps) => {
 
   const updateProgress = async (currentShow: ZustandShowWithProgress) => {
     const newProgress = await Trakt.getShowProgressExtended(currentShow.ids.trakt);
+    const newProgressWithCorrectResetAt = {
+      ...newProgress,
+      reset_at: new Date(initialShow.reset_at).toISOString(),
+    };
 
     let newProgressWithTitleAndIds: ZustandShowWithProgress = {
       ...currentShow,
       aired: newProgress.aired,
-      completed: Trakt.countWatchedSinceReset(newProgress),
+      completed: Trakt.countWatchedSinceReset(newProgressWithCorrectResetAt),
       last_watched_at: newProgress.last_watched_at,
-      reset_at: Trakt.showResetAt(newProgress),
+      reset_at: Trakt.showResetAt(newProgressWithCorrectResetAt),
       seasons: newProgress.seasons,
       runtime: newProgress.last_episode?.runtime || newProgress.next_episode?.runtime,
     };
@@ -202,12 +211,16 @@ const Show: React.FunctionComponent<ShowProps> = ({ id }: ShowProps) => {
         return;
       }
       const newProgress = await Trakt.getShowProgressExtended(showNotFromSearch.ids.trakt);
+      const newProgressWithCorrectResetAt = {
+        ...newProgress,
+        reset_at: new Date(initialShow.reset_at).toISOString(),
+      };
       showNotFromSearch = {
         ...showNotFromSearch,
         aired: newProgress.aired,
-        completed: Trakt.countWatchedSinceReset(newProgress),
+        completed: Trakt.countWatchedSinceReset(newProgressWithCorrectResetAt),
         last_watched_at: newProgress.last_watched_at,
-        reset_at: Trakt.showResetAt(newProgress),
+        reset_at: Trakt.showResetAt(newProgressWithCorrectResetAt),
         seasons: newProgress.seasons,
         next_episode: showNotFromSearch.next_episode,
         runtime: newProgress.last_episode?.runtime || newProgress.next_episode?.runtime,
@@ -279,7 +292,7 @@ const Show: React.FunctionComponent<ShowProps> = ({ id }: ShowProps) => {
           ref={showElement}
         >
           <div className="show-top-area">
-            <ShowProgressBar show={show} />
+            <ShowProgressBar show={showWithCorrectResetAt} />
             <p
               className="title"
               onClick={() => updateProgress(show)}
